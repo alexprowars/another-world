@@ -25,7 +25,7 @@
 		<div id="sectionA" class="tab-pane fade in active">
 			<? if ($otdel > 0): ?>
 				<? if ($otdel == 1): ?>
-					<h4 class="text-center">Регистратура кланов</h4>
+					<h4 class="text-xs-center">Регистратура кланов</h4>
 					<table class="table">
 						<tr>
 							<td>
@@ -141,7 +141,7 @@
 						<tr>
 							<? for ($g = 1; $g < 50; $g++): ?>
 								<? if ($g > 1 && ($g-1)%6 == 0) echo "<tr>"; ?>
-								<td class="text-center">
+								<td class="text-xs-center">
 									<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Купить это образ?', 'load(\'/map/?otdel=<?=$otdel ?>&image=<?=$g ?>\')')"><img src="/images/avatar/obraz/<?=$this->user->sex ?>/<?=$g ?>.png"></a>
 								</td>
 							<? endfor; ?>

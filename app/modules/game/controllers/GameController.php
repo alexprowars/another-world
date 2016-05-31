@@ -26,20 +26,11 @@ class GameController extends Application
 	public function initialize()
 	{
 		parent::initialize();
-
-		$this->tag->setDocType(Tag::HTML5);
-		$this->tag->setTitle($this->config->app->name);
+		
 		$this->view->setMainView('frames');
 
 		$js = $this->assets->collection('js');
-		$js->addJs('js/jquery-1.11.2.min.js');
-		$js->addJs('js/main.js');
 		$js->addJs('js/chat.js');
-
-		$css = $this->assets->collection('css');
-		$css->addJs('css/bootstrap.css');
-		$css->addJs('css/main.css');
-		$css->addJs('css/style.css');
 	}
 
     public function indexAction()

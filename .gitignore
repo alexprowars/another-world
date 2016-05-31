@@ -8,3 +8,6 @@ Thumbs.db
 *.map
 public/assets/admin/*
 public/assets/global/*
+node_modules/*
+public/css/bootstap.css
+public/css/style.css

@@ -6,18 +6,18 @@
 		<td align="center" valign="top" style="padding:0 10px;">
 			<table width="100%" class="impackForm">
 				<tr>
-					<th class="text-center">Бой</th>
+					<th class="text-xs-center">Бой</th>
 				</tr>
 				<tr>
-					<td class="text-center">
+					<td class="text-xs-center">
 						<div id="msg"></div>
 						<div id="centerContent"></div>
 						<div id="indicatorLoad" style="display:none;"><img src="/images/refresh.gif" alt=""></div>
 						<table class="table actions">
 							<tr>
-								<td class="text-center"><input type="button" value='Ударить' class="standbut" onClick="gofight()"></td>
-								<td class="text-center"><input type="button" value='Сменить' onclick='Spisok();' class="standbut"></td>
-								<td class="text-center" id="refresh_b"><input type="button" value='Обновить' onclick='loaderRefresh();' class="standbut"></td>
+								<td class="text-xs-center"><input type="button" value='Ударить' class="standbut" onClick="gofight()"></td>
+								<td class="text-xs-center"><input type="button" value='Сменить' onclick='Spisok();' class="standbut"></td>
+								<td class="text-xs-center" id="refresh_b"><input type="button" value='Обновить' onclick='loaderRefresh();' class="standbut"></td>
 							</tr>
 						</table>
 					</td>
@@ -25,7 +25,7 @@
 			</table>
 			<div id="usersContent"></div>
 			<div id="centerInfo" style="display:block;"></div>
-			<div class="text-center timeout">
+			<div class="text-xs-center timeout">
 				До тайм-аута: <b id='timeout'></b>
 				<HR color=e2e0e0>
 				<b>Полный лог боя <a href="<?=$this->url->get('logs/') ?>?log=<?= $this->user->battle ?>" target="_blank"> тут</a></b>

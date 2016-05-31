@@ -21,9 +21,9 @@
 						<tbody>
 							<? foreach ($refers as $user): ?>
 								<tr>
-									<td class="text-center"><?=$user['username'] ?></td>
-									<td class="text-center"><?=$user['level'] ?></td>
-									<td class="text-center">
+									<td class="text-xs-center"><?=$user['username'] ?></td>
+									<td class="text-xs-center"><?=$user['level'] ?></td>
+									<td class="text-xs-center">
 										<? if (time() - $user['lpv'] < 180): ?>
 											<font color="green">OnLine</font>
 										<? else: ?>

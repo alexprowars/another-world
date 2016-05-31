@@ -5,7 +5,7 @@
 
 <div class="actions">
 	<div class="text-left">В игре: <?=count($users) ?> | <a href="?show=<?=(($show == 1) ? 2 : 1) ?>"><?=_getText('rooms', $this->user->room) ?></a> (<?=(($show == 1) ? 'мир' : 'комната') ?>)</div>
-	<div class="text-center"><a href="?sort=1" <?=($sort == 1 ? 'class="active"' : '') ?>>а-я</a> | <a href="?sort=2" <?=($sort == 2 ? 'class="active"' : '') ?>>я-а</a> | <a href="?sort=3" <?=($sort == 3 ? 'class="active"' : '') ?>>0-10</a> | <a href="?sort=4" <?=($sort == 4 ? 'class="active"' : '') ?>>10-0</a></div>
+	<div class="text-xs-center"><a href="?sort=1" <?=($sort == 1 ? 'class="active"' : '') ?>>а-я</a> | <a href="?sort=2" <?=($sort == 2 ? 'class="active"' : '') ?>>я-а</a> | <a href="?sort=3" <?=($sort == 3 ? 'class="active"' : '') ?>>0-10</a> | <a href="?sort=4" <?=($sort == 4 ? 'class="active"' : '') ?>>10-0</a></div>
 </div>
 <?
 	foreach ($users as $pl)
@@ -23,7 +23,7 @@
 
 				<nobr><a href="javascript:to('<?=$pl['username'] ?>')" title="Послать сообщение"><?=$pl['username'] ?></a> <b>[<?=$pl['level'] ?>]</b> <a href="/info/?id=<?=$pl['id'] ?>&frame=Y" target="main" title="Посмотреть инфу" class="chat"><img src="/images/images/inf.gif" title="Посмотреть инфу" align="absmiddle"></a></nobr>
 
-				<div class="pull-right">
+				<div class="pull-xs-right">
 					<? if ($pl['status'] != 999): ?>
 						 <img src="/images/chat/status<?=$pl['status'] ?>.gif" title="<?=_getText('status', $pl['status']) ?>" width="15" height="15">
 					<? endif; ?>

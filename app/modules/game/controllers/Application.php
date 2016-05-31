@@ -78,7 +78,7 @@ class Application extends Controller
 			$css->addJs('css/jquery.toast.min.css');
 			$css->addJs('css/jquery.confirm.min.css');
 			$css->addJs('css/bootstrap.css');
-			$css->addJs('css/main.css');
+			$css->addJs('css/style.css');
 		}
 
 		if ($this->auth->isAuthorized())

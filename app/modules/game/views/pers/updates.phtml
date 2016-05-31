@@ -4,7 +4,7 @@
 	<? endif; ?>
 
 	<div class="row">
-		<div class="col-xs-12 text-center">
+		<div class="col-xs-12 text-xs-center">
 			<div class="" style="background: #930407;padding:2px;">
 				<font color=FFFFFF><b>Физические параметры [<u><?= $this->user->s_updates ?></u>]</b></font>
 			</div>
@@ -15,8 +15,8 @@
 			<tr>
 				<th></th>
 				<th>Параметр</th>
-				<th class="text-center">Текущая прокачка</th>
-				<th class="text-center">Действие</th>
+				<th class="text-xs-center">Текущая прокачка</th>
+				<th class="text-xs-center">Действие</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -28,10 +28,10 @@
 					<td class="col-xs-4 text-left">
 						<?=$title ?>
 					</td>
-					<td class="col-xs-4 text-center">
+					<td class="col-xs-4 text-xs-center">
 						<b><?=$this->user->{$code} ?></b> очков
 					</td>
-					<td class="col-xs-4 text-center">
+					<td class="col-xs-4 text-xs-center">
 						<? if ($this->user->s_updates > 0): ?>
 							<a href="javascript:;" title='Увеличить' onclick="confirmDialog('Подтвердите действие', 'Увеличить физический параметр <?=$title ?>?', 'load(\'/pers/updates/?update=<?=$code ?>\')')">
 								<input class="btn btn-success" type="button" value="прокачать">

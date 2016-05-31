@@ -14,8 +14,8 @@
 				<tr>
 					<th>Ник</th>
 					<th>Комната</th>
-					<th class="text-center">Кем является</th>
-					<th class="text-center">Статус</th>
+					<th class="text-xs-center">Кем является</th>
+					<th class="text-xs-center">Статус</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -34,14 +34,14 @@
 						<td>
 							<?=_getText('rooms', $user['room']) ?>
 						</td>
-						<td class="text-center">
+						<td class="text-xs-center">
 							<? if ($user['ignor'] == 0): ?>
 								<b><font color='green'>Друг</font></b>
 							<? elseif ($user['ignor'] == 1): ?>
 								<b><font color='red'>Враг (игнор)</font></b>
 							<? endif; ?>
 						</td>
-						<td class="text-center">
+						<td class="text-xs-center">
 							<? if ($user['rank'] == 100): ?>
 								<b><font color='red'>OffLine</font></b>
 							<? else: ?>

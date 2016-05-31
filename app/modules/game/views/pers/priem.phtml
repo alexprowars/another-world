@@ -10,18 +10,18 @@
 	<table class="table table-striped vertical">
 		<thead>
 			<tr>
-				<th width="50" class="text-center">№</th>
-				<th width="300" class="text-center">Название</th>
-				<th class="text-center">Действие</th>
+				<th width="50" class="text-xs-center">№</th>
+				<th width="300" class="text-xs-center">Название</th>
+				<th class="text-xs-center">Действие</th>
 			</tr>
 		</thead>
 		<tbody>
 			<? for ($i = 1; $i < 11; $i++): ?>
 				<? if (isset($priems[$i]) && $priems[$i] != 0): ?>
 					<tr>
-						<td class="text-center"><?=$i ?></td>
-						<td class="text-center"><?=$priem_full[$priems[$i]]['name'] ?></td>
-						<td class="text-center">
+						<td class="text-xs-center"><?=$i ?></td>
+						<td class="text-xs-center"><?=$priem_full[$priems[$i]]['name'] ?></td>
+						<td class="text-xs-center">
 							<a class="btn btn-danger" href="<?=$this->url->get("pers/priem/") ?>?unset_priem=<?=$i ?>">Убрать</a>
 						</td>
 					</tr>
@@ -35,36 +35,36 @@
 	<table class="table table-striped vertical">
 		<thead>
 			<tr>
-				<th width="120" class="text-center">Название</th>
+				<th width="120" class="text-xs-center">Название</th>
 				<th width="40%">Информация</th>
-				<th width="20" class="text-center">lvl</th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/block.gif'></th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/hit.gif'></th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/krit.gif'></th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/parry.gif'></th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/hp.gif'></th>
-				<th width="20" class="text-center"><img src='/images/battle/priem/spirit.gif'></th>
-				<th class="text-center">Действие</th>
+				<th width="20" class="text-xs-center">lvl</th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/block.gif'></th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/hit.gif'></th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/krit.gif'></th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/parry.gif'></th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/hp.gif'></th>
+				<th width="20" class="text-xs-center"><img src='/images/battle/priem/spirit.gif'></th>
+				<th class="text-xs-center">Действие</th>
 			</tr>
 		</thead>
 		<tbody>
 			<? if (is_array($priem_full)): ?>
 				<? foreach ($priem_full as $id => $info): if (isset($info['onset'])) continue; ?>
 					<tr>
-						<td class="text-center">
+						<td class="text-xs-center">
 							<small><?= $info['name'] ?></small>
 						</td>
-						<td class="text-center">
+						<td class="text-xs-center">
 							<small><?= $info['about'] ?></small>
 						</td>
-						<td class="text-center"><?= $info['level'] ?></td>
-						<td class="text-center"><?= $info['block'] ?></td>
-						<td class="text-center"><?= $info['hit'] ?></td>
-						<td class="text-center"><?= $info['krit'] ?></td>
-						<td class="text-center"><?= $info['parry'] ?></td>
-						<td class="text-center"><?= $info['dam'] ?></td>
-						<td class="text-center"><?= $info['mag'] ?></td>
-						<td class="text-center"><a class="btn btn-primary" href='<?=$this->url->get("pers/priem/") ?>?onset_priem=<?= $id ?>'>Использовать</a></td>
+						<td class="text-xs-center"><?= $info['level'] ?></td>
+						<td class="text-xs-center"><?= $info['block'] ?></td>
+						<td class="text-xs-center"><?= $info['hit'] ?></td>
+						<td class="text-xs-center"><?= $info['krit'] ?></td>
+						<td class="text-xs-center"><?= $info['parry'] ?></td>
+						<td class="text-xs-center"><?= $info['dam'] ?></td>
+						<td class="text-xs-center"><?= $info['mag'] ?></td>
+						<td class="text-xs-center"><a class="btn btn-primary" href='<?=$this->url->get("pers/priem/") ?>?onset_priem=<?= $id ?>'>Использовать</a></td>
 					</tr>
 				<? endforeach; ?>
 			<? endif; ?>

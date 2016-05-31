@@ -31,13 +31,13 @@
 		<? if ($battleId == 0): ?>
 			<table class="type">
 				<tr>
-					<td class="col-xs-4 text-center">
+					<td class="col-xs-4 text-xs-center">
 						<b><a class="<?= ($battleType == 1 ? 'active' : '') ?>" href="<?=$this->url->get('battle/') ?>?battle_type=1">PvP</a></b>
 					</td>
-					<td class="col-xs-4 text-center">
+					<td class="col-xs-4 text-xs-center">
 						<b><a class="<?= ($battleType == 2 ? 'active' : '') ?>" href="<?=$this->url->get('battle/') ?>?battle_type=2">Групповые</a></b>
 					</td>
-					<td class="col-xs-4 text-center">
+					<td class="col-xs-4 text-xs-center">
 						<b><a class="<?= ($battleType == 3 ? 'active' : '') ?>" href="<?=$this->url->get('battle/') ?>?battle_type=3">Хаотические</a></b>
 					</td>
 				</tr>

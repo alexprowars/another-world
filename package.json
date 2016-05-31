@@ -1,0 +1,18 @@
+{
+	"name": "another-world",
+	"version": "1.0.0",
+	"description": "Anover World Styles",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/alexprowars/another-world.git"
+	},
+	"main": "index.php",
+	"author": "AlexPro (alexprowars@gmail.com)",
+	"license": "ISC",
+	"dependencies": {
+		"gulp": "^3.9.1",
+		"gulp-autoprefixer": "^3.1.0",
+		"gulp-sass": "^2.3.1",
+		"gulp-uglifycss": "^1.0.6"
+	}
+}

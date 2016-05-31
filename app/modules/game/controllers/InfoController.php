@@ -7,8 +7,6 @@ class InfoController extends Application
 {
 	public function initialize ()
 	{
-		$this->tag->setTitle('Установка образа');
-
 		parent::initialize();
 
 		$js = $this->assets->collection('js');

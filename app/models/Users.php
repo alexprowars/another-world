@@ -152,10 +152,10 @@ class Users extends Model
 		return $this->id;
 	}
 
-    public function getSource()
-    {
-        return DB_PREFIX."users";
-    }
+	public function getSource()
+	{
+		return DB_PREFIX."users";
+	}
 
 	public function afterUpdate ()
 	{
@@ -254,10 +254,10 @@ class Users extends Model
 		if ($this->isEdit)
 		{
 			// МФ
-			$this->krit 	+= ($this->dex * 5);
-			$this->unkrit 	+= ($this->dex * 5);
-			$this->uv 		+= ($this->agility * 5);
-			$this->unuv 	+= ($this->agility * 5);
+			$this->krit		+= ($this->dex * 5);
+			$this->unkrit	+= ($this->dex * 5);
+			$this->uv		+= ($this->agility * 5);
+			$this->unuv		+= ($this->agility * 5);
 		}
 
 		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
@@ -273,13 +273,13 @@ class Users extends Model
 					$this->{$stat} += $effect[$stat];
 			}
 
-			$this->br1 		+= $effect['br1'];
-			$this->br2 		+= $effect['br2'];
-			$this->br3 		+= $effect['br3'];
-			$this->br4 		+= $effect['br4'];
-			$this->br5 		+= $effect['br5'];
-			$this->min 		+= $effect['min'];
-			$this->max 		+= $effect['max'];
+			$this->br1		+= $effect['br1'];
+			$this->br2		+= $effect['br2'];
+			$this->br3		+= $effect['br3'];
+			$this->br4		+= $effect['br4'];
+			$this->br5		+= $effect['br5'];
+			$this->min		+= $effect['min'];
+			$this->max		+= $effect['max'];
 
 			$this->effects++;
 		}
@@ -352,28 +352,28 @@ class Users extends Model
 					$this->{$stat} += $object->{$stat};
 			}
 
-			$this->hp 			+= $object->hp;
-			$this->energy 		+= $object->energy;
+			$this->hp			+= $object->hp;
+			$this->energy		+= $object->energy;
 
-			$this->br1 		+= $object->br1;
-			$this->br2 		+= $object->br2;
-			$this->br3 		+= $object->br3;
-			$this->br4 		+= $object->br4;
-			$this->br5 		+= $object->br5;
+			$this->br1		+= $object->br1;
+			$this->br2		+= $object->br2;
+			$this->br3		+= $object->br3;
+			$this->br4		+= $object->br4;
+			$this->br5		+= $object->br5;
 
-			$this->krit 	+= $object->krit;
-			$this->mkrit 	+= $object->mkrit;
-			$this->unkrit 	+= $object->unkrit;
-			$this->uv 		+= $object->uv;
-			$this->unuv 	+= $object->unuv;
+			$this->krit		+= $object->krit;
+			$this->mkrit	+= $object->mkrit;
+			$this->unkrit	+= $object->unkrit;
+			$this->uv		+= $object->uv;
+			$this->unuv		+= $object->unuv;
 
-			$this->pblock 	+= $object->pblock;
-			$this->mblock 	+= $object->mblock;
-			$this->pbr 		+= $object->pbr;
-			$this->kbr 		+= $object->kbr;
+			$this->pblock	+= $object->pblock;
+			$this->mblock	+= $object->mblock;
+			$this->pbr		+= $object->pbr;
+			$this->kbr		+= $object->kbr;
 
-			$this->min 		+= $object->min_d;
-			$this->max 		+= $object->max_d;
+			$this->min		+= $object->min_d;
+			$this->max		+= $object->max_d;
 		}
 	}
 
@@ -412,30 +412,30 @@ class Users extends Model
 					$this->{$stat} += $object->{$stat};
 			}
 
-			$this->hp 			+= $object->hp;
-			$this->energy 		+= $object->energy;
+			$this->hp			+= $object->hp;
+			$this->energy		+= $object->energy;
 
 			if ($this->isEdit)
 			{
-				$this->br1 		+= $object->br1;
-				$this->br2 		+= $object->br2;
-				$this->br3 		+= $object->br3;
-				$this->br4 		+= $object->br4;
-				$this->br5 		+= $object->br5;
+				$this->br1		+= $object->br1;
+				$this->br2		+= $object->br2;
+				$this->br3		+= $object->br3;
+				$this->br4		+= $object->br4;
+				$this->br5		+= $object->br5;
 
-				$this->krit 	+= $object->krit;
-				$this->mkrit 	+= $object->mkrit;
-				$this->unkrit 	+= $object->unkrit;
-				$this->uv 		+= $object->uv;
-				$this->unuv 	+= $object->unuv;
+				$this->krit		+= $object->krit;
+				$this->mkrit	+= $object->mkrit;
+				$this->unkrit	+= $object->unkrit;
+				$this->uv		+= $object->uv;
+				$this->unuv		+= $object->unuv;
 
-				$this->pblock 	+= $object->pblock;
-				$this->mblock 	+= $object->mblock;
-				$this->pbr 		+= $object->pbr;
-				$this->kbr 		+= $object->kbr;
+				$this->pblock	+= $object->pblock;
+				$this->mblock	+= $object->mblock;
+				$this->pbr		+= $object->pbr;
+				$this->kbr		+= $object->kbr;
 
-				$this->min 		+= $object->min_d;
-				$this->max 		+= $object->max_d;
+				$this->min		+= $object->min_d;
+				$this->max		+= $object->max_d;
 			}
 
 			$info = $object->getInf();
@@ -501,34 +501,30 @@ class Users extends Model
 
 		$parse += $this->toArray();
 
-		foreach ($this->storage->stats as $stat)
-			$parse[$stat] = $parse['s_'.$stat];
+		$parse['hp_now']		= round($this->hp_now);
+		$parse['energy_now']	= round($this->energy_now);
 
-		$parse['hp_now'] 		= round($this->hp_now);
-		$parse['energy_now'] 	= round($this->energy_now);
-
-		$parse['hp'] 		= $this->hp;
-		$parse['energy'] 	= $this->energy;
-		$parse['br1'] 		= $this->br1;
-		$parse['br2'] 		= $this->br2;
-		$parse['br3'] 		= $this->br3;
-		$parse['br4'] 		= $this->br4;
-		$parse['br5'] 		= $this->br5;
-		$parse['min'] 		= $this->min;
-		$parse['max'] 		= $this->max;
-		$parse['krit'] 		= $this->krit;
-		$parse['unkrit'] 	= $this->unkrit;
-		$parse['uv'] 		= $this->uv;
-		$parse['unuv'] 		= $this->unuv;
-		$parse['mblock'] 	= $this->mblock;
-		$parse['pbr'] 		= $this->pbr;
-		$parse['kbr'] 		= $this->kbr;
-		$parse['pblock'] 	= $this->pblock;
-		$parse['mkrit'] 	= $this->mkrit;
-
-		$parse['hp_max'] 		= $this->hp_max;
-		$parse['ustal_max'] 	= $this->ustal_max;
-		$parse['energy_max'] 	= $this->energy_max;
+		$parse['hp']		= $this->hp;
+		$parse['energy']	= $this->energy;
+		$parse['br1']		= $this->br1;
+		$parse['br2']		= $this->br2;
+		$parse['br3']		= $this->br3;
+		$parse['br4']		= $this->br4;
+		$parse['br5']		= $this->br5;
+		$parse['min']		= $this->min;
+		$parse['max']		= $this->max;
+		$parse['krit']		= $this->krit;
+		$parse['unkrit']	= $this->unkrit;
+		$parse['uv']		= $this->uv;
+		$parse['unuv']		= $this->unuv;
+		$parse['mblock']	= $this->mblock;
+		$parse['pbr']		= $this->pbr;
+		$parse['kbr']		= $this->kbr;
+		$parse['pblock']	= $this->pblock;
+		$parse['mkrit']		= $this->mkrit;
+		$parse['hp_max']	= $this->hp_max;
+		$parse['ustal_max']	= $this->ustal_max;
+		$parse['energy_max']= $this->energy_max;
 
 		$parse['w_h'] = $this->getPercent($this->hp_now, $this->hp_max);
 		$parse['w_e'] = $this->getPercent($this->energy_now, $this->energy_max);
@@ -617,6 +613,14 @@ class Users extends Model
 	{
 		$this->db->updateAsDict($this->getSource(), $fields, ['conditions' => 'id = ?', 'bind' => array(($userId > 0 ? $userId : $this->id))]);
 	}
+
+	public function toArray ($columns = null)
+	{
+		$result = parent::toArray($columns);
+
+		foreach ($this->storage->stats as $stat)
+			$result[$stat] = $result['s_'.$stat];
+
+		return $result;
+	}
 }
- 
-?>

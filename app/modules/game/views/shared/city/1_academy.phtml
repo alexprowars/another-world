@@ -38,21 +38,21 @@
 										<tr>
 											<th width=18 align=center><b>№</b></th>
 											<th><b>Наименование</b></th>
-											<th width=150 class="text-center">Уровень</th>
-											<th width=150 class="text-center">Срок обучения</th>
-											<th width=160 class="text-center">Стоимость обучения</th>
-											<th class="text-center" width=120>Действие</th>
+											<th width=150 class="text-xs-center">Уровень</th>
+											<th width=150 class="text-xs-center">Срок обучения</th>
+											<th width=160 class="text-xs-center">Стоимость обучения</th>
+											<th class="text-xs-center" width=120>Действие</th>
 										</tr>
 									</thead>
 									<tbody>
 										<? foreach ($professions as $i => $item): ?>
 										<tr>
-											<td class="text-center"><b><?=($i + 1) ?></b></td>
+											<td class="text-xs-center"><b><?=($i + 1) ?></b></td>
 											<td><b><?=$item['title'] ?></b></td>
-											<td class="text-center"><b><?=$item['level'] ?></b></td>
-											<td class="text-center"><b><?=(round($item['srok']/60,1)) ?> мин.</b></td>
-											<td class="text-center"><b><?=$item['price'] ?> зол.</b></td>
-											<td class="text-center">
+											<td class="text-xs-center"><b><?=$item['level'] ?></b></td>
+											<td class="text-xs-center"><b><?=(round($item['srok']/60,1)) ?> мин.</b></td>
+											<td class="text-xs-center"><b><?=$item['price'] ?> зол.</b></td>
+											<td class="text-xs-center">
 												<? if ($this->user->r_time == 0): ?>
 													<a href="javascript:;" class="btn btn-primary" onclick="confirmDialog('Подтвердите действие', 'Вы действительно хотите получить данную профессию?', 'load(\'<?=$this->url->get('map/') ?>?learn=<?=$item['id'] ?>\')')">Обучаться</a>
 												<? endif; ?>
