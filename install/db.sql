@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Май 31 2016 г., 16:43
+-- Время создания: Май 31 2016 г., 19:48
 -- Версия сервера: 5.7.12-log
 -- Версия PHP: 5.6.20-0+deb8u1
 
@@ -328,7 +328,7 @@ CREATE TABLE IF NOT EXISTS `game_config` (
 --
 
 INSERT INTO `game_config` (`key`, `value`, `type`) VALUES
-('totalUsers', '1', 'text'),
+('totalUsers', '0', 'text'),
 ('totalLight', '0', 'text'),
 ('totalDark', '0', 'text');
 
@@ -2360,7 +2360,24 @@ CREATE TABLE IF NOT EXISTS `game_slots` (
   `i20` int(10) NOT NULL DEFAULT '0',
   `i21` int(10) NOT NULL DEFAULT '0',
   `i22` int(10) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `game_slots`
+--
+
+INSERT INTO `game_slots` (`id`, `user_id`, `i1`, `i2`, `i3`, `i4`, `i5`, `i6`, `i7`, `i8`, `i9`, `i10`, `i11`, `i12`, `i13`, `i14`, `i15`, `i16`, `i17`, `i18`, `i19`, `i20`, `i21`, `i22`) VALUES
+(1, 12, 32, 39, 31, 22, 110, 109, 108, 107, 25, 106, 105, 104, 35, 33, 36, 0, 0, 0, 0, 0, 38, 37),
+(2, 13, 79, 0, 0, 90, 0, 100, 99, 98, 80, 97, 96, 95, 81, 91, 94, 89, 0, 0, 0, 0, 0, 0),
+(3, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(4, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(5, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(6, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(9, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(10, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(11, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2455,13 +2472,13 @@ CREATE TABLE IF NOT EXISTS `game_users` (
   `exp` int(11) unsigned NOT NULL DEFAULT '0',
   `credits` float(10,2) NOT NULL DEFAULT '0.00',
   `f_credits` float(10,2) NOT NULL DEFAULT '0.00',
-  `strength` smallint(6) NOT NULL DEFAULT '3',
-  `dex` smallint(6) NOT NULL DEFAULT '3',
-  `agility` smallint(6) NOT NULL DEFAULT '3',
-  `vitality` smallint(6) NOT NULL DEFAULT '3',
-  `power` smallint(6) NOT NULL DEFAULT '1',
-  `razum` smallint(6) NOT NULL DEFAULT '0',
-  `battery` smallint(6) NOT NULL DEFAULT '1',
+  `s_strength` smallint(6) NOT NULL DEFAULT '3',
+  `s_dex` smallint(6) NOT NULL DEFAULT '3',
+  `s_agility` smallint(6) NOT NULL DEFAULT '3',
+  `s_vitality` smallint(6) NOT NULL DEFAULT '3',
+  `s_power` smallint(6) NOT NULL DEFAULT '1',
+  `s_razum` smallint(6) NOT NULL DEFAULT '0',
+  `s_battery` smallint(6) NOT NULL DEFAULT '1',
   `hp_now` decimal(12,1) NOT NULL DEFAULT '15.0',
   `hp_max` int(11) unsigned NOT NULL DEFAULT '0',
   `energy_now` int(11) NOT NULL DEFAULT '20',
@@ -2502,7 +2519,24 @@ CREATE TABLE IF NOT EXISTS `game_users` (
   `ip` bigint(20) NOT NULL DEFAULT '0',
   `options_toggle` int(11) NOT NULL DEFAULT '0',
   `bonus` int(11) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `game_users`
+--
+
+INSERT INTO `game_users` (`id`, `tutorial`, `username`, `authlevel`, `group_id`, `rank`, `admin`, `banaday`, `r_time`, `r_type`, `ma_time`, `silence`, `ch_time`, `t_time`, `invisible`, `level`, `up`, `exp`, `credits`, `f_credits`, `s_strength`, `s_dex`, `s_agility`, `s_vitality`, `s_power`, `s_razum`, `s_battery`, `hp_now`, `hp_max`, `energy_now`, `otravl`, `s_updates`, `o_updates`, `wins`, `losses`, `drawn`, `room`, `v_room`, `tribe`, `tribe_rank`, `b_tribe`, `sex`, `battle`, `last_battle`, `offer`, `side`, `obraz`, `proff`, `active`, `item_type`, `sign`, `travma`, `t_level`, `t_type`, `onlinetime`, `ic`, `ustal_now`, `immun`, `status`, `reit`, `vip`, `refer`, `battle_drop`, `rank_info`, `ip`, `options_toggle`, `bonus`) VALUES
+(1, 0, 'Клон', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00, 0.00, 2, 3, 3, 3, 3, 0, 3, '15.0', 15, 15, 0, 3, 0, 111, 939, 102, 2, 0, 0, 0, 0, 1, 336, 336, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434810891, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(2, 0, 'Ловкая Мона', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0.00, 0.00, 20, 10, 35, 20, 3, 0, 3, '0.0', 100, 15, 0, 3, 0, 193, 520, 39, 2, 0, 0, 0, 0, 2, 295, 295, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434703490, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(3, 0, 'Чуткая Джесси', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00, 0.00, 4, 3, 3, 4, 3, 0, 3, '0.0', 20, 15, 0, 3, 0, 27, 999, 66, 2, 0, 0, 0, 0, 2, 168, 168, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1433686954, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(4, 0, 'Эдвард Руки Ножницы', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0.00, 0.00, 20, 30, 10, 20, 3, 0, 3, '76.0', 100, 15, 0, 3, 0, 73, 444, 23, 2, 0, 0, 0, 0, 1, 272, 272, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434046244, 0, 10, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(5, 0, 'Потный Гарри', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0.00, 0.00, 55, 5, 100, 30, 3, 0, 3, '0.0', 150, 15, 0, 0, 0, 92, 939, 52, 2, 0, 0, 0, 0, 1, 324, 324, NULL, 1, '0', 0, 1, 1, 1206046800, 1200818659, 1, 4, 1434794180, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(6, 0, 'Наивная Изольда', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0.00, 0.00, 40, 80, 5, 35, 3, 0, 3, '0.0', 175, 15, 0, 0, 0, 84, 1517, 49, 2, 0, 0, 0, 0, 2, 323, 323, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434794165, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(7, 0, 'Мамочка', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0.00, 0.00, 7, 3, 8, 6, 3, 0, 3, '0.0', 30, 15, 0, 1, 0, 90, 947, 37, 2, 0, 0, 0, 0, 1, 176, 176, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1433695740, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(8, 0, 'Легендарный Сноб', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0.00, 0.00, 7, 10, 3, 6, 3, 0, 3, '21.0', 30, 15, 0, 0, 0, 146, 947, 46, 2, 0, 0, 0, 0, 1, 202, 202, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1433700859, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(9, 0, 'Бабушка Скорпа', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0.00, 0.00, 80, 200, 50, 50, 30, 0, 3, '0.0', 250, 15, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 351, 351, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1464462081, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(10, 0, 'Слепой Гудвин', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0.00, 0.00, 8, 15, 6, 9, 3, 0, 3, '0.0', 45, 15, 0, 0, 0, 229, 2612, 127, 2, 0, 0, 0, 0, 1, 291, 291, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434562152, 0, 15, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
+(11, 0, 'Летучий Голандец', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 20, 0.00, 0.00, 9, 3, 20, 15, 3, 0, 3, '0.0', 75, 15, 0, 0, 0, 123, 1753, 63, 2, 0, 0, 0, 0, 1, 287, 287, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434560449, 0, 25, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -3353,7 +3387,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=814;
 -- AUTO_INCREMENT для таблицы `game_slots`
 --
 ALTER TABLE `game_slots`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT для таблицы `game_tribes`
 --
@@ -3373,7 +3407,7 @@ MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT для таблицы `game_users`
 --
 ALTER TABLE `game_users`
-MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT для таблицы `game_users_auth`
 --

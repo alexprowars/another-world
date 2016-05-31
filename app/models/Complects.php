@@ -12,7 +12,7 @@ class Complects extends Model
 
 	public function getSource()
 	{
-	 	return "game_complects";
+	 	return DB_PREFIX."complects";
 	}
 
 	public function getData ()

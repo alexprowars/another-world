@@ -1,13 +1,13 @@
 <?php
 
 use App\Auth\Auth;
+use App\Database;
 use App\Game;
 use Phalcon\Crypt;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Url as UrlResolver;
-use Phalcon\Db\Adapter\Pdo\Mysql as DbAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Logger;
 use Phalcon\Mvc\Dispatcher;
@@ -47,7 +47,7 @@ $di->set(
 		/**
 		 * @var Object $config
 		 */
-		$connection = new DbAdapter(array
+		$connection = new Database(array
 		(
 			'host' 		=> $config->database->host,
 			'username' 	=> $config->database->username,
@@ -114,7 +114,7 @@ $di->set(
 
 $di->set('modelsMetadata', function()
 {
-	$metaData = new \Phalcon\Mvc\Model\MetaData\Memcache([
+	$metaData = new \Phalcon\Mvc\Model\MetaData\Memory([
 		'lifetime'		=> 86400,
 		'prefix'		=> 'aw',
 		'host'			=> 'localhost',
@@ -132,6 +132,8 @@ $di->setShared(
 		return $registry;
 	}
 );
+
+$di->getShared('game')->loadGameVariables();
 
 Model::setup(array(
 	'events' 			=> true,

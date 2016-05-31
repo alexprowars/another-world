@@ -87,14 +87,16 @@ class Application extends Controller
 
 			if (($this->user->r_time > 0 && $this->user->r_type == 0) || ($this->user->r_time == 0 && $this->user->r_type != 0))
 			{
-				$this->db->query("UPDATE `game_users` SET `r_time` = '0', `r_type` = '0' WHERE `id` = '".$this->user->id."'");
-
 				$this->user->r_time = 0;
 				$this->user->r_type = 0;
+				$this->user->update();
 			}
 
 			if ($this->user->last_battle)
-				$this->db->query("UPDATE `game_users` SET `last_battle` = '0' WHERE `id` = '" . $this->user->id . "'");
+			{
+				$this->user->last_battle = 0;
+				$this->user->update();
+			}
 
 			$dispatch = '';
 

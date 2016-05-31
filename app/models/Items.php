@@ -57,7 +57,7 @@ class Items extends Model
 
 	public function getSource()
 	{
-	 	return "game_items";
+	 	return DB_PREFIX."items";
 	}
 
 	public function onConstruct()

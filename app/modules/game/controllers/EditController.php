@@ -78,8 +78,8 @@ class EditController extends Application
 			$item_type = $this->request->get('item_type', 'int');
 			$item_type = ($item_type < 1 || $item_type > 9) ? 1 : $item_type;
 
-			$this->db->query("UPDATE game_users SET item_type = " . $item_type . " WHERE id = '" . $this->user->getId() . "'");
 			$this->user->item_type = $item_type;
+			$this->user->update();
 		}
 
 		$kit = ($this->user->item_type == 9);

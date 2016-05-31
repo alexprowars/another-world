@@ -18,7 +18,7 @@ class Market extends Model
 
 	public function getSource()
 	{
-	 	return "game_market";
+	 	return DB_PREFIX."market";
 	}
 
 	public function onConstruct()

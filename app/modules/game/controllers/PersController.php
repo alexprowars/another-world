@@ -23,8 +23,7 @@ class PersController extends Application
 			if (is_numeric($this->request->getPost('update_status')))
 			{
 				$this->user->status = $this->request->getPost('update_status', 'int');
-
-				$this->db->query("UPDATE game_users SET status = '" . $this->user->status . "' WHERE id = '" . $this->user->getId() . "'");
+				$this->user->update();
 
 				$this->cookies->set('chat_showonline', $this->request->getPost('showonline', 'int'));
 				$this->cookies->set('chat_showstat', $this->request->getPost('showstat', 'int'));
@@ -86,8 +85,7 @@ class PersController extends Application
 				{
 					$this->user->s_updates--;
 					$this->user->{$st_name}++;
-
-					$this->db->query("UPDATE game_users SET s_updates = s_updates - 1, " . $st_name . " = " . $st_name . " + 1 WHERE id = " . $this->user->getId() . " AND s_updates > 0");
+					$this->user->update();
 
 					$msg = "Удачно увеличили физический параметр \""._getText('stats', $st_name)."\"!";
 				}

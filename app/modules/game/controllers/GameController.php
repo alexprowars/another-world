@@ -19,12 +19,14 @@ use Phalcon\Tag;
  * @property \App\Auth\Auth auth
  * @property \Phalcon\Mvc\Dispatcher dispatcher
  */
-class GameController extends Controller
+class GameController extends Application
 {
 	private $message = '';
 
 	public function initialize()
 	{
+		parent::initialize();
+
 		$this->tag->setDocType(Tag::HTML5);
 		$this->tag->setTitle($this->config->app->name);
 		$this->view->setMainView('frames');

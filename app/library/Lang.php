@@ -1,5 +1,12 @@
 <?php
+
 namespace App;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Text;
 
@@ -84,5 +91,3 @@ class Lang
 			return '##'. Text::upper(implode('::', $args)).'##';
 	}
 }
- 
-?>

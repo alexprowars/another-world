@@ -15,7 +15,7 @@ class Shop extends Model
 
 	public function getSource()
 	{
-	 	return "game_shop";
+	 	return DB_PREFIX."shop";
 	}
 
 	public function onConstruct()

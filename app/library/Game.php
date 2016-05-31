@@ -1,5 +1,12 @@
 <?php
+
 namespace App;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use App\Models\Users;
 use Phalcon\Mvc\User\Component;
@@ -302,6 +309,15 @@ class Game extends Component
 		}
 	}
 
+	public function loadGameVariables ()
+	{
+		require_once(APP_PATH."app/vars.php");
+
+		/** @var array $stats */
+
+		$this->storage->stats = $stats;
+	}
+
 	public function setMessage ($message = '')
 	{
 		$this->message = $message;
@@ -322,5 +338,3 @@ class Game extends Component
 		return $this->status;
 	}
 }
- 
-?>

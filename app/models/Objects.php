@@ -53,7 +53,7 @@ class Objects extends Model
 
 	public function getSource()
 	{
-	 	return "game_objects";
+	 	return DB_PREFIX."objects";
 	}
 
 	public function getInf ()

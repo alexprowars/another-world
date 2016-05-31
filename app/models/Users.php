@@ -78,6 +78,7 @@ class Users extends Model
 	public $ustal_now;
 	public $ustal_max = 0;
 
+	// Вычисляемые игровые характеристики
 	public $strength;
 	public $dex;
 	public $agility;
@@ -85,6 +86,15 @@ class Users extends Model
 	public $power;
 	public $razum;
 	public $battery;
+
+	// Характеристики из БД
+	public $s_strength;
+	public $s_dex;
+	public $s_agility;
+	public $s_vitality;
+	public $s_power;
+	public $s_razum;
+	public $s_battery;
 
 	/**
 	 * Вычисляемые модификаторы
@@ -100,28 +110,33 @@ class Users extends Model
 	public $min = 0;
 	public $max = 0;
 
-	public $krit 	= 0;
-	public $unkrit 	= 0;
-	public $uv 		= 0;
-	public $unuv 	= 0;
+	public $krit	= 0;
+	public $unkrit	= 0;
+	public $uv		= 0;
+	public $unuv	= 0;
 
-	public $mblock 	= 0;
-	public $pbr 		= 0;
-	public $kbr 		= 0;
-	public $pblock 	= 0;
-	public $mkrit 	= 0;
+	public $mblock	= 0;
+	public $pbr		= 0;
+	public $kbr		= 0;
+	public $pblock	= 0;
+	public $mkrit	= 0;
 
 	private $db;
 	private $slots;
 
+	private $storage;
+
 	public function onConstruct()
 	{
 		$this->db = $this->getDI()->getShared('db');
+		$this->storage = $this->getDI()->getShared('storage');
 
 		if ($this->getDI()->getShared('router')->getControllerName() == 'edit')
 			$this->isEdit = true;
 
 		$this->hasOne('id', 'App\Models\Slots', 'user_id', Array('alias' => 'slot'));
+
+		$this->useDynamicUpdate(true);
 	}
 
 	public function isAdmin()
@@ -139,8 +154,13 @@ class Users extends Model
 
     public function getSource()
     {
-        return "game_users";
+        return DB_PREFIX."users";
     }
+
+	public function afterUpdate ()
+	{
+		$this->setSnapshotData($this->toArray());
+	}
 
 	public function unpackOptions ($opt, $isToggle = true)
 	{
@@ -202,8 +222,8 @@ class Users extends Model
 	{
 		if ($room != $this->room)
 		{
-			$this->db->query("UPDATE person SET room = '".intval($room)."' WHERE id = '".$this->id."'");
 			$this->room = $room;
+			$this->update();
 		}
 	}
 
@@ -213,6 +233,14 @@ class Users extends Model
 		$result = min(100, max(0, $result));
 
 		return $result;
+	}
+
+	public function afterFetch()
+	{
+		foreach ($this->storage->stats as $stat)
+		{
+			$this->{$stat} = $this->{'s_'.$stat};
+		}
 	}
 
 	public function checkEffects ()
@@ -239,13 +267,12 @@ class Users extends Model
 		{
 			$this->auraInfo[] = $effect;
 
-			$this->strength += $effect['strength'];
-			$this->dex 		+= $effect['dex'];
-			$this->agility 	+= $effect['agility'];
-			$this->vitality += $effect['vitality'];
-			$this->power 	+= $effect['power'];
-			$this->razum 	+= $effect['razum'];
-			$this->battery 	+= $effect['battery'];
+			foreach ($this->storage->stats as $stat)
+			{
+				if (isset($effect[$stat]))
+					$this->{$stat} += $effect[$stat];
+			}
+
 			$this->br1 		+= $effect['br1'];
 			$this->br2 		+= $effect['br2'];
 			$this->br3 		+= $effect['br3'];
@@ -259,20 +286,11 @@ class Users extends Model
 
 		// Конец эффектов
 
-		if ($this->strength < 0)
-			$this->strength = 0;
-		if ($this->dex < 0)
-			$this->dex = 0;
-		if ($this->agility < 0)
-			$this->agility = 0;
-		if ($this->vitality < 0)
-			$this->vitality = 0;
-		if ($this->power < 0)
-			$this->power = 0;
-		if ($this->razum < 0)
-			$this->razum = 0;
-		if ($this->battery < 0)
-			$this->battery = 0;
+		foreach ($this->storage->stats as $stat)
+		{
+			if ($this->{$stat} < 0)
+				$this->{$stat} = 0;
+		}
 
 		// HP, Energy, Battery
 
@@ -281,28 +299,18 @@ class Users extends Model
 		$this->ustal_max = $this->battery * 20;
 
 		if ($this->hp_max != $hp_max)
-		{
-			$this->db->query("UPDATE `game_users` SET `hp_max` = '" . $hp_max . "' WHERE `id` = '" . $this->getId() . "'");
 			$this->hp_max = $hp_max;
-		}
 
 		if ($this->hp_now > $this->hp_max)
-		{
-			$this->db->query("UPDATE `game_users` SET `hp_now` = '" . $this->hp_max . "' WHERE `id` = '" . $this->getId() . "'");
 			$this->hp_now = $this->hp_max;
-		}
 
 		if ($this->energy_now > $this->energy_max)
-		{
-			$this->db->query("UPDATE `game_users` SET `energy_now` = '" . $this->energy_max . "' WHERE `id` = '" . $this->getId() . "'");
 			$this->energy_now = $this->energy_max;
-		}
 
 		if ($this->ustal_now > $this->ustal_max)
-		{
-			$this->db->query("UPDATE `game_users` SET `ustal_now` = '" . $this->ustal_max . "' WHERE `id` = '" . $this->getId() . "'");
 			$this->ustal_now = $this->ustal_max;
-		}
+
+		$this->update();
 	}
 
 	/**
@@ -338,11 +346,11 @@ class Users extends Model
 
 		foreach ($wears as $object)
 		{
-			$this->strength 	+= $object->strength;
-			$this->agility 		+= $object->agility;
-			$this->dex 			+= $object->dex;
-			$this->vitality 	+= $object->vitality;
-			$this->razum 		+= $object->razum;
+			foreach ($this->storage->stats as $stat)
+			{
+				if (isset($object->{$stat}))
+					$this->{$stat} += $object->{$stat};
+			}
 
 			$this->hp 			+= $object->hp;
 			$this->energy 		+= $object->energy;
@@ -398,11 +406,11 @@ class Users extends Model
 
 			$object->setPosition($i);
 
-			$this->strength 	+= $object->strength;
-			$this->agility 		+= $object->agility;
-			$this->dex 			+= $object->dex;
-			$this->vitality 	+= $object->vitality;
-			$this->razum 		+= $object->razum;
+			foreach ($this->storage->stats as $stat)
+			{
+				if (isset($object->{$stat}))
+					$this->{$stat} += $object->{$stat};
+			}
 
 			$this->hp 			+= $object->hp;
 			$this->energy 		+= $object->energy;
@@ -493,6 +501,9 @@ class Users extends Model
 
 		$parse += $this->toArray();
 
+		foreach ($this->storage->stats as $stat)
+			$parse[$stat] = $parse['s_'.$stat];
+
 		$parse['hp_now'] 		= round($this->hp_now);
 		$parse['energy_now'] 	= round($this->energy_now);
 
@@ -528,9 +539,12 @@ class Users extends Model
 		$rait = $this->getUserRaiting();
 
 		if ($this->reit != $rait)
-			$this->db->query("UPDATE game_users SET reit = '" . $rait . "' WHERE id = '" . $this->getId() . "'");
+		{
+			$this->reit = $rait;
+			$this->update();
+		}
 
-		$parse['rating'] = $rait;
+		$parse['rating'] = $this->reit;
 
 		$parse['proffession'] = _getText('proffessions', $this->proff);
 		$parse['actions'] = $this->renderUserStatus();
@@ -597,6 +611,11 @@ class Users extends Model
 		}
 
 		return $result;
+	}
+
+	public function saveData ($fields, $userId = 0)
+	{
+		$this->db->updateAsDict($this->getSource(), $fields, ['conditions' => 'id = ?', 'bind' => array(($userId > 0 ? $userId : $this->id))]);
 	}
 }
  

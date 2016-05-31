@@ -9,7 +9,7 @@ class News extends Model
 
 	public function getSource()
 	{
-	 	return "game_news";
+	 	return DB_PREFIX."news";
 	}
 }
 

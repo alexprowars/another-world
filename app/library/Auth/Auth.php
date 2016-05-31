@@ -90,6 +90,8 @@ class Auth extends Component
 
 				$UserRow = new Users;
 				$UserRow->assign($raw);
+				$UserRow->setSnapshotData($raw);
+				$UserRow->afterFetch();
 
 				$options = $UserRow->unpackOptions($UserRow->options_toggle);
 

@@ -35,7 +35,7 @@ class Slots extends Model
 
 	public function getSource()
 	{
-	 	return "game_slots";
+	 	return DB_PREFIX."slots";
 	}
 
 	public function onConstruct()
