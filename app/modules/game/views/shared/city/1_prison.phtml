@@ -1,7 +1,7 @@
 <? $this->view->partial('shared/city_header', Array('title' => 'Тюрьма')); ?>
 <div class="textblock">
 	<div class="row">
-		<div class="col-xs-12 text-right">
+		<div class="col-xs-12 text-xs-right">
 			<a href="<?=$this->url->get('map/') ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
 			<? if ($this->user->t_time < time()): ?>
 				<a href="<?=$this->url->get('map/') ?>?refer=666"><img src='/images/images/back.gif' alt='Вернуться'></a>

@@ -1,7 +1,7 @@
 <? $this->view->partial('shared/city_header', Array('title' => 'Список Друзей / Врагов')); ?>
 <div class="textblock">
 	<div class="row">
-		<div class="col-xs-12 text-right">
+		<div class="col-xs-12 text-xs-right">
 			<a href="/pers/friends/"><img src='/images/images/refresh.gif' alt='Обновить'></a>
 			<a href='/pers/'><img src='/images/images/back.gif' alt='Вернуться'></a>
 		</div>
@@ -67,13 +67,13 @@
 			<form method="POST" action="/pers/friends/?act=add" class="form-horizontal">
 				<fieldset>
 					<legend>Добавить</legend>
-					<div class="form-group">
+					<div class="form-group row">
 						<label class="col-xs-6 control-label">Введите ник:</label>
 						<div class="col-xs-6">
 							<input type="text" name="name" value="<?=$this->request->getPost('name') ?>" class="form-control input-sm">
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group row">
 						<label class="col-xs-6 control-label">Кем будет являться:</label>
 						<div class="col-xs-6">
 							<select name="dr" class="form-control input-sm">
@@ -83,25 +83,25 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-6 col-xs-push-6">
+						<div class="col-xs-6 push-xs-6">
 							<button type="submit" class="btn btn-primary">Добавить</button>
 						</div>
 					</div>
 				</fieldset>
 			</form>
 		</div>
-		<div class="col-xs-5 col-xs-push-2">
+		<div class="col-xs-5 push-xs-2">
 			<form method="POST" action="/pers/friends/?act=del" class="form-horizontal">
 				<fieldset>
 					<legend>Удалить</legend>
-					<div class="form-group">
+					<div class="form-group row">
 						<label class="col-xs-6 control-label">Введите ник:</label>
 						<div class="col-xs-6">
 							<input type="text" name="name" value="<?=$this->request->getPost('name') ?>" class="form-control input-sm">
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-6 col-xs-push-6">
+						<div class="col-xs-6 push-xs-6">
 							<button type="submit" class="btn btn-primary">Удалить</button>
 						</div>
 					</div>

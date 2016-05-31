@@ -7,17 +7,20 @@
   max-width: 100%;
   margin-bottom: $spacer;
 
+  > thead > tr > th,
+  > thead > tr > td,
+  > tbody > tr > th,
+  > tbody > tr > td {
+    padding: $table-cell-padding;
+    vertical-align: top;
+  }
+
   thead th {
     vertical-align: bottom;
-    border-bottom: (2 * $table-border-width) solid $table-border-color;
   }
 
   tbody + tbody {
     border-top: (2 * $table-border-width) solid $table-border-color;
-  }
-
-  .table {
-    background-color: $body-bg;
   }
 }
 
