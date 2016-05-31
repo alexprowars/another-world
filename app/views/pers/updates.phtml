@@ -1,0 +1,47 @@
+<div class="textblock">
+	<? if (!empty($message)): ?>
+		<p class="message bg-danger"><?=$message ?></p>
+	<? endif; ?>
+
+	<div class="row">
+		<div class="col-xs-12 text-center">
+			<div class="" style="background: #930407;padding:2px;">
+				<font color=FFFFFF><b>Физические параметры [<u><?= $this->user->s_updates ?></u>]</b></font>
+			</div>
+		</div>
+	</div>
+	<table class="table vertical">
+		<thead>
+			<tr>
+				<th></th>
+				<th>Параметр</th>
+				<th class="text-center">Текущая прокачка</th>
+				<th class="text-center">Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<? foreach (_getText('stats') as $code => $title): ?>
+				<tr>
+					<td>
+						<img src="/images/help.gif" class="tooltip text" data-content="<b><?=$title ?></b><br><?=_getText('stats-info', $code) ?>">
+					</td>
+					<td class="col-xs-4 text-left">
+						<?=$title ?>
+					</td>
+					<td class="col-xs-4 text-center">
+						<b><?=$this->user->{$code} ?></b> очков
+					</td>
+					<td class="col-xs-4 text-center">
+						<? if ($this->user->s_updates > 0): ?>
+							<a href="javascript:;" title='Увеличить' onclick="confirmDialog('Подтвердите действие', 'Увеличить физический параметр <?=$title ?>?', 'load(\'/pers/updates/?update=<?=$code ?>\')')">
+								<input class="btn btn-success" type="button" value="прокачать">
+							</a>
+						<? else: ?>
+							нет очков
+						<? endif; ?>
+					</td>
+				</tr>
+			<? endforeach; ?>
+		</tbody>
+	</table>
+</div>
