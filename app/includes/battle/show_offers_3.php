@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var \App\Controllers\MapController $this
+ * @var \App\Game\Controllers\MapController $this
  */
 
 if (!isset($userOffer['BattleID']))

@@ -1,9 +1,9 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Models\Users;
 
-class InfoController extends ControllerBase
+class InfoController extends Application
 {
 	public function initialize ()
 	{
@@ -11,7 +11,7 @@ class InfoController extends ControllerBase
 
 		parent::initialize();
 
-		$js = $this->assets->collection('jsHeader');
+		$js = $this->assets->collection('js');
 		$js->addJs('js/inf.js');
 	}
 

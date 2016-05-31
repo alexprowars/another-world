@@ -1,9 +1,9 @@
 <?
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Battle\Battle;
 
-class BattleController extends ControllerBase
+class BattleController extends Application
 {
 	public function initialize ()
 	{
@@ -112,7 +112,7 @@ class BattleController extends ControllerBase
 						}
 						else
 						{
-							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . user::get()->getId() . "");
+							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . $this->user->getId() . "");
 						}
 
 						unset($userOffer);

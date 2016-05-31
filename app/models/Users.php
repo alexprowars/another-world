@@ -116,9 +116,9 @@ class Users extends Model
 
 	public function onConstruct()
 	{
-		$this->db = $this->getDi()->getShared('db');
+		$this->db = $this->getDI()->getShared('db');
 
-		if ($this->getDi()->getShared('router')->getControllerName() == 'edit')
+		if ($this->getDI()->getShared('router')->getControllerName() == 'edit')
 			$this->isEdit = true;
 
 		$this->hasOne('id', 'App\Models\Slots', 'user_id', Array('alias' => 'slot'));
@@ -535,7 +535,7 @@ class Users extends Model
 		$parse['proffession'] = _getText('proffessions', $this->proff);
 		$parse['actions'] = $this->renderUserStatus();
 
-		return $this->getDi()->getShared('view')->getPartial('shared/person', Array('parse' => $parse));
+		return $this->getDI()->getShared('view')->getPartial('shared/person', Array('parse' => $parse));
 	}
 
 	function renderUserStatus ()

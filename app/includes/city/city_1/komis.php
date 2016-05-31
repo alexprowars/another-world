@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Controllers\MapController $this
+ * @var \App\Game\Controllers\MapController $this
  */
 
 $otdel = $this->request->get('otdel', 'int', 0);

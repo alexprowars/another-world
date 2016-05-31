@@ -25,11 +25,11 @@ class Complects extends Model
 		/**
 		 * @var $db \Phalcon\Db\Adapter\Pdo\Mysql
 		 */
-		$db = $this->getDi()->getShared('db');
+		$db = $this->getDI()->getShared('db');
 		/**
 		 * @var $user \App\Models\Users
 		 */
-		$user = $this->getDi()->getShared('user');
+		$user = $this->getDI()->getShared('user');
 
 		$data = $this->getData();
 

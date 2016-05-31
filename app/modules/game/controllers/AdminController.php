@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use Phalcon\Mvc\Controller;
 use Phalcon\Tag;
@@ -27,7 +27,7 @@ class AdminController extends Controller
 
 	public function initialize ()
 	{
-		$this->tag->setDoctype(Tag::HTML5);
+		$this->tag->setDocType(Tag::HTML5);
 		$this->tag->setTitle($this->config->app->name);
 		$this->view->setMainView('admin');
 

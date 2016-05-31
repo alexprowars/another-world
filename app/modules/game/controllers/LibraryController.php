@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class LibraryController extends ControllerBase
+class LibraryController extends Application
 {
 	public function initialize ()
 	{

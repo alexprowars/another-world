@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class TribeController extends ControllerBase
+class TribeController extends Application
 {
 	private $tribe = [];
 

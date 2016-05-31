@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Controllers\ControllerBase $this
+ * @var \App\Game\Controllers\Application $this
  */
 
 define('SHOP_ID', 1);

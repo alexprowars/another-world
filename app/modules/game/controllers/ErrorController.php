@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class ErrorController extends ControllerBase
+class ErrorController extends Application
 {
 	public function initialize ()
 	{

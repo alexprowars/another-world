@@ -1,9 +1,9 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use Phalcon\Mvc\View;
 
-class PersController extends ControllerBase
+class PersController extends Application
 {
 	public function initialize ()
 	{

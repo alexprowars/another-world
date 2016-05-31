@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var $this App\Controllers\ControllerBase
+ * @var $this App\Game\Controllers\ControllerBase
  */
 
 use App\Models\Objects;

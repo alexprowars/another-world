@@ -23,7 +23,7 @@ class Market extends Model
 
 	public function onConstruct()
 	{
-		$this->hasOne("item_id", "App\Models\Objects", "id", Array('alias' => 'Object'));
+		$this->hasOne("item_id", 'App\Models\Objects', "id", Array('alias' => 'Object'));
 	}
 
 	public function getObject($parameters = null)

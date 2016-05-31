@@ -1,10 +1,10 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Lang;
 use Phalcon\Mvc\View;
 
-class ChatController extends ControllerBase
+class ChatController extends Application
 {
 	public function initialize()
 	{

@@ -1,9 +1,9 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Models\Complects;
 
-class EditController extends ControllerBase
+class EditController extends Application
 {
 	public function initialize ()
 	{

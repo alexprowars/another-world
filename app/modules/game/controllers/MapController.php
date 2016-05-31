@@ -1,7 +1,7 @@
 <?
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class MapController extends ControllerBase
+class MapController extends Application
 {
     public function indexAction()
     {

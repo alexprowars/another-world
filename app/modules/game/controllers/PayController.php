@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class PayController extends ControllerBase
+class PayController extends Application
 {
 	public function initialize ()
 	{

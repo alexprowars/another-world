@@ -20,7 +20,7 @@ class Shop extends Model
 
 	public function onConstruct()
 	{
-		$this->hasMany("id", "App\Models\ShopItems", "shop_id", Array('alias' => 'ShopItems'));
+		$this->hasMany("id", 'App\Models\ShopItems', "shop_id", Array('alias' => 'ShopItems'));
 	}
 
 	public function getShopItems($parameters = null)

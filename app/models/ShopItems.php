@@ -24,16 +24,16 @@ class ShopItems extends Model
 
 	public function onConstruct()
 	{
-	 	$this->belongsTo("shop_id", "App\Models\Shop", "id", Array('alias' => 'shop'));
-	 	$this->belongsTo("item_id", "App\Models\Items", "id", Array('alias' => 'item'));
+	 	$this->belongsTo("shop_id", 'App\Models\Shop', "id", Array('alias' => 'shop'));
+	 	$this->belongsTo("item_id", 'App\Models\Items', "id", Array('alias' => 'item'));
 	}
 
 	public function buy ()
 	{
 		$result = '';
 
-		$user = $this->getDi()->getShared('user');
-		$db = $this->getDi()->getShared('db');
+		$user = $this->getDI()->getShared('user');
+		$db = $this->getDI()->getShared('db');
 
 		if ($this->cnt > 0)
 		{
@@ -80,7 +80,7 @@ class ShopItems extends Model
 						{
 							$result = "Вы купили предмет <u>" . $this->item->title . "</u> за <u>" . $this->item->price . "</u> ".($this->item->f_price > 0 ? 'пл.' : 'зол.');
 
-							$game = $this->getDi()->getShared('game');
+							$game = $this->getDI()->getShared('game');
 							$game->addToLog($user->id, 'купил', $this->item->title.' ('.$price.' '.($this->item->f_price > 0 ? 'пл.' : 'зол.').')', 'гос магазин');
 						}
 					}

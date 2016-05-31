@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Lang;
 use App\Tutorial;
@@ -8,7 +8,7 @@ use Phalcon\Mvc\View;
 use Phalcon\Tag;
 
 /**
- * Class ControllerBase
+ * Class Application
  * @property \Phalcon\Mvc\View view
  * @property \Phalcon\Tag tag
  * @property \Phalcon\Assets\Manager assets
@@ -25,13 +25,31 @@ use Phalcon\Tag;
  * @property \App\Auth\Auth auth
  * @property \Phalcon\Mvc\Dispatcher dispatcher
  * @property \Phalcon\Flash\Direct flash
- * @property \Phalcon\Config config
+ * @property \stdClass config
  * @property \App\Game game
  */
-class ControllerBase extends Controller
+class Application extends Controller
 {
+	private static $isInitialized = false;
+
     public function initialize()
 	{
+		if (self::$isInitialized)
+			return true;
+
+		self::$isInitialized = true;
+
+		if (function_exists('sys_getloadavg'))
+		{
+			$load = sys_getloadavg();
+
+			if ($load[0] > 15)
+			{
+				header('HTTP/1.1 503 Too busy, try again later');
+				die('Server too busy. Please try again later.');
+			}
+		}
+
 		$this->view->setMainView('game');
 
 		Lang::setLang($this->config->app->language);
@@ -42,9 +60,9 @@ class ControllerBase extends Controller
 		{
 			$this->tag->setTitleSeparator(' | ');
 			$this->tag->setTitle($this->config->app->name);
-	        $this->tag->setDoctype(Tag::HTML5);
+	        $this->tag->setDocType(Tag::HTML5);
 
-			$js = $this->assets->collection('jsHeader');
+			$js = $this->assets->collection('js');
 			$js->addJs('js/jquery-1.11.2.min.js');
 			$js->addJs('js/jquery-ui.js');
 			$js->addJs('js/jquery.form.min.js');
@@ -54,11 +72,8 @@ class ControllerBase extends Controller
 			$js->addJs('js/battle.js');
 			$js->addJs('js/shop.js');
 			$js->addJs('js/main.js');
-			//$js->setTargetPath('js/final.js');
-			//$js->setTargetUri('js/final.js');
-			//$js->addFilter(new Jsmin());
 
-			$css = $this->assets->collection('cssHeader');
+			$css = $this->assets->collection('css');
 			$css->addJs('css/jquery-ui.css');
 			$css->addJs('css/jquery.toast.min.css');
 			$css->addJs('css/jquery.confirm.min.css');
@@ -140,6 +155,11 @@ class ControllerBase extends Controller
 				$tutorial = new Tutorial();
 				$this->game->tutorial = $tutorial->getArray();
 			}
+
+			$controller = $this->dispatcher->getControllerName();
+
+			if ($controller == 'index')
+				$this->dispatcher->forward(['controller' => 'game', 'action' => 'index']);
 		}
 
 		return true;
@@ -154,14 +174,29 @@ class ControllerBase extends Controller
 		}
 	}
 
-	public function message ($text, $title = '')
+	public function message ($text, $title = '', $redirect = '', $timeout = 5)
 	{
 		$this->view->pick('shared/message');
 		$this->view->setVar('text', $text);
 		$this->view->setVar('title', $title);
+		$this->view->setVar('destination', $redirect);
+		$this->view->setVar('time', $timeout);
+
+		$this->tag->setTitle(($title ? strip_tags($title) : 'Сообщение'));
+
 		$this->view->start();
 
-		return true;
+		$this->view->render(
+			$this->dispatcher->getControllerName(),
+			$this->dispatcher->getActionName(),
+			$this->dispatcher->getParams()
+		);
+
+		$this->view->finish();
+
+		echo $this->view->getContent();
+
+		die();
 	}
 }
  

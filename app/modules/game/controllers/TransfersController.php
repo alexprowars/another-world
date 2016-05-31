@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class TransfersController extends ControllerBase
+class TransfersController extends Application
 {
 	public function initialize ()
 	{

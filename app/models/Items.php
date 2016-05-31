@@ -62,14 +62,14 @@ class Items extends Model
 
 	public function onConstruct()
 	{
-		$this->hasMany("id", "App\Models\ShopItems", "item_id", Array('alias' => 'ShopItems'));
+		$this->hasMany("id", 'App\Models\ShopItems', "item_id", Array('alias' => 'ShopItems'));
 	}
 
 	public function getMinDemands ()
 	{
 		$result = '';
 
-		$user = $this->getDi()->getShared('user');
+		$user = $this->getDI()->getShared('user');
 
 		if ($this->min_level > 0)
 		{
@@ -178,7 +178,7 @@ class Items extends Model
 		$inf = $this->name . "|" . $this->title . "|" . $this->price . "|0|" . (int) $this->isSecondHand() . "|" . $this->art . "|0|" . $this->iznos;
 		$min = $this->min_level . "|" . $this->min_strength . "|" . $this->min_dex . "|" . $this->min_agility . "|" . $this->min_vitality . "|" . $this->min_razum . "|0|" . $this->min_proff;
 
-		return $this->getDi()->getShared('db')->insertAsDict(
+		return $this->getDI()->getShared('db')->insertAsDict(
 		   	"game_objects",
 			array
 		   	(

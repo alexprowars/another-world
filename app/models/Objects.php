@@ -186,7 +186,7 @@ class Objects extends Model
 		/**
 		 * @var $user \App\Models\Users
 		 */
-		$user = $this->getDi()->getShared('user');
+		$user = $this->getDI()->getShared('user');
 
 		// Проверка уровня
 		if ($demands[0] > 0)

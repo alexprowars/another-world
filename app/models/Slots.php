@@ -115,7 +115,7 @@ class Slots extends Model
 
 		if (count($items) && $this->save())
 		{
-			$this->getDi()->getShared('db')->query("UPDATE game_objects SET `onset` = '0' WHERE `onset` > '0' AND `user_id` = '".$this->user_id."' AND id IN (".implode(',', $items).")");
+			$this->getDI()->getShared('db')->query("UPDATE game_objects SET `onset` = '0' WHERE `onset` > '0' AND `user_id` = '".$this->user_id."' AND id IN (".implode(',', $items).")");
 		}
 	}
 
@@ -124,11 +124,11 @@ class Slots extends Model
 		/**
 		 * @var $db \Phalcon\Db\Adapter\Pdo\Mysql
 		 */
-		$db = $this->getDi()->getShared('db');
+		$db = $this->getDI()->getShared('db');
 		/**
 		 * @var $user \App\Models\Users
 		 */
-		$user = $this->getDi()->getShared('user');
+		$user = $this->getDI()->getShared('user');
 
 		$message = '';
 

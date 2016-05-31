@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
-class AvatarController extends ControllerBase
+class AvatarController extends Application
 {
 	public function initialize ()
 	{

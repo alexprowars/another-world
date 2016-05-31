@@ -1,5 +1,5 @@
 <?
-namespace App\Controllers;
+namespace App\Game\Controllers;
 
 use App\Mail\PHPMailer;
 use App\Models\Users;
@@ -25,32 +25,37 @@ use Phalcon\Text;
  * @property \Phalcon\Mvc\Dispatcher dispatcher
  * @property \App\Game game
  */
-class IndexController extends Controller
+class IndexController extends Application
 {
 	public function initialize()
 	{
-		$this->tag->setDoctype(Tag::HTML5);
-		$this->view->setMainView('index');
-		$this->tag->setTitleSeparator(' | ');
-		$this->tag->setTitle($this->config->app->name);
+		parent::initialize();
 
-		$js = $this->assets->collection('jsHeader');
-		$js->addJs('js/jquery-1.11.2.min.js');
-		$js->addJs('js/index/swf.js');
-		$js->addJs('js/index/common.js');
+		if (!$this->auth->isAuthorized())
+		{
+			$this->tag->setDocType(Tag::HTML5);
+			$this->view->setMainView('index');
+			$this->tag->setTitleSeparator(' | ');
+			$this->tag->setTitle($this->config->app->name);
 
-		$css = $this->assets->collection('cssHeader');
-		$css->addCss('css/index/general.css');
-		$css->addCss('css/index/content.css');
-		$css->addCss('css/style.css');
+			$js = $this->assets->collection('js');
+			$js->addJs('js/jquery-1.11.2.min.js');
+			$js->addJs('js/index/swf.js');
+			$js->addJs('js/index/common.js');
 
-		$totalOnline = $this->db->query("SELECT COUNT(*) AS num FROM `game_users` WHERE `onlinetime` > '".(time() - 200)."'")->fetch()['num'];
-		$registeredToday = $this->db->query("SELECT COUNT(*) AS num FROM `game_users_info` WHERE `register_time` > '".startOfDay()."'")->fetch()['num'];
+			$css = $this->assets->collection('css');
+			$css->addCss('css/index/general.css');
+			$css->addCss('css/index/content.css');
+			$css->addCss('css/style.css');
 
-		$this->view->setVar('totalOnline', $totalOnline);
-		$this->view->setVar('registeredToday', $registeredToday);
-		$this->view->setVar('topUsers', $this->db->query("SELECT username, reit FROM game_users WHERE rank != 60 AND rank != 61 AND admin = 0 order by reit desc limit 0, 20")->fetchAll());
-		$this->view->setVar('topKlans', $this->db->query("SELECT name, points FROM game_tribes order by points desc limit 10")->fetchAll());
+			$totalOnline = $this->db->query("SELECT COUNT(*) AS num FROM `game_users` WHERE `onlinetime` > '".(time() - 200)."'")->fetch()['num'];
+			$registeredToday = $this->db->query("SELECT COUNT(*) AS num FROM `game_users_info` WHERE `register_time` > '".startOfDay()."'")->fetch()['num'];
+
+			$this->view->setVar('totalOnline', $totalOnline);
+			$this->view->setVar('registeredToday', $registeredToday);
+			$this->view->setVar('topUsers', $this->db->query("SELECT username, reit FROM game_users WHERE rank != 60 AND rank != 61 AND admin = 0 order by reit desc limit 0, 20")->fetchAll());
+			$this->view->setVar('topKlans', $this->db->query("SELECT name, points FROM game_tribes order by points desc limit 10")->fetchAll());
+		}
 	}
 
 	public function message ($text, $title = '')

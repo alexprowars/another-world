@@ -4,6 +4,7 @@ use Phalcon\Mvc\Router;
 
 $router = new Router(true);
 $router->removeExtraSlashes(true);
+$router->setDefaultModule('game');
 
 $router->add('/admin/:action/action/([a-zA-Z0-9_-]+)/:params', array
 (

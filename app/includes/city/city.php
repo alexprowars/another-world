@@ -1,6 +1,6 @@
 <?
 /**
- * @var \App\Controllers\MapController $this
+ * @var \App\Game\Controllers\MapController $this
  */
 
 $message = '';
