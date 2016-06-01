@@ -1,13 +1,13 @@
-<?= $this->tag->getDoctype() ?>
+{{ getDoctype() }}
 <html>
 	<head>
-		<?php echo $this->tag->getTitle(); ?>
+		{{ getTitle() }}
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="/favicon.ico">
-		<?php $this->assets->outputCss('css') ?>
-		<?php $this->assets->outputJs('js') ?>
+		{{ assets.outputCss('css') }}
+		{{ assets.outputJs('js') }}
 		<script type="text/javascript">
-			var timestamp = <?=time() ?>;
+			var timestamp = {{ time() }};
 			var timezone = 0;
 			var addToUrl = '';
 		</script>
@@ -15,7 +15,7 @@
 	<body style="overflow: hidden">
 		<div class="game scrollbox">
 			<div class="content" id="gamediv">
-				<?php echo $this->getContent() ?>
+				{{ content() }}
 			</div>
 		</div>
 		<div id="windowDialog"></div>

@@ -1,13 +1,11 @@
-<?= $this->tag->getDoctype() ?>
+{{ getDoctype() }}
 <html lang="ru">
 <head>
-	<?php echo $this->tag->getTitle(); ?>
-	<?= $this->tag->tagHtml('meta', ['name' => 'description', 'content' => 'Отличная RPG онлайн игра посвященная боям и магии. Тысячи жизней, миллионы смертей, два бога, сотни битв между Светом и Тьмой.']) ?>
-	<?= $this->tag->tagHtml('meta', ['name' => 'keywords', 'content' => 'игра, играть, игрушки, онлайн, диалоговый, интернет, Интернет, RPG, фантазия, фэнтези, меч, топор, магия, кулак, удар, блок, атака, защита, мистери оф хероес, бой, битва, отдых, обучение, развлечение, виртуальная реальность, рыцарь, маг, знакомства, чат, лучший, форум, свет, тьма, bk, игры, клан, банк, магазин, клан']) ?>
+	{{ getTitle() }}
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="shortcut icon" href="/favicon.ico">
-	<?php $this->assets->outputCss('css') ?>
-	<?php $this->assets->outputJs('js') ?>
+	{{ assets.outputCss('css') }}
+	{{ assets.outputJs('js') }}
 </head>
 <body>
 

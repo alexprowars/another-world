@@ -56,6 +56,25 @@ class Module implements ModuleDefinitionInterface
 					'compiledExtension'	=> '.cache'
 				]);
 
+				$compiler = $volt->getCompiler();
+
+				$compiler->addFunction('request', function($arguments, $type)
+				{
+					if ($type == 'get')
+						return '$this->request->getQuery(' . $arguments . ')';
+					elseif ($type == 'post')
+						return '$this->request->getPost(' . $arguments . ')';
+					else
+						return '$this->request->get(' . $arguments . ')';
+				});
+
+				$compiler->addFunction('_text', function($arguments)
+				{
+					return '_getText(' . $arguments . ')';
+				});
+
+				$compiler->addFilter('round', 'round');
+
 				return $volt;
 			}]);
 

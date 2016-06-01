@@ -1,16 +1,16 @@
-<?= $this->tag->getDoctype() ?>
+{{ getDoctype() }}
 <html lang="ru">
     <head>
-        <?php echo $this->tag->getTitle(); ?>
-		<?php $this->assets->outputCss('css') ?>
-		<?php $this->assets->outputJs('js') ?>
+		{{ getTitle() }}
+		{{ assets.outputCss('css') }}
+		{{ assets.outputJs('js') }}
 		<link href='//fonts.googleapis.com/css?family=Open+Sans:600&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
     </head>
     <body>
 		<script type="text/javascript">
-			var timestamp = <?=time() ?>;
+			var timestamp = {{ time() }};
 			var timezone = 0;
-			var serverTime = <?=time() ?>000 - Djs + (timezone + <?=(date("Z") / 1800) ?>) * 1800000;
+			var serverTime = {{ time() }}000 - Djs + (timezone + {{ date("Z") / 1800 }}) * 1800000;
 		</script>
 		<input type="hidden" name="message_id" id="message_id" value="0">
 		<div class="frame">
@@ -23,17 +23,17 @@
 						<div class="links">
 							<div class="left">
 								<span>
-									<a href="<?=$this->url->get("map/") ?>" target="main">
+									<a href="{{ url("map/") }}" target="main">
 										<div class="icon_1"></div><div class="icon_1_text">Город</div>
 									</a>
 								</span>
 								<span>
-									<a href="<?=$this->url->get("edit/") ?>" target="main">
+									<a href="{{ url("edit/") }}" target="main">
 										<div class="icon_2"></div><div class="icon_2_text">Персонаж</div>
 									</a>
 								</span>
 								<span>
-									<a href="<?=$this->url->get("library/") ?>" target="main">
+									<a href="{{ url("library/") }}" target="main">
 										<div class="icon_4"></div><div class="icon_4_text">Библиотека</div>
 									</a>
 								</span>
@@ -41,24 +41,24 @@
 							<div class="center logo"></div>
 							<div class="right">
 								<span>
-									<a href="<?=$this->url->get("battle/") ?>" target="main">
+									<a href="{{ url("battle/") }}" target="main">
 										<div class="icon_5"></div><div class="icon_5_text">Поединки</div>
 									</a>
 								</span>
 								<span>
-									<a href="<?=$this->url->get("pers/work/") ?>" target="main">
+									<a href="{{ url("pers/work/") }}" target="main">
 										<div class="icon_6"></div><div class="icon_6_text">Заработок</div>
 									</a>
 								</span>
 								<span>
-									<a href="<?=$this->url->get("pay/") ?>" target="main">
+									<a href="{{ url("pay/") }}" target="main">
 										<div class="icon_7"></div><div class="icon_7_text">Платина</div>
 									</a>
 								</span>
 							</div>
 						</div>
 					</div>
-					<iframe src="<?=$this->url->get("pers/") ?>" class="mainFrame" name="main" id="main" width="100%" height="100%"></iframe>
+					<iframe src="{{ url("pers/") }}" class="mainFrame" name="main" id="main" width="100%" height="100%"></iframe>
 				</div>
 				<div class="bottom">
 					<div class="line" id="linefon"></div>
@@ -95,30 +95,30 @@
 									</a>
 								</td>
 								<!--<td><img src='/images/frames/lbd4.jpg' width='50' height='39' alt=''></td>-->
-								<? if ($this->user->tribe > 0): ?>
+								{% if user.tribe > 0 %}
 									<td><img src="/images/frames/lbd3.jpg" width="11" height="39" alt=""></td>
 									<td>
-										<a href="<?=$this->url->get("tribe/") ?>" target="main" title='Клан'>
+										<a href="{{ url("tribe/") }}" target="main" title='Клан'>
 											<img src='/images/menu/b_m4.jpg' width="40" height="39">
 										</a>
 									</td>
-								<? endif; ?>
-								<? if ($this->user->level >= 6 || $this->user->isAdmin()): ?>
+								{% endif %}
+								{% if user.level >= 6 or user.isAdmin() %}
 									<td><img src="/images/frames/lbd3.jpg" width="11" height="39" alt=""></td>
 									<td>
-										<a href="<?=$this->url->get("transfers/") ?>" target="main" title='Передача предметов / кредитов'>
+										<a href="{{ url("transfers/") }}" target="main" title='Передача предметов / кредитов'>
 											<img src='/images/menu/b_m5.jpg' width="40" height="39">
 										</a>
 									</td>
-								<? endif; ?>
-								<? if (($this->user->rank >= 10 && $this->user->rank < 15) || $this->user->rank >= 98): ?>
+								{% endif %}
+								{% if (user.rank >= 10 and user.rank < 15) or user.rank >=98 %}
 									<td><img src="/images/frames/lbd3.jpg" width="11" height="39" alt=""></td>
 									<td>
-										<a href="<?=$this->url->get("guard/") ?>" target="main" title='Инквизиция'>
+										<a href="{{ url("guard/") }}" target="main" title='Инквизиция'>
 											<img src='/images/menu/b_m6.jpg' width="40" height="39">
 										</a>
 									</td>
-								<? endif; ?>
+								{% endif %}
 								<td><img src="/images/frames/lbd5.jpg" width="51" height="39" border="0" alt="" /></td>
 								<td valign="middle" class="timefon">
 									<div id="clock" class="timer"></div>
@@ -142,7 +142,7 @@
 			</div>
 			<div class="border right"></div>
 		</div>
-		<? if (isset($_REQUEST['viewer_id'])): ?>
+		{% if request('viewer_id') is not empty %}
 			<script src="//vk.com/js/api/xd_connection.js" type="text/javascript"></script>
 			<script type="application/javascript">
 				$(window).load(function()
@@ -150,11 +150,11 @@
 					  VK.init(function() { console.log('vk init success'); }, function() {}, '5.30');
 				});
 			</script>
-		<? endif; ?>
-		<? if (isset($_REQUEST['api_server'])): ?>
-			<script src="<?=$_REQUEST['api_server'] ?>js/fapi5.js" type="text/javascript"></script>
+		{% endif %}
+		{% if request('api_server') is not empty %}
+			<script src="{{ request('api_server') }}js/fapi5.js" type="text/javascript"></script>
 			<script type="text/javascript">
-				FAPI.init('<?=$_REQUEST['api_server'] ?>', '<?=$_REQUEST['apiconnection'] ?>',
+				FAPI.init('{{ request('api_server') }}', '{{ request('apiconnection') }}',
 					function()
 					{
 						console.log('ok api initialized');
@@ -165,7 +165,7 @@
 					}
 				);
 			</script>
-		<? endif; ?>
+		{% endif %}
 		<!-- Yandex.Metrika counter -->
 		<script type="text/javascript">
 		(function (d, w, c) {
