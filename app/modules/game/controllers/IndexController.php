@@ -64,16 +64,6 @@ class IndexController extends Application
 		}
 	}
 
-	public function message ($text, $title = '')
-	{
-		$this->view->pick('shared/message');
-		$this->view->setVar('text', $text);
-		$this->view->setVar('title', $title);
-		$this->view->start();
-
-		return true;
-	}
-
 	public function loginAction ()
 	{
 		if ($this->request->hasPost('email') && $this->request->getPost('email') != '' && $this->request->hasPost('password') && $this->request->getPost('password') != '')

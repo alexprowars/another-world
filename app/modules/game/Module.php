@@ -15,6 +15,7 @@ use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\ModuleDefinitionInterface;
 use Phalcon\Mvc\View;
 use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Mvc\View\Engine\Volt;
 
 class Module implements ModuleDefinitionInterface
 {
@@ -41,6 +42,23 @@ class Module implements ModuleDefinitionInterface
 		{
 			$view = new View();
 			$view->setViewsDir(APP_PATH.$config->application->baseDir.$config->application->modulesDir.'game/'.$config->application->viewsDir);
+
+			if (!is_dir(APP_PATH.$config->application->baseDir.$config->application->cacheDir.'views'))
+				mkdir(APP_PATH.$config->application->baseDir.$config->application->cacheDir.'views');
+
+			$view->registerEngines([".volt" => function ($view, $di) use ($config)
+			{
+				$volt = new Volt($view, $di);
+
+				$volt->setOptions([
+					'compiledPath'		=> APP_PATH.$config->application->baseDir.$config->application->cacheDir.'views/',
+					'compiledSeparator'	=> '|',
+					'compiledExtension'	=> '.cache'
+				]);
+
+				return $volt;
+			}]);
+
 			return $view;
 		});
 
