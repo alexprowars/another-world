@@ -46,5 +46,3 @@ if ($shop_kol == 0)
 	echo "<tr><td align=center><b>У вас нет вещей в инвентаре</b></td></tr>";
 
 echo "</table>";
-
-?>

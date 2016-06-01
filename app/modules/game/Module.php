@@ -2,6 +2,12 @@
 
 namespace App\Game;
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 use App\Auth\Security;
 use Phalcon\DiInterface;
 use Phalcon\Loader;

@@ -58,5 +58,3 @@ $types = $this->db->query("SELECT * FROM game_works_type WHERE 1 = 1 ORDER BY id
 $this->view->setVar('works', $works);
 $this->view->setVar('types', $types);
 $this->view->setVar('message', $message);
-
-?>

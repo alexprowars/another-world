@@ -100,5 +100,3 @@ echo "
 </center>
 </body>
 <BR>";
-
-?>

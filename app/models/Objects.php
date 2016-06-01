@@ -1,10 +1,16 @@
 <?php
+
 namespace App\Models;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\Model;
 
 /**
- * Class Objects
  * @property \Phalcon\Db\Adapter\Pdo\Mysql db
  */
 class Objects extends Model

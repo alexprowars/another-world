@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 use App\Auth\Auth;
 use App\Database;
 use App\Game;
@@ -49,11 +55,11 @@ $di->set(
 		 */
 		$connection = new Database(array
 		(
-			'host' 		=> $config->database->host,
-			'username' 	=> $config->database->username,
-			'password' 	=> $config->database->password,
-			'dbname' 	=> $config->database->dbname,
-			'options' 	=> [PDO::ATTR_PERSISTENT => false, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+			'host'		=> $config->database->host,
+			'username'	=> $config->database->username,
+			'password'	=> $config->database->password,
+			'dbname'	=> $config->database->dbname,
+			'options'	=> [PDO::ATTR_PERSISTENT => false, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
 		));
 
 		return $connection;
@@ -136,9 +142,7 @@ $di->setShared(
 $di->getShared('game')->loadGameVariables();
 
 Model::setup(array(
-	'events' 			=> true,
-	'columnRenaming' 	=> false,
+	'events'			=> true,
+	'columnRenaming'	=> false,
 	'notNullValidations'=> false,
 ));
- 
-?>

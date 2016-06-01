@@ -30,4 +30,3 @@ if (!empty($sale) && is_numeric($sale))
 	}
 	else echo "Предмет не найден в Вашем рюкзаке!";
 }
-?>

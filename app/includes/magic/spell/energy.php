@@ -62,5 +62,3 @@ else
 	$this->insertInChat($MesgForAdd, $enemy->username, true);
 	$this->dropMagic($object['id']);
 }
-
-?>

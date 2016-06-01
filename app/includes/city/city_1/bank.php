@@ -67,5 +67,3 @@ if ($otdel == 1)
 
 $this->view->setVar('message', $message);
 $this->view->setVar('otdel', $otdel);
-
-?>

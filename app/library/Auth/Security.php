@@ -2,6 +2,12 @@
 
 namespace App\Auth;
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 use Phalcon\Acl;
 use Phalcon\Acl\Role;
 use Phalcon\Acl\Resource;
@@ -11,7 +17,6 @@ use Phalcon\Acl\Adapter\Memory as AclList;
 use Phalcon\Mvc\User\Component;
 
 /**
- * Class Security
  * @property \Phalcon\Session\Bag persistent
  */
 class Security extends Component
@@ -99,13 +104,7 @@ class Security extends Component
 
 		return $this->persistent->acl;
 	}
-	/**
-	 * This action is executed before execute any action in the application
-	 *
-	 * @param Event $event
-	 * @param Dispatcher $dispatcher
-	 * @return bool
-	 */
+
 	public function beforeExecuteRoute (Event $event, Dispatcher $dispatcher)
 	{
 		$role = 'Users';

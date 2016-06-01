@@ -184,5 +184,3 @@ if ($this->user->r_type == 8)
 $this->view->pick('shared/city/1_vault');
 $this->view->setVar('message', $message);
 $this->view->setVar('vault', $VaultInfo);
-
-?>

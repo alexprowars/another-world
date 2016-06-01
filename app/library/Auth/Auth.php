@@ -1,5 +1,12 @@
 <?php
+
 namespace App\Auth;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use App\Auth\Ext\Ulogin;
 use App\Auth\Ext\Vk;

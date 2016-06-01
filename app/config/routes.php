@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 use Phalcon\Mvc\Router;
 
 $router = new Router(true);
@@ -23,5 +29,3 @@ $router->add('/', array
 $router->handle();
 
 return $router;
- 
-?>

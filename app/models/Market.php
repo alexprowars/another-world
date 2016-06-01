@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Models;
 
-use Phalcon\Mvc\Model;
-
 /**
- * Class Objects
- * @property \Phalcon\Db\Adapter\Pdo\Mysql db
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
  */
+
+use Phalcon\Mvc\Model;
 
 class Market extends Model
 {
@@ -18,7 +20,7 @@ class Market extends Model
 
 	public function getSource()
 	{
-	 	return DB_PREFIX."market";
+		return DB_PREFIX."market";
 	}
 
 	public function onConstruct()
@@ -28,7 +30,7 @@ class Market extends Model
 
 	public function getObject($parameters = null)
 	{
-	 	return $this->getRelated('Object', $parameters);
+		return $this->getRelated('Object', $parameters);
 	}
 }
 

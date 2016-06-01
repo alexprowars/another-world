@@ -61,5 +61,3 @@ if ($otdel == 4)
 {
 	$this->view->setVar('list', $this->db->query("SELECT * FROM game_tribes ORDER BY id ASC")->fetchAll());
 }
-
-?>

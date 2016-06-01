@@ -144,6 +144,7 @@ class POP3 {
    * @param integer $tval
    * @param string $username
    * @param string $password
+   * @return bool
    */
   public function Authorise ($host, $port = false, $tval = false, $username, $password, $debug_level = 0) {
     $this->host = $host;
@@ -407,4 +408,3 @@ class POP3 {
 
   //  End of class
 }
-?>

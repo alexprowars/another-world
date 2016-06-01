@@ -1,11 +1,17 @@
 <?php
+
 namespace App\Game\Controllers;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\Controller;
 use Phalcon\Tag;
 
 /**
- * Class ControllerBase
  * @property \Phalcon\Mvc\View view
  * @property \Phalcon\Tag tag
  * @property \Phalcon\Assets\Manager assets

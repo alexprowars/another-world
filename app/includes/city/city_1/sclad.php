@@ -23,7 +23,3 @@ if (isset($_GET['unsale']))
 $this->view->pick('shared/city/1_sclad');
 $this->view->setVar('otdel', $otdel);
 $this->view->setVar('message', $message);
-
-
-?>
-

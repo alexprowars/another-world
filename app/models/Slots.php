@@ -1,5 +1,12 @@
 <?php
+
 namespace App\Models;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\Model;
 
@@ -35,7 +42,7 @@ class Slots extends Model
 
 	public function getSource()
 	{
-	 	return DB_PREFIX."slots";
+		return DB_PREFIX."slots";
 	}
 
 	public function onConstruct()

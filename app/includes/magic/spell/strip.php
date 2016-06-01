@@ -25,5 +25,3 @@ else
 
 	$this->dropMagic($object['id']);
 }
-
-?>

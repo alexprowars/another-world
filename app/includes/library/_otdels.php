@@ -21,5 +21,3 @@ if (!empty($otdel))
 $this->view->setVar('otdel', $otdel);
 $this->view->setVar('objects', $objects);
 $this->view->partial('library/objects', Array('objects' => $objects, 'otdel' => $otdel));
-
-?>

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 include_once(APP_PATH."app/functions.php");
 
 if (isset($application))
@@ -36,5 +42,3 @@ if ($di->has('auth'))
 
 define('VERSION', '0.1');
 define('DB_PREFIX', 'game_');
- 
-?>

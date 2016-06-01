@@ -2,6 +2,12 @@
 
 namespace App\Battle;
 
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
+
 use App\Models\Users;
 use Phalcon\Mvc\User\Component;
 
@@ -82,12 +88,12 @@ class Battle extends Component
 
 	public function init ()
 	{
-		$this->Battles 			= array();
-		$this->BattleFighter 	= array();
+		$this->Battles			= array();
+		$this->BattleFighter	= array();
 
-		$this->numKicks 	= 1;
-		$this->numBlocks 	= 2;
-		$this->battleId 	= 0;
+		$this->numKicks		= 1;
+		$this->numBlocks	= 2;
+		$this->battleId		= 0;
 	}
 
 	public function show()
@@ -103,8 +109,8 @@ class Battle extends Component
 
 		$this->battleId = $this->user->battle;
 
-		$opponent 	= $this->request->get('opponent', 'int', 0);
-		$logId 		= $this->request->get('lastLogId', 'int', 0);
+		$opponent	= $this->request->get('opponent', 'int', 0);
+		$logId		= $this->request->get('lastLogId', 'int', 0);
 
 		if ($this->request->has('use_priem') && is_numeric($this->request->get('use_priem')))
 		{
@@ -493,19 +499,19 @@ class Battle extends Component
 		(
 			'user' => array
 			(
-				'items' 	=> $left_wear,
-				'data' 		=> array
+				'items'	=> $left_wear,
+				'data'	=> array
 				(
-					'orden' 		=> $this->user->rank,
-					'hp_all' 		=> $this->user->hp_max,
-					'hp' 			=> $this->user->hp_now,
-					'energy_all' 	=> $this->user->energy_max,
-					'energy' 		=> $this->user->energy_now,
-					'level' 		=> $this->user->level,
-					'rang' 			=> $this->user->tribe,
-					'login' 		=> $this->user->username,
-					'user_id' 		=> $this->user->id,
-					'obraz' 		=> $obraz
+					'orden'			=> $this->user->rank,
+					'hp_all'		=> $this->user->hp_max,
+					'hp'			=> $this->user->hp_now,
+					'energy_all'	=> $this->user->energy_max,
+					'energy'		=> $this->user->energy_now,
+					'level'			=> $this->user->level,
+					'rang'			=> $this->user->tribe,
+					'login'			=> $this->user->username,
+					'user_id'		=> $this->user->id,
+					'obraz'			=> $obraz
 				)
 			)
 		);
@@ -523,12 +529,12 @@ class Battle extends Component
 
 				$command[($fighter['Team'] == 0 ? 'left' : 'right')][] = array
 				(
-					'id' 		=> $fighter['id'],
-					'login' 	=> $fighter['username'],
-					'hp' 		=> $fighter['hp'],
-					'level' 	=> $fighter['level'],
-					'sd' 		=> $fighter['Team'],
-					'timeout' 	=> $fighter['EndRound'],
+					'id'		=> $fighter['id'],
+					'login'		=> $fighter['username'],
+					'hp'		=> $fighter['hp'],
+					'level'		=> $fighter['level'],
+					'sd'		=> $fighter['Team'],
+					'timeout'	=> $fighter['EndRound'],
 				);
 
 				if ($fighter['rank'] == 60 && $fighter['EndRound'] == 0)
@@ -549,9 +555,9 @@ class Battle extends Component
 
 						$this->updateUserParams($enemy, 2);
 
-						$enemy_kick1 	= rand(1, 5);
-						$enemy_block1 	= rand(1, 5);
-						$enemy_block2 	= rand(1, 5);
+						$enemy_kick1	= rand(1, 5);
+						$enemy_block1	= rand(1, 5);
+						$enemy_block2	= rand(1, 5);
 
 						while ($enemy_block1 == $enemy_block2)
 						{
@@ -597,19 +603,19 @@ class Battle extends Component
 			(
 				'enemy' => array
 				(
-					'items' => $right_wear,
-					'data' 	=> array
+					'items'	=> $right_wear,
+					'data'	=> array
 					(
-						'orden' 		=> $enemy->rank,
-						'hp_all' 		=> $enemy->hp_max,
-						'hp' 			=> $enemy->hp_now,
-						'energy_all' 	=> $enemy->energy_max,
-						'energy' 		=> $enemy->energy_now,
-						'level' 		=> $enemy->level,
-						'obraz' 		=> $obraz,
-						'rang' 			=> $enemy->tribe,
-						'login' 		=> $enemy->username,
-						'user_id' 		=> $enemy->id
+						'orden'			=> $enemy->rank,
+						'hp_all'		=> $enemy->hp_max,
+						'hp'			=> $enemy->hp_now,
+						'energy_all'	=> $enemy->energy_max,
+						'energy'		=> $enemy->energy_now,
+						'level'			=> $enemy->level,
+						'obraz'			=> $obraz,
+						'rang'			=> $enemy->tribe,
+						'login'			=> $enemy->username,
+						'user_id'		=> $enemy->id
 					)
 				),
 				'action' => 'getAllEnemy'
@@ -637,10 +643,10 @@ class Battle extends Component
 
 					$json['info'] = array
 					(
-						'damage' 		=> $this->BattleFighter['damage'],
-						'battle_id' 	=> $this->user->battle,
+						'damage'		=> $this->BattleFighter['damage'],
+						'battle_id'		=> $this->user->battle,
 						'timebattle'	=> $timeout,
-						'timeout' 		=> ($this->Battles['Timeout'] / 60)
+						'timeout'		=> ($this->Battles['Timeout'] / 60)
 					);
 				}
 
@@ -649,22 +655,22 @@ class Battle extends Component
 
 				$json['logs'][] = array
 				(
-					'uid' 	=> $turn['HitID'],
-					'date' 	=> date('H:i', $turn['HitTime']),
-					'id' 	=> $turn['HitStatus'],
-					'a' 	=> $turn['AttackerFighterName'],
-					'at' 	=> $turn['AttackerTeam'],
-					'ah' 	=> $turn['AttackerHitType'],
-					'ad' 	=> $turn['AttackerDamage'],
-					'ab' 	=> $turn['AttackerBlock'],
-					'd' 	=> $turn['DefenderFighterName'],
-					'dh' 	=> $turn['DefenderHitType'],
-					'dd' 	=> $turn['DefenderDamage'],
-					'db' 	=> $turn['DefenderBlock'],
-					'c' 	=> $turn['RedComment'],
-					't' 	=> '',
-					'my' 	=> ($this->user->id == $turn['AttackerFighter'] ||$this->user->id == $turn['DefenderFighter']) ? 'y' : 'n',
-					'hr' 	=> ($lg < $turn['HitStatus']) ? 1 : 0
+					'uid'	=> $turn['HitID'],
+					'date'	=> date('H:i', $turn['HitTime']),
+					'id'	=> $turn['HitStatus'],
+					'a'		=> $turn['AttackerFighterName'],
+					'at'	=> $turn['AttackerTeam'],
+					'ah'	=> $turn['AttackerHitType'],
+					'ad'	=> $turn['AttackerDamage'],
+					'ab'	=> $turn['AttackerBlock'],
+					'd'		=> $turn['DefenderFighterName'],
+					'dh'	=> $turn['DefenderHitType'],
+					'dd'	=> $turn['DefenderDamage'],
+					'db'	=> $turn['DefenderBlock'],
+					'c'		=> $turn['RedComment'],
+					't'		=> '',
+					'my'	=> ($this->user->id == $turn['AttackerFighter'] ||$this->user->id == $turn['DefenderFighter']) ? 'y' : 'n',
+					'hr'	=> ($lg < $turn['HitStatus']) ? 1 : 0
 				);
 
 				$lg = $turn['HitStatus'];
@@ -738,34 +744,34 @@ class Battle extends Component
 				if ($i == 16 && !isset($w['4']))
 					$i = 4;
 
-				$user->strength 	+= $wear['strength'];
-				$user->agility 		+= $wear['agility'];
-				$user->dex 			+= $wear['dex'];
-				$user->vitality 	+= $wear['vitality'];
-				$user->razum 		+= $wear['razum'];
+				$user->strength		+= $wear['strength'];
+				$user->agility		+= $wear['agility'];
+				$user->dex			+= $wear['dex'];
+				$user->vitality		+= $wear['vitality'];
+				$user->razum		+= $wear['razum'];
 
-				$user->hp 			+= $wear['hp'];
-				$user->energy 		+= $wear['energy'];
+				$user->hp			+= $wear['hp'];
+				$user->energy		+= $wear['energy'];
 
-				$user->br1 			+= $wear['br1'];
-				$user->br2 			+= $wear['br2'];
-				$user->br3 			+= $wear['br3'];
-				$user->br4 			+= $wear['br4'];
-				$user->br5 			+= $wear['br5'];
+				$user->br1			+= $wear['br1'];
+				$user->br2			+= $wear['br2'];
+				$user->br3			+= $wear['br3'];
+				$user->br4			+= $wear['br4'];
+				$user->br5			+= $wear['br5'];
 
-				$user->krit 		+= $wear['krit'];
-				$user->mkrit 		+= $wear['mkrit'];
-				$user->unkrit 		+= $wear['unkrit'];
-				$user->uv 			+= $wear['uv'];
-				$user->unuv 		+= $wear['unuv'];
+				$user->krit			+= $wear['krit'];
+				$user->mkrit		+= $wear['mkrit'];
+				$user->unkrit		+= $wear['unkrit'];
+				$user->uv			+= $wear['uv'];
+				$user->unuv			+= $wear['unuv'];
 
-				$user->pblock 		+= $wear['pblock'];
-				$user->mblock 		+= $wear['mblock'];
+				$user->pblock		+= $wear['pblock'];
+				$user->mblock		+= $wear['mblock'];
 				$user->pbr			+= $wear['pbr'];
-				$user->kbr 			+= $wear['kbr'];
+				$user->kbr			+= $wear['kbr'];
 
-				$user->min 			+= $wear['min_d'];
-				$user->max 			+= $wear['max_d'];
+				$user->min			+= $wear['min_d'];
+				$user->max			+= $wear['max_d'];
 
 				if ($userType == 1)
 				{
@@ -791,20 +797,20 @@ class Battle extends Component
 
 			while ($effect = $effects->fetch())
 			{
-				$user->strength += $effect['strength'];
-				$user->dex 		+= $effect['dex'];
-				$user->agility 	+= $effect['agility'];
-				$user->vitality += $effect['vitality'];
-				$user->power 	+= $effect['power'];
-				$user->razum 	+= $effect['razum'];
-				$user->battery 	+= $effect['battery'];
-				$user->br1 		+= $effect['br1'];
-				$user->br2 		+= $effect['br2'];
-				$user->br3 		+= $effect['br3'];
-				$user->br4 		+= $effect['br4'];
-				$user->br5 		+= $effect['br5'];
-				$user->min 		+= $effect['min'];
-				$user->max 		+= $effect['max'];
+				$user->strength	+= $effect['strength'];
+				$user->dex		+= $effect['dex'];
+				$user->agility	+= $effect['agility'];
+				$user->vitality	+= $effect['vitality'];
+				$user->power	+= $effect['power'];
+				$user->razum	+= $effect['razum'];
+				$user->battery	+= $effect['battery'];
+				$user->br1		+= $effect['br1'];
+				$user->br2		+= $effect['br2'];
+				$user->br3		+= $effect['br3'];
+				$user->br4		+= $effect['br4'];
+				$user->br5		+= $effect['br5'];
+				$user->min		+= $effect['min'];
+				$user->max		+= $effect['max'];
 
 				$user->effects++;
 			}
@@ -870,16 +876,16 @@ class Battle extends Component
 			$agility = round($enemy['agility'] * ($level / 3.2)) * (-1);
 
 		$this->db->updateAsDict(
-		   	"game_users",
+			"game_users",
 			[
 				'travma' 	=> time() + $time,
 				't_level' 	=> $level
 			],
-		   	"id = ".$enemy['id']
+			"id = ".$enemy['id']
 		);
 
 		$this->db->insertAsDict(
-		   	"game_users_effects",
+			"game_users_effects",
 			[
 				'user_id' 	=> $enemy['id'],
 				'type' 		=> 3,
@@ -887,7 +893,7 @@ class Battle extends Component
 				'strength'	=> $strength,
 				'dex'		=> $dex,
 				'agility'	=> $agility
-		   	]
+			]
 		);
 
 		$message = '<b>'.$enemy['username'].'</b> получает в бою ';
@@ -1077,9 +1083,9 @@ class Battle extends Component
 		$update['battle'] = 0;
 
 		$this->db->updateAsDict(
-		   	"game_users",
+			"game_users",
 			$update,
-		   	"id = ".$this->user->id
+			"id = ".$this->user->id
 		);
 
 		if ($type == 1)
@@ -1179,16 +1185,16 @@ class Battle extends Component
 					if ($ups['level'] > $user->level)
 						$this->game->insertInChat("Персонаж <b>" . $user->username . "</b> получил повышение! Теперь он <b>" . $ups['level'] . "</b> уровня! Поздравим его с этим достижением.", "", false);
 
-					$result['wins'] 	= $user->wins + 1;
-					$result['exp'] 		= $user->exp + $addexp;
-					$result['level'] 	= $ups['level'];
-					$result['up'] 		= $ups['up'];
+					$result['wins']		= $user->wins + 1;
+					$result['exp']		= $user->exp + $addexp;
+					$result['level']	= $ups['level'];
+					$result['up']		= $ups['up'];
 
 					if (isset($addons['credits']))
 					{
-						$result['s_updates'] 	= $user->s_updates + $addons['updates'];
-						$result['o_updates'] 	= $user->o_updates + $addons['raseup'];
-						$result['credits'] 		= $user->credits + $addons['credits'];
+						$result['s_updates']	= $user->s_updates + $addons['updates'];
+						$result['o_updates']	= $user->o_updates + $addons['raseup'];
+						$result['credits']		= $user->credits + $addons['credits'];
 					}
 				}
 			}
@@ -1337,13 +1343,13 @@ class Battle extends Component
 					break;
 			}
 
-			$user['obj']->min 		+= $priem['dam'];
-			$user['obj']->max 		+= $priem['dam'];
-			$user['obj']->krit 		+= $priem['krit'];
-			$user['obj']->uv 		+= $priem['uvorot'];
-			$user['obj']->mkrit 	+= $priem['mkrit'];
-			$user['obj']->pblock 	+= $priem['pblock'];
-			$user['obj']->pbr 		+= $priem['pbr'];
+			$user['obj']->min		+= $priem['dam'];
+			$user['obj']->max		+= $priem['dam'];
+			$user['obj']->krit		+= $priem['krit'];
+			$user['obj']->uv		+= $priem['uvorot'];
+			$user['obj']->mkrit		+= $priem['mkrit'];
+			$user['obj']->pblock	+= $priem['pblock'];
+			$user['obj']->pbr		+= $priem['pbr'];
 		}
 
 		if ($enemy['useWait'] == 1)
@@ -1361,12 +1367,12 @@ class Battle extends Component
 					break;
 			}
 
-			$enemy['obj']->min 		+= $priem_opp['antidam'];
-			$enemy['obj']->max 		+= $priem_opp['antidam'];
-			$enemy['obj']->krit 	+= $priem_opp['krit'];
-			$enemy['obj']->uv 		+= $priem_opp['uvorot'];
-			$enemy['obj']->pblock 	+= $priem_opp['pblock'];
-			$enemy['obj']->pbr 		+= $priem_opp['pbr'];
+			$enemy['obj']->min		+= $priem_opp['antidam'];
+			$enemy['obj']->max		+= $priem_opp['antidam'];
+			$enemy['obj']->krit		+= $priem_opp['krit'];
+			$enemy['obj']->uv		+= $priem_opp['uvorot'];
+			$enemy['obj']->pblock	+= $priem_opp['pblock'];
+			$enemy['obj']->pbr		+= $priem_opp['pbr'];
 		}
 
 		$userKick 	= explode(",", $user['AttackerHitType']);
@@ -1394,9 +1400,9 @@ class Battle extends Component
 		$y = $user['obj']->strength + $user['obj']->kbr / STATS_VS_MOD;
 		$pbr = $this->calcMF($x, $y);
 
-		$a 		= mt_rand(0, PRECESSION) / PRECESSION; // случайное число на (0,1), показывающее, сработал ли уворот в данном случае.
-		$rb 	= mt_rand(0, PRECESSION) / PRECESSION; // случайное число на (0,1), показывающее, сработал ли крит в данном случае.
-		$bpr 	= mt_rand(0, PRECESSION) / PRECESSION;
+		$a		= mt_rand(0, PRECESSION) / PRECESSION; // случайное число на (0,1), показывающее, сработал ли уворот в данном случае.
+		$rb		= mt_rand(0, PRECESSION) / PRECESSION; // случайное число на (0,1), показывающее, сработал ли крит в данном случае.
+		$bpr	= mt_rand(0, PRECESSION) / PRECESSION;
 
 		$kickDamage = array(1 => 0, 2 => 0);
 		$kickAction = array(1 => '', 2 => '');

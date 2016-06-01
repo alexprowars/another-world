@@ -175,4 +175,3 @@ if ($iteminfo['name'] == "perevod") {
 include("includes/magic/elik/magics.php");
 include("includes/magic/rune/magics.php");
 */
-?>

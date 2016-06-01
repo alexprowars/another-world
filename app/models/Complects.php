@@ -1,5 +1,12 @@
 <?php
+
 namespace App\Models;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\Model;
 
@@ -12,7 +19,7 @@ class Complects extends Model
 
 	public function getSource()
 	{
-	 	return DB_PREFIX."complects";
+		return DB_PREFIX."complects";
 	}
 
 	public function getData ()
@@ -62,9 +69,9 @@ class Complects extends Model
 		}
 
 		$db->updateAsDict(
-		   	"game_slots",
+			"game_slots",
 			$update,
-		   	"user_id = ".$user->id
+			"user_id = ".$user->id
 		);
 
 		return true;

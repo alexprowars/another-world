@@ -1,9 +1,15 @@
 <?
+
 namespace App\Game\Controllers;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use App\Mail\PHPMailer;
 use App\Models\Users;
-use Phalcon\Mvc\Controller;
 use App\Models;
 use Phalcon\Tag;
 use Phalcon\Text;

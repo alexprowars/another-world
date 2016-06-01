@@ -44,4 +44,3 @@ echo"</td>
 
 
 if ($i==0) echo"<tr><td align=center><i>Рюкзак пуст!</i></td></tr>";
-?>

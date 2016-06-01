@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var $this App\Game\Controllers\ControllerBase
+ * @var $this App\Game\Controllers\Application
  */
 
 use App\Models\Objects;
@@ -367,5 +367,3 @@ switch ($otdel)
 $this->view->pick('shared/city/1_repair');
 $this->view->setVar('message', $message);
 $this->view->setVar('otdel', $otdel);
-
-?>

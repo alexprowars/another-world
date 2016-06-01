@@ -67,5 +67,3 @@ else
 
 $this->view->pick('shared/city/1_street_2');
 $this->view->setVar('city', $city);
-
-?>

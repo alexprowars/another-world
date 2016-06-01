@@ -1231,10 +1231,11 @@ class PHPMailer
      * Initiate a connection to an SMTP server.
      * Returns false if the operation failed.
      * @param array $options An array of options compatible with stream_context_create()
+     * @return bool
+     * @throws MailException
+     * @throws null
      * @uses SMTP
      * @access public
-     * @throws MailException
-     * @return bool
      */
     public function smtpConnect($options = array())
     {

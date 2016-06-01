@@ -76,5 +76,3 @@ if ($this->user->r_time > 0)
 
 $this->view->pick('shared/city/1_ambulance');
 $this->view->setVar('time', $time);
-
-?>

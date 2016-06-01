@@ -200,5 +200,3 @@ function pagination ($count, $per_page, $link, $page = 0)
 
 	return $pages;
 }
- 
-?>

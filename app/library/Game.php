@@ -38,7 +38,7 @@ class Game extends Component
 		$chat = json_decode($this->cache->get("game_chat"), true);
 
 		$this->db->insertAsDict(
-		   	"game_log_chat",
+			"game_log_chat",
 			Array
 			(
 				'user' => 0,
@@ -171,11 +171,11 @@ class Game extends Component
 			"game_log_items",
 			array
 			(
-				'user_id' 	=> $userId,
-				'action' 	=> $action,
-				'item' 		=> $item,
-				'time' 		=> time(),
-				'place' 	=> $place,
+				'user_id'	=> $userId,
+				'action'	=> $action,
+				'item'		=> $item,
+				'time'		=> time(),
+				'place'		=> $place,
 			)
 		);
 	}

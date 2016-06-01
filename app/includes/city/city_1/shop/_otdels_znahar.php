@@ -84,5 +84,3 @@ if (!empty($otdel)) {
         }
         echo"</table>";
 }
-
-?>

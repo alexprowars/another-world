@@ -32,5 +32,3 @@ $this->view->pick('shared/city/city');
 $this->view->setVar('room_1_members', $this->db->query("SELECT COUNT(`id`) AS num FROM `game_users` WHERE `room` = 1 AND `onlinetime` > '" . (time() - 180) . "'")->fetch()['num']);
 $this->view->setVar('room_2_members', $this->db->query("SELECT COUNT(`id`) AS num FROM `game_users` WHERE `room` = 2 AND `onlinetime` > '" . (time() - 180) . "'")->fetch()['num']);
 $this->view->setVar('message', $message);
-
-?>

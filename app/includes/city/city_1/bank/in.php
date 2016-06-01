@@ -7,4 +7,3 @@ if (!empty($ob['id'])) { mysql_query("UPDATE objects set bank=1 WHERE id=$ob[id]
 else echo"<br><center><font color=red><b>Предмет не найден в Вашем рюкзаке!</b></font></center>";
 
 }
-?>

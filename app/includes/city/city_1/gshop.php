@@ -117,5 +117,3 @@ $this->view->pick('shared/city/1_gshop');
 $this->view->setVar('otdel', $otdel);
 $this->view->setVar('objects', $objects);
 $this->view->setVar('message', $message);
-
-?>

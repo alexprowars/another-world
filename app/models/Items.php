@@ -1,5 +1,12 @@
 <?php
+
 namespace App\Models;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\Model;
 
@@ -57,7 +64,7 @@ class Items extends Model
 
 	public function getSource()
 	{
-	 	return DB_PREFIX."items";
+		return DB_PREFIX."items";
 	}
 
 	public function onConstruct()
@@ -179,13 +186,13 @@ class Items extends Model
 		$min = $this->min_level . "|" . $this->min_strength . "|" . $this->min_dex . "|" . $this->min_agility . "|" . $this->min_vitality . "|" . $this->min_razum . "|0|" . $this->min_proff;
 
 		return $this->getDI()->getShared('db')->insertAsDict(
-		   	"game_objects",
+			"game_objects",
 			array
-		   	(
-				'user_id' 	=> $userId,
-				'inf' 		=> $inf,
-				'min' 		=> $min,
-				'tip' 		=> $this->tip,
+			(
+				'user_id'	=> $userId,
+				'inf'		=> $inf,
+				'min'		=> $min,
+				'tip'		=> $this->tip,
 				'br1'		=> $this->br1,
 				'br2'		=> $this->br2,
 				'br3'		=> $this->br3,
@@ -215,7 +222,7 @@ class Items extends Model
 				'use_mana'	=> $this->use_mana,
 				'magic'		=> $this->magic,
 				'life'		=> $this->life > 0 ? (time() + $this->life) : 0
-		   	)
+			)
 		);
 	}
 }

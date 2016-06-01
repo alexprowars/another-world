@@ -1,5 +1,12 @@
 <?php
+
 namespace App\Auth\Ext;
+
+/**
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
+ */
 
 use Phalcon\Mvc\User\Component;
 
@@ -52,9 +59,9 @@ class Ulogin extends Component implements ExtAuthInterface
 		else
 		{
 			$this->db->updateAsDict(
-			   	"game_users_auth",
+				"game_users_auth",
 				['enter_time' => time()],
-			   	"id = ".$Row['auth_id']
+				"id = ".$Row['auth_id']
 			);
 
 			$this->auth->auth($Row['id'], $Row['password'], 0, (time() + 2419200));
@@ -93,15 +100,15 @@ class Ulogin extends Component implements ExtAuthInterface
 		$this->db->query("LOCK TABLES game_users_info WRITE, game_users WRITE, game_users_auth WRITE");
 
 		$this->db->insertAsDict(
-		   	"game_users",
+			"game_users",
 			array
-		   	(
-				'username' 		=> trim($this->data['first_name']." ".$this->data['last_name']),
-				'sex' 			=> ($this->data['sex'] > 0 ? ($this->data['sex'] == 1 ? 2 : 1) : 1),
-				'ip' 			=> sprintf("%u", ip2long($this->request->getClientAddress())),
-				'bonus' 		=> time(),
-				'onlinetime' 	=> time()
-		   	)
+			(
+				'username'		=> trim($this->data['first_name']." ".$this->data['last_name']),
+				'sex'			=> ($this->data['sex'] > 0 ? ($this->data['sex'] == 1 ? 2 : 1) : 1),
+				'ip'			=> sprintf("%u", ip2long($this->request->getClientAddress())),
+				'bonus'			=> time(),
+				'onlinetime'	=> time()
+			)
 		);
 
 		$iduser = $this->db->lastInsertId();
@@ -109,31 +116,31 @@ class Ulogin extends Component implements ExtAuthInterface
 		if ($iduser > 0)
 		{
 			$this->db->insertAsDict(
-			   	"game_users_info",
+				"game_users_info",
 				array
-			   	(
-					'id' 			=> $iduser,
-					'email' 		=> '',
-					'register_time' => time(),
-					'password' 		=>md5($this->token)
-			   	)
+				(
+					'id'			=> $iduser,
+					'email'			=> '',
+					'register_time'	=> time(),
+					'password'		=> md5($this->token)
+				)
 			);
 
 			$this->db->insertAsDict(
-			   	"game_users_auth",
+				"game_users_auth",
 				array
-			   	(
-					'user_id' 			=> $iduser,
-					'external_id' 		=> $this->data['identity'],
-					'register_time' 	=> time(),
-					'enter_time' 		=> time()
-			   	)
+				(
+					'user_id'			=> $iduser,
+					'external_id'		=> $this->data['identity'],
+					'register_time'		=> time(),
+					'enter_time'		=> time()
+				)
 			);
 
 			$this->db->query("UNLOCK TABLES");
 
 			$this->db->insertAsDict(
-			   	"game_slots",
+				"game_slots",
 				['user_id' => $iduser]
 			);
 
@@ -144,12 +151,12 @@ class Ulogin extends Component implements ExtAuthInterface
 				if (isset($ref['id']))
 				{
 					$this->db->insertAsDict(
-					   	"game_refs",
+						"game_refs",
 						array
-					   	(
-							'r_id' 	=> $iduser,
+						(
+							'r_id'	=> $iduser,
 							'u_id'	=> $refer
-					   	)
+						)
 					);
 				}
 			}
@@ -169,5 +176,3 @@ class Ulogin extends Component implements ExtAuthInterface
 		}
 	}
 }
- 
-?>

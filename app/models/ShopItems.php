@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Models;
 
-use Phalcon\Mvc\Model;
-
 /**
- * Class Objects
- * @property \Phalcon\Db\Adapter\Pdo\Mysql db
+ * @author AlexPro
+ * @copyright 2008 - 2016 XNova Game Group
+ * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
  */
+
+use Phalcon\Mvc\Model;
 
 class ShopItems extends Model
 {
@@ -19,13 +21,13 @@ class ShopItems extends Model
 
 	public function getSource()
 	{
-	 	return DB_PREFIX."shop_items";
+		return DB_PREFIX."shop_items";
 	}
 
 	public function onConstruct()
 	{
-	 	$this->belongsTo("shop_id", 'App\Models\Shop', "id", Array('alias' => 'shop'));
-	 	$this->belongsTo("item_id", 'App\Models\Items', "id", Array('alias' => 'item'));
+		$this->belongsTo("shop_id", 'App\Models\Shop', "id", Array('alias' => 'shop'));
+		$this->belongsTo("item_id", 'App\Models\Items', "id", Array('alias' => 'item'));
 	}
 
 	public function buy ()
