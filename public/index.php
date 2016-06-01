@@ -17,18 +17,18 @@ define('APP_PATH', realpath('..').'/');
 ini_set('log_errors', 'On');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-ini_set('error_log', APP_PATH.'/php_errors.log');
+ini_set('error_log', APP_PATH.'php_errors.log');
 
 try
 {
-	$config = new \Phalcon\Config\Adapter\Ini(APP_PATH."/app/config/config.ini");
+	$config = new \Phalcon\Config\Adapter\Ini(APP_PATH."app/config/config.ini");
 
-	include (APP_PATH."/app/config/loader.php");
-	include (APP_PATH."/app/config/services.php");
+	include (APP_PATH."app/config/loader.php");
+	include (APP_PATH."app/config/services.php");
 
 	$application = new Application($di);
 
-	include (APP_PATH."/app/config/bootstrap.php");
+	include (APP_PATH."app/config/bootstrap.php");
 
 	$handle = $application->handle();
 

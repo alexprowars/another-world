@@ -50,7 +50,7 @@
 		<div class="col-xs-6">
 			<fieldset>
 				<legend>Введите число желаемой платины</legend>
-				<div class="form-group">
+				<div class="form-group row">
 					<div class="col-xs-5 push-xs-3">
 						<input type="text" id="credits" value="10" class="form-control input-sm">
 					</div>

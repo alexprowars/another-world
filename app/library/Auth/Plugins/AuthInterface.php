@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Ext;
+namespace App\Auth\Plugins;
 
 /**
  * @author AlexPro
@@ -19,7 +19,7 @@ namespace App\Auth\Ext;
  * @property \Phalcon\Http\Response response
  * @property \Phalcon\Config config
  */
-interface ExtAuthInterface
+interface AuthInterface
 {
 	public function isAuthorized ();
 	public function login ();

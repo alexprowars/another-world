@@ -37,7 +37,11 @@ $di->get('config')->merge(new \Phalcon\Config(['app' => $result]));
 
 if ($di->has('auth'))
 {
-	$di->get('auth')->checkExtAuth();
+	$auth = $di->getShared('auth');
+
+	$auth->addAuthPlugin('\App\Auth\Plugins\Ulogin');
+	$auth->addAuthPlugin('\App\Auth\Plugins\Vk');
+	$auth->checkExtAuth();
 }
 
 define('VERSION', '0.1');

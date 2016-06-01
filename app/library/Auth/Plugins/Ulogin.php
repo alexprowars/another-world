@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Ext;
+namespace App\Auth\Plugins;
 
 /**
  * @author AlexPro
@@ -22,23 +22,28 @@ use Phalcon\Mvc\User\Component;
  * @property \Phalcon\Http\Response response
  * @property \Phalcon\Config config
  */
-class Ulogin extends Component implements ExtAuthInterface
+class Ulogin extends Component implements AuthInterface
 {
 	private $token = '';
 	private $data = array();
 	private $isLogin = false;
-
-	function __construct($token)
+	
+	public function check ()
 	{
-		$s = file_get_contents('http://u-login.com/token.php?token=' . $token . '&host=' . $_SERVER['HTTP_HOST']);
-		$this->data = json_decode($s, true);
-
-		$this->token = $token;
-
-		if (isset($this->data['identity']))
+		if ($this->request->has('token') && $this->request->get('token') != '')
 		{
-			$this->isLogin = true;
-			$this->login();
+			$token = $this->request->get('token');
+
+			$s = file_get_contents('http://u-login.com/token.php?token=' . $token . '&host=' . $_SERVER['HTTP_HOST']);
+			$this->data = json_decode($s, true);
+
+			$this->token = $token;
+
+			if (isset($this->data['identity']))
+			{
+				$this->isLogin = true;
+				$this->login();
+			}
 		}
 	}
 
