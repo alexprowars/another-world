@@ -1,16 +1,16 @@
 <div class="textblock">
-	<form action="<?=$this->url->get('pers/config/') ?>" method="post" class="form-horizontal">
+	<form action="{{ url('pers/config/') }}" method="post" class="form-horizontal">
 		<fieldset>
 			<legend>Настройки статусов</legend>
 			<div class="form-group row">
 				<label for="formStatus" class="col-xs-6 control-label">Ваш статус</label>
 				<div class="col-xs-6">
 					<select name="update_status" class="form-control input-sm">
-						<option value=0 <? if ($this->user->status == 0) print"selected"; ?>>Онлайн</option>
-						<option value=1 <? if ($this->user->status == 1) print"selected"; ?>>Подерусь</option>
-						<option value=2 <? if ($this->user->status == 2) print"selected"; ?>>Занят</option>
-						<option value=3 <? if ($this->user->status == 3) print"selected"; ?>>Отошел</option>
-						<option value=4 <? if ($this->user->status == 4) print"selected"; ?>>Не беспокоить</option>
+						<option value=0 {% if user.status == 0 %}selected{% endif %}>Онлайн</option>
+						<option value=1 {% if user.status == 1 %}selected{% endif %}>Подерусь</option>
+						<option value=2 {% if user.status == 2 %}selected{% endif %}>Занят</option>
+						<option value=3 {% if user.status == 3 %}selected{% endif %}>Отошел</option>
+						<option value=4 {% if user.status == 4 %}selected{% endif %}>Не беспокоить</option>
 					</select>
 				</div>
 			</div>

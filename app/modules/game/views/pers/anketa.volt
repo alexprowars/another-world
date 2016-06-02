@@ -1,7 +1,7 @@
 <div class="textblock">
-	<? if (!empty($message)): ?>
-		<p class="message bg-danger"><?=$message ?></p>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message bg-danger">{{ message }}</p>
+	{% endif %}
 
 	<form method="post" action="/pers/anketa/" class="form-horizontal">
 		<input type="hidden" name="changeinfo" value="Y">
@@ -10,19 +10,19 @@
 			<div class="form-group row">
 				<label for="formStatus" class="col-xs-6 control-label">Имя:</label>
 				<div class="col-xs-6">
-					<input name="realname" value="<?= $anketa['name'] ?>" class="form-control input-sm">
+					<input name="realname" value="{{ anketa['name'] }}" class="form-control input-sm">
 				</div>
 			</div>
 			<div class="form-group row">
 				<label for="formStatus" class="col-xs-6 control-label">Город:</label>
 				<div class="col-xs-6">
-					<input name="city" value="<?= $anketa['city'] ?>" class="form-control input-sm">
+					<input name="city" value="{{ anketa['city'] }}" class="form-control input-sm">
 				</div>
 			</div>
 			<div class="form-group row">
 				<label for="formStatus" class="col-xs-6 control-label">Немного о себе:</label>
 				<div class="col-xs-6">
-					<textarea name="about" rows="6" cols="25" class="form-control input-sm"><?=stripslashes($anketa['about']) ?></textarea>
+					<textarea name="about" rows="6" cols="25" class="form-control input-sm">{{ anketa['about']|stripslashes }}</textarea>
 				</div>
 			</div>
 			<div class="row">

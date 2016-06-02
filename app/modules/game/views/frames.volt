@@ -142,7 +142,7 @@
 			</div>
 			<div class="border right"></div>
 		</div>
-		{% if request('viewer_id') is not empty %}
+		{% if request.get('viewer_id') is not empty %}
 			<script src="//vk.com/js/api/xd_connection.js" type="text/javascript"></script>
 			<script type="application/javascript">
 				$(window).load(function()
@@ -151,10 +151,10 @@
 				});
 			</script>
 		{% endif %}
-		{% if request('api_server') is not empty %}
-			<script src="{{ request('api_server') }}js/fapi5.js" type="text/javascript"></script>
+		{% if request.get('api_server') is not empty %}
+			<script src="{{ request.get('api_server') }}js/fapi5.js" type="text/javascript"></script>
 			<script type="text/javascript">
-				FAPI.init('{{ request('api_server') }}', '{{ request('apiconnection') }}',
+				FAPI.init('{{ request.get('api_server') }}', '{{ request.get('apiconnection') }}',
 					function()
 					{
 						console.log('ok api initialized');

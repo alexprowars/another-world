@@ -1,4 +1,4 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Список Друзей / Врагов')); ?>
+{{ partial('shared/city_header', ['title': 'Список Друзей / Врагов']) }}
 <div class="textblock">
 	<div class="row">
 		<div class="col-xs-12 text-xs-right">
@@ -7,7 +7,7 @@
 		</div>
 	</div>
 
-	<? if (count($list) > 0): ?>
+	{% if list|length > 0 %}
 		<h4>Список ваших Друзей/Врагов</h4>
 		<table class="table">
 			<thead>
@@ -19,49 +19,49 @@
 				</tr>
 			</thead>
 			<tbody>
-				<? foreach ($list as $user): ?>
+				{% for user in list %}
 					<tr>
 						<td>
 							<b>
-								<img src="/images/rank/<?=$user['rank'] ?>.gif" alt="">
-								<? if ($user['tribe']): ?>
-									<img src="/images/tribe/<?=$user['tribe'] ?>.gif" alt="">
-								<? endif; ?>
-								<?=$user['username'] ?>
+								<img src="/images/rank/{{ user['rank'] }}.gif" alt="">
+								{% if user['tribe'] %}
+									<img src="/images/tribe/{{ user['tribe'] }}.gif" alt="">
+								{% endif %}
+								{{ user['username'] }}
 							</b>
-								[<?=$user['level'] ?>] <a href="/info/?id=<?=$user['friend_id'] ?>" target="_blank"><img src='/images/images/inf.gif' alt="Информация о <?=$user['username'] ?>"></a>
+								[{{ user['level'] }}] <a href="/info/?id={{ user['friend_id'] }}" target="_blank"><img src='/images/images/inf.gif' alt="Информация о {{ user['username'] }}"></a>
 						</td>
 						<td>
-							<?=_getText('rooms', $user['room']) ?>
+							{{ _text('rooms', user['room']) }}
 						</td>
 						<td class="text-xs-center">
-							<? if ($user['ignor'] == 0): ?>
+							{% if user['ignor'] == 0 %}
 								<b><font color='green'>Друг</font></b>
-							<? elseif ($user['ignor'] == 1): ?>
+							{% elseif user['ignor'] == 1 %}
 								<b><font color='red'>Враг (игнор)</font></b>
-							<? endif; ?>
+							{% endif %}
 						</td>
 						<td class="text-xs-center">
-							<? if ($user['rank'] == 100): ?>
+							{% if user['rank'] == 100 %}
 								<b><font color='red'>OffLine</font></b>
-							<? else: ?>
-								<? if (time() - $user['onlinetime'] <= 180 || $user['rank'] == 60): ?>
+							{% else %}
+								{% if time() - user['onlinetime'] <= 180 or user['rank'] == 60 %}
 									<b><font color='green'>OnLine</font></b>
-								<? else: ?>
+								{% else %}
 									<b><font color='red'>OffLine</font></b>
-								<? endif; ?>
-							<? endif; ?>
+								{% endif %}
+							{% endif %}
 						</td>
 					</tr>
-				<? endforeach; ?>
+				{% endfor %}
 			</tbody>
 		</table>
 		<br><br>
-	<? endif; ?>
+	{% endif %}
 
-	<? if (!empty($message)): ?>
-		<p class="message bg-danger"><?=$message ?></p>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message bg-danger">{{ message }}</p>
+	{% endif %}
 	<div class="row">
 		<div class="col-xs-5">
 			<form method="POST" action="/pers/friends/?act=add" class="form-horizontal">
@@ -70,7 +70,7 @@
 					<div class="form-group row">
 						<label class="col-xs-6 control-label">Введите ник:</label>
 						<div class="col-xs-6">
-							<input type="text" name="name" value="<?=$this->request->getPost('name') ?>" class="form-control input-sm">
+							<input type="text" name="name" value="{{ request.getPost('name') }}" class="form-control input-sm">
 						</div>
 					</div>
 					<div class="form-group row">
@@ -97,7 +97,7 @@
 					<div class="form-group row">
 						<label class="col-xs-6 control-label">Введите ник:</label>
 						<div class="col-xs-6">
-							<input type="text" name="name" value="<?=$this->request->getPost('name') ?>" class="form-control input-sm">
+							<input type="text" name="name" value="{{ request.getPost('name') }}" class="form-control input-sm">
 						</div>
 					</div>
 					<div class="row">
