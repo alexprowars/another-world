@@ -1,8 +1,8 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Тренировочный зал для новичков')); ?>
+{{ partial('shared/city_header', ['title': 'Тренировочный зал для новичков']) }}
 <div class="textblock">
-	<? if (!empty($message)): ?>
-		<div class="alert alert-danger"><?= $message ?></div>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message alert-danger">{{ message }}</p>
+	{% endif %}
 	<table width=100%>
 		<tr>
 			<td width=600 valign=top>
@@ -10,36 +10,36 @@
 					<tr>
 						<TD valign=middle style="padding:5px 5px 5px 0;">
 							<SCRIPT language=JavaScript>
-								show_inf('<?=$this->user->username ?>', '<?=$this->user->id ?>', '<?=$this->user->level ?>', '<?=$this->user->rank ?>', '<?=$this->user->tribe ?>');
+								show_inf('{{ user.username }}', '{{ user.id }}', '{{ user.level }}', '{{ user.rank }}', '{{ user.tribe }}');
 							</SCRIPT>
 						</TD>
 						<TD valign=middle>
 							<table align=center>
 								<tr>
-									<td width=200 title='Уровень жизни: <?= $this->user->hp_now ?>/<?= $this->user->hp_max ?>' align=left valign=bottom width=200>
-										<img src=/images/images/vault/navigation/hp/_helth.gif width='10' height=10 alt=''><img src=/images/images/vault/navigation/hp/helth.gif height='10' width='<?= ceil(GetWPers($this->user->hp_now, $this->user->hp_max) / 100 * 170) ?>' alt='Уровень жизни: <?= $this->user->hp_now ?>/<?= $this->user->hp_max ?>'><img src="/images/images/vault/navigation/hp/_helth_.gif" alt="">
+									<td width="200" title="Уровень жизни: {{ user.hp_now }}/{{ user.hp_max }}" align="left" valign="bottom">
+										<img src=/images/images/vault/navigation/hp/_helth.gif width='10' height=10 alt=''><img src=/images/images/vault/navigation/hp/helth.gif height='10' width="{{ (getWidth(user.hp_now, user.hp_max) / 100 * 170)|ceil }}" alt='Уровень жизни: {{ user.hp_now }}/{{ user.hp_max }}'><img src="/images/images/vault/navigation/hp/_helth_.gif" alt="">
 									</td>
 								</tr>
 							</table>
 						</TD>
 						<TD valign=middle>
-							<FONT COLOR=RED><B><?= $this->user->hp_now ?> / <?= $this->user->hp_max ?></B></FONT>
+							<FONT COLOR=RED><B>{{ user.hp_now }} / {{ user.hp_max }}</B></FONT>
 						</TD>
 					</TR>
 				</TABLE>
 			</td>
 			<td align=right valign=top>
 				<a href="/map/"><img src='/images/images/refresh.gif' alt='Обновить'></a>
-				<? if ($this->user->room == 2): ?>
+				{% if user.room == 2 %}
 					<a href='/map/?refer=2'><img src='/images/images/back.gif' alt='Вернуться'></a>
-				<? endif; ?>
+				{% endif %}
 			</td>
 		</tr>
 	</table>
 	<br>
-	<? if (!count($bots)): ?>
+	{% if bots|length == 0 %}
 		<div class="alert alert-danger">Вам больше не нужно тренироваться</div>
-	<? else: ?>
+	{% else %}
 		<div class="row">
 			<div class="col-xs-8">
 				<b>Как вести себя в поединке.</b><br><br>
@@ -58,10 +58,10 @@
 			<div class="col-xs-4 text-xs-center">
 				<b>Тренировочные Боты</b>
 				<HR color=silver>
-				<? foreach ($bots as $tl): ?>
-					<a href="javascript:fightTo('<?=$tl['id'] ?>')"><b><?=$tl['username'] ?></b></a> [<?=$tl['level'] ?>]<br>
-				<? endforeach; ?>
+				{% for tl in bots %}
+					<a href="javascript:fightTo('{{ tl['id'] }}')"><b>{{ tl['username'] }}</b></a> [{{ tl['level'] }}]<br>
+				{% endfor %}
 			</div>
 		</div>
-	<? endif; ?>
+	{% endif %}
 </div>

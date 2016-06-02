@@ -1,4 +1,4 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Территория подземелья')); ?>
+{{ partial('shared/city_header', ['title': 'Территория подземелья']) }}
 <div class="textblock">
 	<table width=100% cellspacing=0 cellpadding=5 border=0>
 		<tr>
@@ -8,7 +8,7 @@
 
 						<TD valign=top>
 							<script type="text/javascript">
-								show_inf('<?=$this->user->username ?>', '<?=$this->user->id ?>', '<?=$this->user->level ?>', '<?=$this->user->rank ?>', '<?=$this->user->tribe ?>');
+								show_inf('{{ user.username }}', '{{ user.id }}', '{{ user.level }}', '{{ user.rank }}', '{{ user.tribe }}');
 							</script>
 						</TD>
 						<TD valign=top>
@@ -20,15 +20,15 @@
 								</tr>
 							</table>
 						</TD>
-						<TD valign=top>&nbsp;<FONT COLOR=RED><B><?=$this->user->hp_now ?> / <?=$this->user->hp_max ?></B></FONT>
+						<TD valign=top>&nbsp;<FONT COLOR=RED><B>{{ user.hp_now }} / {{ user.hp_max }}</B></FONT>
 						</TD>
 					</TR>
 				</TABLE>
 			</td>
 			<td align=right valign=top>
-				<a href="<?=$this->url->get('map/') ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
+				<a href="{{ url('map/') }}"><img src='/images/images/refresh.gif' alt='Обновить'></a>
 				<? if ($this->user->room == 200): ?>
-					<a href="<?=$this->url->get('map/') ?>?refer=200"><img src='/images/images/back.gif' alt='Вернуться'></a>
+					<a href="{{ url('map/') }}?refer=200"><img src='/images/images/back.gif' alt='Вернуться'></a>
 				<? endif; ?>
 			</td>
 		</tr>
@@ -130,7 +130,7 @@
 														<b>Действия</b><HR color=silver>
 														<input type="button" class="input" value="Колодец Жизни" style="WIDTH: 120px"<?=($vault['heal'] >= time() ? " disabled" : " onclick=\"load('/map/?heal=Y')\"") ?>>
 														<HR color="silver">
-														<form action="<?=$this->url->get('map/') ?>" method="post">
+														<form action="{{ url('map/') }}" method="post">
 															<input type="hidden" name="dig" value="Y">
 															<img src="/captcha.php" width="120"><br>
 															<input type="text" name="captcha" size="10" placeholder="код с картинки" maxlength="20" style="WIDTH: 120px">

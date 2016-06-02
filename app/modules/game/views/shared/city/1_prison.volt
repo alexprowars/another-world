@@ -1,10 +1,10 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Тюрьма')); ?>
+{{ partial('shared/city_header', ['title': 'Тюрьма']) }}
 <div class="textblock">
 	<div class="row">
 		<div class="col-xs-12 text-xs-right">
-			<a href="<?=$this->url->get('map/') ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
+			<a href="{{ url('map/') }}"><img src='/images/images/refresh.gif' alt='Обновить'></a>
 			<? if ($this->user->t_time < time()): ?>
-				<a href="<?=$this->url->get('map/') ?>?refer=666"><img src='/images/images/back.gif' alt='Вернуться'></a>
+				<a href="{{ url('map/') }}?refer=666"><img src='/images/images/back.gif' alt='Вернуться'></a>
 			<? endif; ?>
 		</div>
 	</div>
@@ -49,12 +49,12 @@
 				</td>
 				<script src='/img/js/time.js'></script>
 				<script>
-					ShowTime('dt', <?=$this->user->t_time - time() ?>);
+					ShowTime('dt', {{ user.t_time - time() }});
 				</script>
 			</tr>
 			<tr>
 				<td style='BORDER-TOP: 1px solid'>
-					Причина отправку в тюрьму: <u><font color=red><b><?=$this->user->reason ?></b></font></u>
+					Причина отправку в тюрьму: <u><font color=red><b>{{ user.reason }}</b></font></u>
 				</td>
 			</tr>
 		</table>

@@ -36,7 +36,7 @@ if (count($objects))
 				<tr>
 					<td width='30%' align='center'>
 						<small><img src='/images/items/<?=$object->tip ?>/<?= $info[0] ?>.gif' alt='<?= $info[1] ?>'><br></small>
-						<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Продать предмет &quot;<?= $info[1] ?>&quot; за &quot;<?= $sale_price ?>&quot; зол.?', 'load(\'/map/?otdel=<?= $otdel ?>&sale=<?= $object->id ?>\')')"><b>Продать за <?= $sale_price ?> <?=(SHOP_ID == 2 ? 'е' : '') ?>зол.</b></a>
+						<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Продать предмет &quot;<?= $info[1] ?>&quot; за &quot;<?= $sale_price ?>&quot; зол.?', 'load(\'/map/?otdel={{ otdel }}&sale=<?= $object->id ?>\')')"><b>Продать за <?= $sale_price ?> <?=(SHOP_ID == 2 ? 'е' : '') ?>зол.</b></a>
 					</td>
 					<td width='70%'>
 						<small>

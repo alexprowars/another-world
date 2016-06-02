@@ -1,9 +1,9 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Передача предметов и денег')); ?>
+{{ partial('shared/city_header', ['title': 'Передача предметов и денег']) }}
 
 <div class="textblock text-xs-center">
-	<? if (!empty($message)): ?>
-		<p class="message bg-danger"><?=$message ?></p>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message bg-danger">{{ message }}</p>
+	{% endif %}
 
 	<? if (!$this->request->has('login')): ?>
 		<script type="text/javascript">

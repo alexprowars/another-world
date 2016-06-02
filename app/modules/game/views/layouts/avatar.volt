@@ -1,10 +1,10 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Бесплатные образы')); ?>
+{{ partial('shared/city_header', ['title': 'Бесплатные образы']) }}
 <table align='center' class='ltable' style='width:100%;'>
 	<tr>
 		<td valign="top" bgcolor=efdcb8 class="textblock">
-			<? if (isset($message) && !empty($message)): ?>
-				<div class="alert alert-danger"><?= $message ?></div>
-			<? endif; ?>
+			{% if message is not empty %}
+				<p class="message alert-danger">{{ message }}</p>
+			{% endif %}
 
 			<center>
 				<small><b>Внимание! Выбрав образ сейчас, Вы более не сможете его сменить!</b></small>
@@ -13,20 +13,20 @@
 
 			<table width="100%">
 				<tr>
-					<? if ($this->user->level < 8): ?>
-						<? for ($g = 1; $g < 6; $g++): ?>
-							<? if (!($g % 6)): ?>
+					{% if user.level < 8 %}
+						{% for g in 1..5 %}
+							{% if !(g%6) %}
 								</tr><tr>
-							<? endif; ?>
+							{% endif %}
 							<td class="text-xs-center">
-								<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Применить это образ?', 'load(\'/avatar/?setimg=<?=$g ?>\')')">
-								<img src="/images/avatar/obraz/<?=$this->user->sex ?>/<?=$g ?>.png">
+								<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Применить это образ?', 'load(\'/avatar/?setimg={{ g }}\')')">
+								<img src="/images/avatar/obraz/{{ user.sex }}/<?=$g ?>.png">
 								</a>
 							</td>
-						<? endfor; ?>
-					<? else: ?>
+						{% endfor %}
+					{% else %}
 						<td><center><b>У вас уже установлен образ. Сменить его вы сможете только в здании администрации.</b></center></td>
-					<? endif; ?>
+					{% endif %}
 				</tr>
 			</table>
 		</td>

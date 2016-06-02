@@ -1,22 +1,22 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Банк', 'credits' => $this->user->credits)); ?>
+{{ partial('shared/city_header', ['title': 'Банк', 'credits': user.credits]) }}
 
 <div class="textblock">
 	<div class="row">
 		<div class="col-xs-12 text-xs-right">
-			<a href="<?=$this->url->get('map/') ?>?otdel=<?=$otdel ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
-			<a href="<?=$this->url->get('map/') ?>?refer=17"><img src='/images/images/back.gif' alt='Вернуться'></a>
+			<a href="{{ url('map/') }}?otdel=<?=$otdel ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
+			<a href="{{ url('map/') }}?refer=17"><img src='/images/images/back.gif' alt='Вернуться'></a>
 		</div>
 	</div>
 	<div class="clearfix"></div>
 
-	<? if (!empty($message)): ?>
-		<div class="alert alert-danger"><?= $message ?></div>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message alert-danger">{{ message }}</p>
+	{% endif %}
 
 
 	<ul class="nav nav-tabs">
-	  	<li role="presentation" class="<?=($otdel == 1 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=1">Пожертвования</a></li>
-		<li role="presentation" class="<?=($otdel == 2 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=2">Обмен валюты</a></li>
+	  	<li role="presentation" class="<?=($otdel == 1 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=1">Пожертвования</a></li>
+		<li role="presentation" class="<?=($otdel == 2 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=2">Обмен валюты</a></li>
 	</ul>
 
 	<div class="tab-content">
@@ -28,7 +28,7 @@
 					<br><br>
 					<div class="row">
 						<div class="col-xs-6">
-							<form method="POST" action="<?=$this->url->get('map/') ?>?otdel=<?=$otdel ?>" class="form-horizontal">
+							<form method="POST" action="{{ url('map/') }}?otdel=<?=$otdel ?>" class="form-horizontal">
 								<fieldset>
 									<legend>Отблагодарить за создание игры</legend>
 									<div class="form-group">
@@ -83,7 +83,7 @@
 					<br><br>
 					<div class="row">
 						<div class="col-xs-6">
-							<form method="POST" action="<?=$this->url->get('map/') ?>?otdel=<?=$otdel ?>" class="form-horizontal">
+							<form method="POST" action="{{ url('map/') }}?otdel=<?=$otdel ?>" class="form-horizontal">
 								<fieldset>
 									<legend>Введите сколько платины вы хотели бы обменять</legend>
 									<div class="form-group">

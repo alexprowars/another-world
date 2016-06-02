@@ -7,7 +7,7 @@
 				<? endif; ?>
 				<td valign="top" height="100%" width="50%">
 					<div style="height:100%;background: url(/images/inman_fon2.gif)">
-						<? $this->view->partial('shared/shop_item', Array('object' => $object, 'type' => 1)); ?>
+						{{ partial('shared/shop_item', ['object': object, 'type': 1]) }}
 					</div>
 				</td>
 			<? endforeach; ?>

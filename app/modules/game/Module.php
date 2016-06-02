@@ -64,6 +64,13 @@ class Module implements ModuleDefinitionInterface
 				});
 
 				$compiler->addFilter('round', 'round');
+				$compiler->addFilter('ceil', 'ceil');
+				$compiler->addFilter('pretty_time', 'pretty_time');
+
+				$compiler->addFunction('getWidth', function($arguments)
+				{
+					return 'GetWPers('.$arguments.')';
+				});
 
 				return $volt;
 			}]);

@@ -49,57 +49,57 @@
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Оружие</b></u></font>
 											<ul class="uz">
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=1">Ножи и кинжалы</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=2">Мечи</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=3">Топоры и Секиры</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=4">Дубины и Булавы</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=5">Луки и Арбалеты</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=1">Ножи и кинжалы</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=2">Мечи</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=3">Топоры и Секиры</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=4">Дубины и Булавы</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=5">Луки и Арбалеты</a></li>
 											</ul>
 										</li>
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Доспехи</b></u></font>
 											<ul class="uz">
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=6">Шлема</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=7">Рубахи</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=8">Броня</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=16">Нарукавники</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=9">Перчатки</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=10">Щиты</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=11">Пояса</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=17">Штаны</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=12">Обувь</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=6">Шлема</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=7">Рубахи</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=8">Броня</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=16">Нарукавники</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=9">Перчатки</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=10">Щиты</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=11">Пояса</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=17">Штаны</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=12">Обувь</a></li>
 											</ul>
 										</li>
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Ювелирные изделия</b></u></font>
 											<ul class="uz">
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=13">Ожерелья</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=14">Кольца</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=15">Серьги</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=13">Ожерелья</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=14">Кольца</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=15">Серьги</a></li>
 											</ul>
 										</li>
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Подарки</b></u></font>
 											<ul class="uz">
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=101">Букеты</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=100">Открытки</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=102">Подарки</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=101">Букеты</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=100">Открытки</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=102">Подарки</a></li>
 											</ul>
 										</li>
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Прочее</b></u></font>
 											<ul class="uz">
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=30">Ресурсы</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=31">Драг. камни</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=30">Ресурсы</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=31">Драг. камни</a></li>
 											</ul>
 										</li>
 										<li class="m">
 											<font class="m" color="#B27D5D"><b><u>Справочная</b></u></font>
 											<ul class="uz">
 												<li class="m"><a class="m" href="exp.php" target=_blank>Таблица опыта</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=21">Центр занятости</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=22">Академия</a></li>
-												<li class="m"><a class="m" href="<?=$this->url->get('library/') ?>?otdel=23">Модификаторы</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=21">Центр занятости</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=22">Академия</a></li>
+												<li class="m"><a class="m" href="<{{ url('library/') }}?otdel=23">Модификаторы</a></li>
 											</ul>
 										</li>
 									</ul>

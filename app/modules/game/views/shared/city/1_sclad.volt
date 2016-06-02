@@ -1,4 +1,4 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Складское Помещение')); ?>
+{{ partial('shared/city_header', ['title': 'Складское Помещение']) }}
 <table border='0' cellspacing='0' cellpadding='0' class='tmain'>
 	<tr>
 		<td valign='top' style='text-align:center;'>
@@ -42,10 +42,9 @@
 							<tr>
 								<td align=right>
 
-									<? if (!empty($message)): ?>
-									<center><FONT COLOR=RED><b><?=$message ?></b></font></center>
-									<BR>
-									<? endif; ?>
+									{% if message is not empty %}
+										<p class="message alert-danger">{{ message }}</p>
+									{% endif %}
 
 									<table width=100% cellspacing=0 cellpadding=3 border=0>
 										<tr>

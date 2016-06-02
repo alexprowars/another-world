@@ -11,7 +11,7 @@
 				<tr>
 					<td width='30%' align='center'>
 						<small><img src='/images/items/<?= $object->item->tip ?>/<?= $object->item->name ?>.gif' alt='<?= $object->item->title ?>'><br></small>
-						<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Купить предмет &quot;<?= $object->item->title ?>&quot; за &quot;<?= $object->item->price ?>&quot; зол.?', 'load(\'/map/?otdel=<?= $otdel ?>&buy=<?= $object->shop->id ?>\')')"><b>Купить за <?= $object->item->price ?> зол.</b></a>
+						<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Купить предмет &quot;<?= $object->item->title ?>&quot; за &quot;<?= $object->item->price ?>&quot; зол.?', 'load(\'/map/?otdel={{ otdel }}&buy=<?= $object->shop->id ?>\')')"><b>Купить за <?= $object->item->price ?> зол.</b></a>
 					</td>
 					<td width='70%'>
 						<small>

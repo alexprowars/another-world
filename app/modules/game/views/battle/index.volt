@@ -28,7 +28,7 @@
 			<div class="text-xs-center timeout">
 				До тайм-аута: <b id='timeout'></b>
 				<HR color=e2e0e0>
-				<b>Полный лог боя <a href="<?=$this->url->get('logs/') ?>?log=<?= $this->user->battle ?>" target="_blank"> тут</a></b>
+				<b>Полный лог боя <a href="{{ url('logs/') }}?log={{ user.battle }}" target="_blank"> тут</a></b>
 				<HR color=e2e0e0>
 			</div>
 		</td>

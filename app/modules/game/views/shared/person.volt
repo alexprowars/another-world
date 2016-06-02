@@ -1,6 +1,6 @@
 {% set isEdit = router.getControllerName() == "edit" %}
 <td width="245" valign=top>
-	{% if !parse['exp'] %}
+	{% if parse['exp'] == 0 %}
 		<script>setTimeout("parent.noob_text()", 30000);</script>
 	{% endif %}
 	<table class="tmain personBlock">

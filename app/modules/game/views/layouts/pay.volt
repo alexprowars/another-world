@@ -1,8 +1,8 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Покупка платины')); ?>
+{{ partial('shared/city_header', ['title': 'Покупка платины']) }}
 <div class="textblock text-xs-center">
-	<? if (!empty($message)): ?>
-		<p class="message bg-danger"><?=$message ?></p>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message bg-danger">{{ message }}</p>
+	{% endif %}
 
 	<p class="message bg-info">
 		Для развития проекта Вы можете поддержать нас преобретая платину по следующему курсу:<br><br>1 платина - 1 ОК

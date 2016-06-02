@@ -1,24 +1,24 @@
-<? $this->view->partial('shared/city_header', Array('title' => 'Администрация', 'credits' => $this->user->credits)); ?>
+{{ partial('shared/city_header', ['title': 'Администрация', 'credits': user.credits]) }}
 
 <div class="textblock">
 	<div class="row">
 		<div class="col-xs-12 text-xs-right">
-			<a href="<?=$this->url->get('map/') ?>?otdel=<?=$otdel ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
-			<a href="<?=$this->url->get('map/') ?>?refer=14"><img src='/images/images/back.gif' alt='Вернуться'></a>
+			<a href="{{ url('map/') }}?otdel=<?=$otdel ?>"><img src='/images/images/refresh.gif' alt='Обновить'></a>
+			<a href="{{ url('map/') }}?refer=14"><img src='/images/images/back.gif' alt='Вернуться'></a>
 		</div>
 	</div>
 	<div class="clearfix"></div>
 
-	<? if (!empty($message)): ?>
-		<div class="alert alert-danger"><?= $message ?></div>
-	<? endif; ?>
+	{% if message is not empty %}
+		<p class="message alert-danger">{{ message }}</p>
+	{% endif %}
 
 
 	<ul class="nav nav-tabs">
-	 	<li role="presentation" class="<?=($otdel == 1 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=1">Правила регистрации</a></li>
-	  	<li role="presentation" class="<?=($otdel == 2 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=2">Подать заявку на проверку</a></li>
-	  	<li role="presentation" class="<?=($otdel == 3 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=3">Образ</a></li>
-		<li role="presentation" class="<?=($otdel == 4 ? 'active' : '') ?>"><a href="<?=$this->url->get('map/') ?>?otdel=4">Архив кланов</a></li>
+	 	<li role="presentation" class="<?=($otdel == 1 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=1">Правила регистрации</a></li>
+	  	<li role="presentation" class="<?=($otdel == 2 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=2">Подать заявку на проверку</a></li>
+	  	<li role="presentation" class="<?=($otdel == 3 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=3">Образ</a></li>
+		<li role="presentation" class="<?=($otdel == 4 ? 'active' : '') ?>"><a href="{{ url('map/') }}?otdel=4">Архив кланов</a></li>
 	</ul>
 
 	<div class="tab-content">
@@ -142,7 +142,7 @@
 							<? for ($g = 1; $g < 50; $g++): ?>
 								<? if ($g > 1 && ($g-1)%6 == 0) echo "<tr>"; ?>
 								<td class="text-xs-center">
-									<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Купить это образ?', 'load(\'/map/?otdel=<?=$otdel ?>&image=<?=$g ?>\')')"><img src="/images/avatar/obraz/<?=$this->user->sex ?>/<?=$g ?>.png"></a>
+									<a href="javascript:;" onclick="confirmDialog('Подтвердите действие', 'Купить это образ?', 'load(\'/map/?otdel=<?=$otdel ?>&image=<?=$g ?>\')')"><img src="/images/avatar/obraz/{{ user.sex }}/<?=$g ?>.png"></a>
 								</td>
 							<? endfor; ?>
 						</tr>

@@ -1,12 +1,12 @@
 <table class="table np">
 	<tr>
-		<?=$this->user->getPersonBlock() ?>
+		{{ user.getPersonBlock() }}
 		<td valign="top">
 			<? if (isset($message) && $message != ''): ?>
 				<br>
 				<center><font color=red><b><?= $message ?></b></font></center><br>
 			<? endif; ?>
-			<? $this->view->partial('shared/person_menu'); ?>
+			{{ partial('shared/person_menu') }}
 			<div class="textblock">
 				<table  style="width:100%">
 					<tr>

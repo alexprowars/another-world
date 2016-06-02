@@ -1,13 +1,11 @@
-<? if (count($objects)): ?>
+{% if objects|length %}
 	<div class="shop-items row">
-		<? foreach ($objects as $i => $object): ?>
+		{% for object in objects %}
 			<div class="col-xs-6 col-xl-3 col-lg-4">
-				<? $this->view->partial('shared/shop_item', Array('object' => $object, 'type' => 1)); ?>
+				{{ partial('shared/shop_item', ['object': object, 'type': 1]) }}
 			</div>
-		<? endforeach; ?>
-
-		<? if (count($objects) == 0): ?>
-			<div>В данном отделе нет товаров.</div>
-		<? endif; ?>
+		{% endfor %}
 	</div>
-<? endif; ?>
+{% else %}
+	<div>В данном отделе нет товаров.</div>
+{% endif %}

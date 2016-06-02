@@ -1,11 +1,11 @@
 <table class="table np">
 	<tr>
-		<?=$this->user->getPersonBlock() ?>
+		{{ user.getPersonBlock() }}
 		<td valign="top">
-			<? if (isset($message) && !empty($message)): ?>
-				<div class="alert alert-danger"><?= $message ?></div>
-			<? endif; ?>
-			<? $this->view->partial('shared/person_menu'); ?>
+			{% if message is not empty %}
+				<p class="message alert-danger">{{ message }}</p>
+			{% endif %}
+			{{ partial('shared/person_menu') }}
 			<div class="textblock">
 				<table width=100%>
 					<tr>
@@ -15,7 +15,7 @@
 					</tr>
 					<tr>
 						<td valign=center colspan=2 align=center>
-							<a href="<?=$this->url->get('map/') ?>?room=23" class="standbut">Уйти с арены</a>
+							<a href="{{ url('map/') }}?room=23" class="standbut">Уйти с арены</a>
 						</td>
 					</tr>
 					<tr>
@@ -23,25 +23,25 @@
 							<b>Боевая комната</b><br>
 							<small>[Уровень: <u>0</u>-15]</small>
 							<br>
-							<?
-							if ($room_1_members > 0)
-								echo "Воинов: " . $room_1_members . "";
-							else echo "Пустует";
-							?>
+							{% if room_1_members > 0 %}
+								Воинов: {{ room_1_members }}
+							{% else %}
+								Пустует
+							{% endif %}
 							<br>
-							<a href="<?=$this->url->get('map/') ?>?room=1" class="standbut">Вход</a>
+							<a href="{{ url('map/') }}?room=1" class="standbut">Вход</a>
 						</td>
 						<td align=center>
 							<b>Тренировочный зал</b><br>
 							<small>[Уровень: <u>0</u>-15]</small>
 							<br>
-							<?
-							if ($room_2_members > 0)
-								echo "Воинов: " . $room_2_members . "";
-							else echo "Пустует";
-							?>
+							{% if room_2_members > 0 %}
+								Воинов: {{ room_2_members }}
+							{% else %}
+								Пустует
+							{% endif %}
 							<br>
-							<a href="<?=$this->url->get('map/') ?>?room=2" class="standbut">Вход</a>
+							<a href="{{ url('map/') }}?room=2" class="standbut">Вход</a>
 						</td>
 					</tr>
 					<tr>
@@ -49,7 +49,7 @@
 							<b>Больница</b><br>
 							<small>[портал в больницу]</small>
 							<br>
-							<a href="<?=$this->url->get('map/') ?>?room=8" class="standbut">Вход</a>
+							<a href="{{ url('map/') }}?room=8" class="standbut">Вход</a>
 						</td>
 					</tr>
 				</table>
