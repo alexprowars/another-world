@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 $message = '';

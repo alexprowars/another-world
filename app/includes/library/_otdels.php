@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Game\Controllers\Application $this
+ * @var \Game\Controllers\MapController $this
  */
 
 define('SHOP_ID', 1);
@@ -12,7 +12,7 @@ if (!empty($otdel))
 {
 	$builder = $this->modelsManager->createBuilder();
 
-	$objects =  $builder->from(['item' => 'App\Models\Items', 'shop' => 'App\Models\ShopItems'])
+	$objects =  $builder->from(['item' => 'Game\Models\Items', 'shop' => 'Game\Models\ShopItems'])
 						->where('item.id = shop.item_id AND shop.shop_id = :shop: AND shop.group_id = :group:', Array('shop' => SHOP_ID, 'group' => $otdel))
 						->orderBy('item.min_level ASC')
 						->getQuery()->execute();

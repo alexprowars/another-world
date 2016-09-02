@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 $message = '';
@@ -22,9 +22,9 @@ if ($this->request->hasPost('donation'))
 		if ($this->user->credits >= $money)
 		{
 			$this->db->query("INSERT INTO game_donations (user_id, money, comment, time) values(".$this->user->getId().", '" . $money . "','" . $comment . "', ".time().")");
-			$this->db->query("UPDATE game_users SET credits = credits - ".$money." WHERE id = ".$this->user->getId()."");
 
 			$this->user->credits -= $money;
+			$this->user->update();
 
 			$message = "Ваше пожертвование: ".$money." зол. принято!";
 		}
@@ -48,8 +48,7 @@ if ($this->request->hasPost('exchange'))
 		{
 			$this->user->f_credits -= $money;
 			$this->user->credits += $money * 20;
-
-			$this->db->query("UPDATE game_users SET credits = ".$this->user->credits.", f_credits = ".$this->user->f_credits." WHERE id = ".$this->user->getId()."");
+			$this->user->update();
 
 			$message = "Обмен совершен!! Вы приобрели ".($money * 20)." зол.";
 		}

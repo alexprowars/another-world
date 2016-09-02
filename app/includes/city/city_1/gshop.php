@@ -1,11 +1,11 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 
-use App\Models\ShopItems;
+use Game\Models\ShopItems;
 
 define('SHOP_ID', 4);
 
@@ -106,7 +106,7 @@ if ($otdel < 4)
 {
 	$builder = $this->modelsManager->createBuilder();
 
-	$objects = $builder->from(['item' => 'App\Models\Items', 'shop' => 'App\Models\ShopItems'])->where('item.id = shop.item_id AND shop.shop_id = :shop: AND shop.group_id = :group:', Array('shop' => SHOP_ID, 'group' => $otdel))->orderBy('item.price ASC')->getQuery()->execute();
+	$objects = $builder->from(['item' => 'Game\Models\Items', 'shop' => 'Game\Models\ShopItems'])->where('item.id = shop.item_id AND shop.shop_id = :shop: AND shop.group_id = :group:', Array('shop' => SHOP_ID, 'group' => $otdel))->orderBy('item.price ASC')->getQuery()->execute();
 }
 else
 {

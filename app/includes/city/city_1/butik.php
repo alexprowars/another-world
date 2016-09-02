@@ -1,11 +1,11 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
-use App\Models\Objects;
-use App\Models\ShopItems;
+use Game\Models\Objects;
+use Game\Models\ShopItems;
 
 define('SHOP_ID', 2);
 
@@ -15,18 +15,12 @@ $message = '';
 
 if ($this->request->has('buy') && $this->request->get('buy', 'int') > 0)
 {
-	/**
-	 * @var $item \App\Models\ShopItems
-	 */
 	$item = ShopItems::findFirst($this->request->get('buy', 'int'));
 	$message = $item->buy();
 }
 
 if ($this->request->has('sale') && $this->request->get('sale', 'int') > 0)
 {
-	/**
-	 * @var $object \App\Models\Objects
-	 */
 	$object = Objects::findFirst('id = '.$this->request->get('sale', 'int').' AND user_id = '.$this->user->id.'');
 	$message = $object->sale();
 }
@@ -37,7 +31,7 @@ if ($otdel == 0)
 {
 	$builder = $this->modelsManager->createBuilder();
 
-	$objects =  $builder->from(['item' => 'App\Models\Items', 'shop' => 'App\Models\ShopItems'])
+	$objects =  $builder->from(['item' => 'Game\Models\Items', 'shop' => 'Game\Models\ShopItems'])
 						->where('item.id = shop.item_id AND shop.shop_id = :shop: AND shop.cnt > 0 AND item.min_level = :level:', Array('shop' => SHOP_ID, 'level' => $this->user->level))
 						->orderBy('shop.group_id ASC')
 						->getQuery()->execute();
@@ -46,7 +40,7 @@ elseif ($otdel < 40)
 {
 	$builder = $this->modelsManager->createBuilder();
 
-	$objects =  $builder->from(['item' => 'App\Models\Items', 'shop' => 'App\Models\ShopItems'])
+	$objects =  $builder->from(['item' => 'Game\Models\Items', 'shop' => 'Game\Models\ShopItems'])
 						->where('item.id = shop.item_id AND shop.shop_id = :shop: AND shop.group_id = :group:', Array('shop' => SHOP_ID, 'group' => $otdel))
 						->orderBy('item.min_level ASC')
 						->getQuery()->execute();

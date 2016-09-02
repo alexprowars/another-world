@@ -1,10 +1,10 @@
 <?
 
 /**
- * @var $this App\Game\Controllers\Application
+ * @var $this \Game\Controllers\MapController
  */
 
-use App\Models\Objects;
+use Game\Models\Objects;
 
 $message = '';
 

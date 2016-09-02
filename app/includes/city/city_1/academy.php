@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 $message = '';
@@ -24,13 +24,13 @@ if ($this->request->hasQuery('learn'))
 					$message = "Вы не можете получить эту профессию, уровень маловат!";
 				else
 				{
-					$this->db->query("UPDATE `game_users` SET proff = ".$ch['id'].", `r_time` = ".(time() + $ch['srok']).", r_type = '3', `credits` = credits - ".$ch['price']." WHERE `id` = '" . $this->user->id . "'");
-
 					$this->user->r_time = time() + $ch['srok'];
 					$this->user->r_type = 3;
 					$this->user->proff = $ch['id'];
+					$this->user->credits -= $ch['price'];
 
-					$message = "Процесс обучения начат! По окончанию обучения Вы станете высококвалицицированным специалистом!";
+					if ($this->user->update())
+						$message = "Процесс обучения начат! По окончанию обучения Вы станете высококвалицицированным специалистом!";
 				}
 			}
 			else
@@ -45,10 +45,9 @@ if ($this->request->hasQuery('learn'))
 
 if ($this->user->r_type == 3 && $this->user->r_time < time())
 {
-	$this->db->query("UPDATE game_users set r_time = 0, r_type = 0 WHERE id = ".$this->user->id."");
-
 	$this->user->r_time = 0;
 	$this->user->r_type = 0;
+	$this->user->update();
 }
 
 $this->view->pick('shared/city/1_academy');

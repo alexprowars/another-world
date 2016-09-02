@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 if ($this->user->level < 4)
@@ -20,8 +20,9 @@ if ($this->request->has('use'))
 	{
 		if ($time > 0)
 		{
-			$this->db->query("UPDATE `game_users` SET `r_time` = " . (time() + $time) . ", r_type = '2' WHERE `id` = '" . $this->user->id . "'");
 			$this->user->r_time = time() + $time;
+			$this->user->r_type = 2;
+			$this->user->update();
 		}
 	}
 }
@@ -30,7 +31,14 @@ if ($this->request->has('use'))
 if ($this->request->has('puse') && $this->user->travma > time() && $this->user->credits >= 200)
 {
 	$this->db->query("DELETE FROM game_users_effects WHERE user_id = '" . $this->user->id . "' AND type = '3'");
-	$this->db->query("UPDATE `game_users` SET travma = 0, t_level = 0, t_type = 0, credits = credits - 200, room = 1  WHERE `id` = '" . $this->user->id . "'");
+
+	$this->user->update([
+		'travma' => 0,
+		't_level' => 0,
+		't_type' => 0,
+		'credits' => $this->user->credits - 200,
+		'room' => 1
+	]);
 
 	$this->game->insertInChat("Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>", $this->user->username, true);
 
@@ -42,12 +50,11 @@ if ($this->request->has('puse') && $this->user->travma > time() && $this->user->
 if ($this->user->r_time > 0)
 {
 	if ($this->user->vitality < 1)
-		$this->db->query("UPDATE `game_users` SET `r_time` = 0, r_type = '0' WHERE `id` = '" . $this->user->id . "'");
+		$this->user->update(['r_time' => 0, 'r_type' => 0]);
 
 	if ($time <= 0)
 	{
-		$this->db->query("UPDATE `game_users` SET `r_time` = '0', `r_type` = '0', `room` = '1' WHERE `id` = '".$this->user->id."'");
-
+		$this->user->update(['r_time' => 0, 'r_type' => 0, 'room' => 1]);
 
 		$this->game->insertInChat("Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>", $this->user->username);
 
@@ -59,13 +66,12 @@ if ($this->user->r_time > 0)
 
 	if ($hp <= $hp_max)
 	{
-		$this->db->query("UPDATE `game_users` SET `hp_now` = '".$hp."' WHERE `id` = '".$this->user->id."'");
-
 		$this->user->hp_now = $hp;
+		$this->user->update();
 	}
 	else
 	{
-		$this->db->query("UPDATE `game_users` SET `r_time` = '0', `r_type` = '0', `room` = '1', `hp_now` = '".$hp_max."' WHERE `id` = '".$this->user->id."'");
+		$this->user->update(['r_time' => 0, 'r_type' => 0, 'room' => 1, 'hp_now' => $hp_max]);
 
 		$this->game->insertInChat("Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>", $this->user->username);
 

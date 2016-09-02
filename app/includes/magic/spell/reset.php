@@ -2,7 +2,7 @@
 
 /**
  * @var array $iteminfo
- * @var $enemy \App\Models\Users
+ * @var $enemy \Game\Models\User
  * @var array $object
  */
 

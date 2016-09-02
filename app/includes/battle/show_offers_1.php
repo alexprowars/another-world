@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var \App\Game\Controllers\MapController $this
+ * @var \Game\Controllers\MapController $this
  */
 
 // Если у вас подана заявка на одиночный поединок
