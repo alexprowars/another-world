@@ -11,3 +11,5 @@ public/assets/global/*
 node_modules/*
 public/css/bootstap.css
 public/css/style.css
+public/assets/metronic/
+public/css/bootstrap.css

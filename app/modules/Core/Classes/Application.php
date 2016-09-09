@@ -53,7 +53,7 @@ class Application extends PhalconApplication
 		if ($version < 3)
 			throw new \Exception('Required Phalcon 3.0.0 and above');
 
-		if (file_exists(ROOT_PATH.'/.installed'))
+		//if (file_exists(ROOT_PATH.'/.installed'))
 			define('INSTALLED', true);
 
 		if (defined('INSTALLED'))

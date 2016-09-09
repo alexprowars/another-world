@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.12deb2+deb8u1
+-- version 4.2.12deb2+deb8u2
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Май 31 2016 г., 19:48
--- Версия сервера: 5.7.12-log
--- Версия PHP: 5.6.20-0+deb8u1
+-- Время создания: Сен 09 2016 г., 14:49
+-- Версия сервера: 5.7.14-log
+-- Версия PHP: 5.6.24-0+deb8u1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -26,6 +26,7 @@ SET time_zone = "+00:00";
 -- Структура таблицы `abils`
 --
 
+DROP TABLE IF EXISTS `abils`;
 CREATE TABLE IF NOT EXISTS `abils` (
 `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `abils` (
 -- Структура таблицы `bank_transfers`
 --
 
+DROP TABLE IF EXISTS `bank_transfers`;
 CREATE TABLE IF NOT EXISTS `bank_transfers` (
   `time` int(11) unsigned NOT NULL DEFAULT '0',
   `fr` varchar(20) NOT NULL,
@@ -56,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `bank_transfers` (
 -- Структура таблицы `battle_drop`
 --
 
+DROP TABLE IF EXISTS `battle_drop`;
 CREATE TABLE IF NOT EXISTS `battle_drop` (
   `id` smallint(6) unsigned NOT NULL DEFAULT '0',
   `name` varchar(35) NOT NULL,
@@ -72,6 +75,7 @@ CREATE TABLE IF NOT EXISTS `battle_drop` (
 -- Структура таблицы `craft`
 --
 
+DROP TABLE IF EXISTS `craft`;
 CREATE TABLE IF NOT EXISTS `craft` (
 `id` int(10) NOT NULL,
   `item_id` varchar(150) DEFAULT NULL,
@@ -88,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `craft` (
 -- Структура таблицы `drop`
 --
 
+DROP TABLE IF EXISTS `drop`;
 CREATE TABLE IF NOT EXISTS `drop` (
 `id` int(4) NOT NULL,
   `p_drop` int(4) NOT NULL DEFAULT '0',
@@ -101,6 +106,7 @@ CREATE TABLE IF NOT EXISTS `drop` (
 -- Структура таблицы `game_academy`
 --
 
+DROP TABLE IF EXISTS `game_academy`;
 CREATE TABLE IF NOT EXISTS `game_academy` (
 `id` int(11) NOT NULL,
   `type` int(1) NOT NULL DEFAULT '0',
@@ -129,6 +135,7 @@ INSERT INTO `game_academy` (`id`, `type`, `title`, `srok`, `price`, `level`) VAL
 -- Структура таблицы `game_bank`
 --
 
+DROP TABLE IF EXISTS `game_bank`;
 CREATE TABLE IF NOT EXISTS `game_bank` (
   `name` varchar(10) NOT NULL DEFAULT '',
   `bank` decimal(12,2) NOT NULL DEFAULT '0.00',
@@ -147,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `game_bank` (
 -- Структура таблицы `game_banned`
 --
 
+DROP TABLE IF EXISTS `game_banned`;
 CREATE TABLE IF NOT EXISTS `game_banned` (
   `id` int(11) NOT NULL,
   `who` int(11) NOT NULL DEFAULT '0',
@@ -162,6 +170,7 @@ CREATE TABLE IF NOT EXISTS `game_banned` (
 -- Структура таблицы `game_battle`
 --
 
+DROP TABLE IF EXISTS `game_battle`;
 CREATE TABLE IF NOT EXISTS `game_battle` (
 `BattleID` int(11) NOT NULL,
   `StartTime` int(11) DEFAULT NULL,
@@ -192,6 +201,7 @@ CREATE TABLE IF NOT EXISTS `game_battle` (
 -- Структура таблицы `game_battle_log`
 --
 
+DROP TABLE IF EXISTS `game_battle_log`;
 CREATE TABLE IF NOT EXISTS `game_battle_log` (
 `HitID` int(11) NOT NULL,
   `BattleID` int(11) DEFAULT NULL,
@@ -218,6 +228,7 @@ CREATE TABLE IF NOT EXISTS `game_battle_log` (
 -- Структура таблицы `game_battle_users`
 --
 
+DROP TABLE IF EXISTS `game_battle_users`;
 CREATE TABLE IF NOT EXISTS `game_battle_users` (
   `BattleID` int(11) NOT NULL DEFAULT '0',
   `FighterID` int(11) NOT NULL DEFAULT '0',
@@ -242,54 +253,10 @@ CREATE TABLE IF NOT EXISTS `game_battle_users` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `game_cms_menu`
---
-
-CREATE TABLE IF NOT EXISTS `game_cms_menu` (
-`id` int(11) NOT NULL,
-  `active` enum('0','1') NOT NULL DEFAULT '0',
-  `parent_id` int(11) NOT NULL DEFAULT '0',
-  `priority` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(150) NOT NULL DEFAULT '',
-  `alias` varchar(50) NOT NULL DEFAULT '',
-  `icon` varchar(50) NOT NULL DEFAULT '',
-  `image` varchar(150) NOT NULL DEFAULT ''
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `game_cms_modules`
---
-
-CREATE TABLE IF NOT EXISTS `game_cms_modules` (
-`id` int(11) NOT NULL,
-  `is_admin` enum('0','1') NOT NULL DEFAULT '0',
-  `alias` varchar(50) NOT NULL DEFAULT '',
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `active` enum('0','1') NOT NULL DEFAULT '0',
-  `private` enum('0','1') NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `game_cms_rights`
---
-
-CREATE TABLE IF NOT EXISTS `game_cms_rights` (
-`id` int(11) NOT NULL,
-  `module_id` int(11) NOT NULL DEFAULT '0',
-  `group_id` int(11) NOT NULL DEFAULT '0',
-  `right_id` enum('0','1','2') NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `game_comments`
 --
 
+DROP TABLE IF EXISTS `game_comments`;
 CREATE TABLE IF NOT EXISTS `game_comments` (
 `id` int(11) unsigned NOT NULL,
   `news` int(11) unsigned NOT NULL DEFAULT '0',
@@ -304,6 +271,7 @@ CREATE TABLE IF NOT EXISTS `game_comments` (
 -- Структура таблицы `game_complects`
 --
 
+DROP TABLE IF EXISTS `game_complects`;
 CREATE TABLE IF NOT EXISTS `game_complects` (
 `id` int(11) unsigned NOT NULL,
   `user_id` int(11) unsigned NOT NULL,
@@ -314,30 +282,10 @@ CREATE TABLE IF NOT EXISTS `game_complects` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `game_config`
---
-
-CREATE TABLE IF NOT EXISTS `game_config` (
-  `key` varchar(100) NOT NULL,
-  `value` varchar(150) NOT NULL,
-  `type` enum('text','int','textarea','') NOT NULL DEFAULT 'text'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `game_config`
---
-
-INSERT INTO `game_config` (`key`, `value`, `type`) VALUES
-('totalUsers', '0', 'text'),
-('totalLight', '0', 'text'),
-('totalDark', '0', 'text');
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `game_donations`
 --
 
+DROP TABLE IF EXISTS `game_donations`;
 CREATE TABLE IF NOT EXISTS `game_donations` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -349,23 +297,10 @@ CREATE TABLE IF NOT EXISTS `game_donations` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `game_errors`
---
-
-CREATE TABLE IF NOT EXISTS `game_errors` (
-`id` int(11) NOT NULL,
-  `time` int(11) NOT NULL DEFAULT '0',
-  `user` int(11) NOT NULL DEFAULT '0',
-  `type` varchar(50) NOT NULL,
-  `text` varchar(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `game_friends`
 --
 
+DROP TABLE IF EXISTS `game_friends`;
 CREATE TABLE IF NOT EXISTS `game_friends` (
 `id` smallint(5) unsigned NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -379,6 +314,7 @@ CREATE TABLE IF NOT EXISTS `game_friends` (
 -- Структура таблицы `game_ip_banned`
 --
 
+DROP TABLE IF EXISTS `game_ip_banned`;
 CREATE TABLE IF NOT EXISTS `game_ip_banned` (
   `start` int(11) NOT NULL DEFAULT '0',
   `com` varchar(50) NOT NULL DEFAULT '0',
@@ -392,6 +328,7 @@ CREATE TABLE IF NOT EXISTS `game_ip_banned` (
 -- Структура таблицы `game_items`
 --
 
+DROP TABLE IF EXISTS `game_items`;
 CREATE TABLE IF NOT EXISTS `game_items` (
 `id` int(11) NOT NULL,
   `name` varchar(30) NOT NULL DEFAULT '',
@@ -1279,6 +1216,7 @@ INSERT INTO `game_items` (`id`, `name`, `title`, `price`, `f_price`, `tip`, `slo
 -- Структура таблицы `game_levels`
 --
 
+DROP TABLE IF EXISTS `game_levels`;
 CREATE TABLE IF NOT EXISTS `game_levels` (
   `id` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '0',
@@ -1410,6 +1348,7 @@ INSERT INTO `game_levels` (`id`, `level`, `up`, `base`, `exp`, `credits`, `updat
 -- Структура таблицы `game_log_chat`
 --
 
+DROP TABLE IF EXISTS `game_log_chat`;
 CREATE TABLE IF NOT EXISTS `game_log_chat` (
 `id` int(11) unsigned NOT NULL,
   `time` int(11) NOT NULL DEFAULT '0',
@@ -1423,6 +1362,7 @@ CREATE TABLE IF NOT EXISTS `game_log_chat` (
 -- Структура таблицы `game_log_ip`
 --
 
+DROP TABLE IF EXISTS `game_log_ip`;
 CREATE TABLE IF NOT EXISTS `game_log_ip` (
   `id` int(11) NOT NULL DEFAULT '0',
   `time` int(11) NOT NULL DEFAULT '0',
@@ -1435,6 +1375,7 @@ CREATE TABLE IF NOT EXISTS `game_log_ip` (
 -- Структура таблицы `game_log_items`
 --
 
+DROP TABLE IF EXISTS `game_log_items`;
 CREATE TABLE IF NOT EXISTS `game_log_items` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -1450,6 +1391,7 @@ CREATE TABLE IF NOT EXISTS `game_log_items` (
 -- Структура таблицы `game_log_transfers`
 --
 
+DROP TABLE IF EXISTS `game_log_transfers`;
 CREATE TABLE IF NOT EXISTS `game_log_transfers` (
 `id` int(11) NOT NULL,
   `time` int(11) unsigned NOT NULL DEFAULT '0',
@@ -1467,6 +1409,7 @@ CREATE TABLE IF NOT EXISTS `game_log_transfers` (
 -- Структура таблицы `game_lostpasswords`
 --
 
+DROP TABLE IF EXISTS `game_lostpasswords`;
 CREATE TABLE IF NOT EXISTS `game_lostpasswords` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -1482,6 +1425,7 @@ CREATE TABLE IF NOT EXISTS `game_lostpasswords` (
 -- Структура таблицы `game_market`
 --
 
+DROP TABLE IF EXISTS `game_market`;
 CREATE TABLE IF NOT EXISTS `game_market` (
 `id` int(11) NOT NULL,
   `group_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
@@ -1494,9 +1438,33 @@ CREATE TABLE IF NOT EXISTS `game_market` (
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `game_modules`
+--
+
+DROP TABLE IF EXISTS `game_modules`;
+CREATE TABLE IF NOT EXISTS `game_modules` (
+`id` int(11) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `active` enum('0','1') NOT NULL DEFAULT '1',
+  `sort` smallint(6) NOT NULL DEFAULT '0',
+  `namespace` varchar(150) DEFAULT NULL
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `game_modules`
+--
+
+INSERT INTO `game_modules` (`id`, `code`, `active`, `sort`, `namespace`) VALUES
+(1, 'core', '1', 10, 'Sky\\Core'),
+(2, 'game', '1', 20, 'Game');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `game_news`
 --
 
+DROP TABLE IF EXISTS `game_news`;
 CREATE TABLE IF NOT EXISTS `game_news` (
 `id` smallint(4) unsigned NOT NULL,
   `autor` varchar(25) NOT NULL,
@@ -1512,6 +1480,7 @@ CREATE TABLE IF NOT EXISTS `game_news` (
 -- Структура таблицы `game_objects`
 --
 
+DROP TABLE IF EXISTS `game_objects`;
 CREATE TABLE IF NOT EXISTS `game_objects` (
 `id` int(11) unsigned NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -1565,6 +1534,7 @@ CREATE TABLE IF NOT EXISTS `game_objects` (
 -- Структура таблицы `game_sclad`
 --
 
+DROP TABLE IF EXISTS `game_sclad`;
 CREATE TABLE IF NOT EXISTS `game_sclad` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -1575,9 +1545,28 @@ CREATE TABLE IF NOT EXISTS `game_sclad` (
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `game_sessions`
+--
+
+DROP TABLE IF EXISTS `game_sessions`;
+CREATE TABLE IF NOT EXISTS `game_sessions` (
+`id` int(11) NOT NULL,
+  `token` varchar(100) DEFAULT NULL,
+  `object_type` enum('client','user') DEFAULT NULL,
+  `object_id` int(11) DEFAULT NULL,
+  `timestamp` int(11) DEFAULT NULL,
+  `lifetime` int(6) NOT NULL DEFAULT '0',
+  `useragent` varchar(200) DEFAULT NULL,
+  `request` varchar(250) DEFAULT NULL
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `game_shop`
 --
 
+DROP TABLE IF EXISTS `game_shop`;
 CREATE TABLE IF NOT EXISTS `game_shop` (
 `id` int(11) NOT NULL,
   `name` varchar(150) NOT NULL DEFAULT ''
@@ -1599,6 +1588,7 @@ INSERT INTO `game_shop` (`id`, `name`) VALUES
 -- Структура таблицы `game_shop_items`
 --
 
+DROP TABLE IF EXISTS `game_shop_items`;
 CREATE TABLE IF NOT EXISTS `game_shop_items` (
 `id` int(11) NOT NULL,
   `shop_id` tinyint(2) NOT NULL DEFAULT '0',
@@ -2335,6 +2325,7 @@ INSERT INTO `game_shop_items` (`id`, `shop_id`, `group_id`, `item_id`, `cnt`, `d
 -- Структура таблицы `game_slots`
 --
 
+DROP TABLE IF EXISTS `game_slots`;
 CREATE TABLE IF NOT EXISTS `game_slots` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2385,6 +2376,7 @@ INSERT INTO `game_slots` (`id`, `user_id`, `i1`, `i2`, `i3`, `i4`, `i5`, `i6`, `
 -- Структура таблицы `game_stats`
 --
 
+DROP TABLE IF EXISTS `game_stats`;
 CREATE TABLE IF NOT EXISTS `game_stats` (
   `name` varchar(15) NOT NULL DEFAULT '',
   `value` int(11) NOT NULL DEFAULT '0'
@@ -2405,6 +2397,7 @@ INSERT INTO `game_stats` (`name`, `value`) VALUES
 -- Структура таблицы `game_tribes`
 --
 
+DROP TABLE IF EXISTS `game_tribes`;
 CREATE TABLE IF NOT EXISTS `game_tribes` (
 `id` int(11) NOT NULL,
   `name` varchar(150) NOT NULL,
@@ -2424,6 +2417,7 @@ CREATE TABLE IF NOT EXISTS `game_tribes` (
 -- Структура таблицы `game_tribes_log`
 --
 
+DROP TABLE IF EXISTS `game_tribes_log`;
 CREATE TABLE IF NOT EXISTS `game_tribes_log` (
 `id` int(11) unsigned NOT NULL,
   `tribe_id` int(11) NOT NULL DEFAULT '0',
@@ -2438,6 +2432,7 @@ CREATE TABLE IF NOT EXISTS `game_tribes_log` (
 -- Структура таблицы `game_tribes_request`
 --
 
+DROP TABLE IF EXISTS `game_tribes_request`;
 CREATE TABLE IF NOT EXISTS `game_tribes_request` (
 `id` int(11) unsigned NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2451,6 +2446,7 @@ CREATE TABLE IF NOT EXISTS `game_tribes_request` (
 -- Структура таблицы `game_users`
 --
 
+DROP TABLE IF EXISTS `game_users`;
 CREATE TABLE IF NOT EXISTS `game_users` (
 `id` int(11) unsigned NOT NULL,
   `tutorial` tinyint(2) NOT NULL DEFAULT '0',
@@ -2459,7 +2455,7 @@ CREATE TABLE IF NOT EXISTS `game_users` (
   `group_id` smallint(6) NOT NULL DEFAULT '0',
   `rank` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `admin` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `banaday` int(11) NOT NULL DEFAULT '0',
+  `banned` int(11) NOT NULL DEFAULT '0',
   `r_time` int(11) unsigned NOT NULL DEFAULT '0',
   `r_type` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `ma_time` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2525,7 +2521,7 @@ CREATE TABLE IF NOT EXISTS `game_users` (
 -- Дамп данных таблицы `game_users`
 --
 
-INSERT INTO `game_users` (`id`, `tutorial`, `username`, `authlevel`, `group_id`, `rank`, `admin`, `banaday`, `r_time`, `r_type`, `ma_time`, `silence`, `ch_time`, `t_time`, `invisible`, `level`, `up`, `exp`, `credits`, `f_credits`, `s_strength`, `s_dex`, `s_agility`, `s_vitality`, `s_power`, `s_razum`, `s_battery`, `hp_now`, `hp_max`, `energy_now`, `otravl`, `s_updates`, `o_updates`, `wins`, `losses`, `drawn`, `room`, `v_room`, `tribe`, `tribe_rank`, `b_tribe`, `sex`, `battle`, `last_battle`, `offer`, `side`, `obraz`, `proff`, `active`, `item_type`, `sign`, `travma`, `t_level`, `t_type`, `onlinetime`, `ic`, `ustal_now`, `immun`, `status`, `reit`, `vip`, `refer`, `battle_drop`, `rank_info`, `ip`, `options_toggle`, `bonus`) VALUES
+INSERT INTO `game_users` (`id`, `tutorial`, `username`, `authlevel`, `group_id`, `rank`, `admin`, `banned`, `r_time`, `r_type`, `ma_time`, `silence`, `ch_time`, `t_time`, `invisible`, `level`, `up`, `exp`, `credits`, `f_credits`, `s_strength`, `s_dex`, `s_agility`, `s_vitality`, `s_power`, `s_razum`, `s_battery`, `hp_now`, `hp_max`, `energy_now`, `otravl`, `s_updates`, `o_updates`, `wins`, `losses`, `drawn`, `room`, `v_room`, `tribe`, `tribe_rank`, `b_tribe`, `sex`, `battle`, `last_battle`, `offer`, `side`, `obraz`, `proff`, `active`, `item_type`, `sign`, `travma`, `t_level`, `t_type`, `onlinetime`, `ic`, `ustal_now`, `immun`, `status`, `reit`, `vip`, `refer`, `battle_drop`, `rank_info`, `ip`, `options_toggle`, `bonus`) VALUES
 (1, 0, 'Клон', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00, 0.00, 2, 3, 3, 3, 3, 0, 3, '15.0', 15, 15, 0, 3, 0, 111, 939, 102, 2, 0, 0, 0, 0, 1, 336, 336, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434810891, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
 (2, 0, 'Ловкая Мона', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0.00, 0.00, 20, 10, 35, 20, 3, 0, 3, '0.0', 100, 15, 0, 3, 0, 193, 520, 39, 2, 0, 0, 0, 0, 2, 295, 295, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1434703490, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
 (3, 0, 'Чуткая Джесси', 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00, 0.00, 4, 3, 3, 4, 3, 0, 3, '0.0', 20, 15, 0, 3, 0, 27, 999, 66, 2, 0, 0, 0, 0, 2, 168, 168, NULL, 1, '0', 0, 1, 1, 1206046800, 0, 0, 0, 1433686954, 0, 0, 0, 0, 0.00, '0', 0, 0, '', 0, 0, 0),
@@ -2544,6 +2540,7 @@ INSERT INTO `game_users` (`id`, `tutorial`, `username`, `authlevel`, `group_id`,
 -- Структура таблицы `game_users_auth`
 --
 
+DROP TABLE IF EXISTS `game_users_auth`;
 CREATE TABLE IF NOT EXISTS `game_users_auth` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2558,6 +2555,7 @@ CREATE TABLE IF NOT EXISTS `game_users_auth` (
 -- Структура таблицы `game_users_effects`
 --
 
+DROP TABLE IF EXISTS `game_users_effects`;
 CREATE TABLE IF NOT EXISTS `game_users_effects` (
 `id` int(11) unsigned NOT NULL,
   `user_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2585,6 +2583,7 @@ CREATE TABLE IF NOT EXISTS `game_users_effects` (
 -- Структура таблицы `game_users_groups`
 --
 
+DROP TABLE IF EXISTS `game_users_groups`;
 CREATE TABLE IF NOT EXISTS `game_users_groups` (
 `id` int(11) NOT NULL,
   `name` varchar(150) NOT NULL DEFAULT ''
@@ -2604,6 +2603,7 @@ INSERT INTO `game_users_groups` (`id`, `name`) VALUES
 -- Структура таблицы `game_users_info`
 --
 
+DROP TABLE IF EXISTS `game_users_info`;
 CREATE TABLE IF NOT EXISTS `game_users_info` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `password` char(32) NOT NULL DEFAULT '',
@@ -2623,6 +2623,7 @@ CREATE TABLE IF NOT EXISTS `game_users_info` (
 -- Структура таблицы `game_users_journal`
 --
 
+DROP TABLE IF EXISTS `game_users_journal`;
 CREATE TABLE IF NOT EXISTS `game_users_journal` (
 `id` bigint(255) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2640,6 +2641,7 @@ CREATE TABLE IF NOT EXISTS `game_users_journal` (
 -- Структура таблицы `game_users_payments`
 --
 
+DROP TABLE IF EXISTS `game_users_payments`;
 CREATE TABLE IF NOT EXISTS `game_users_payments` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2658,6 +2660,7 @@ CREATE TABLE IF NOT EXISTS `game_users_payments` (
 -- Структура таблицы `game_users_priems`
 --
 
+DROP TABLE IF EXISTS `game_users_priems`;
 CREATE TABLE IF NOT EXISTS `game_users_priems` (
 `id` int(11) NOT NULL,
   `user_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2679,6 +2682,7 @@ CREATE TABLE IF NOT EXISTS `game_users_priems` (
 -- Структура таблицы `game_users_prizes`
 --
 
+DROP TABLE IF EXISTS `game_users_prizes`;
 CREATE TABLE IF NOT EXISTS `game_users_prizes` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2695,6 +2699,7 @@ CREATE TABLE IF NOT EXISTS `game_users_prizes` (
 -- Структура таблицы `game_vault`
 --
 
+DROP TABLE IF EXISTS `game_vault`;
 CREATE TABLE IF NOT EXISTS `game_vault` (
   `id` smallint(3) NOT NULL DEFAULT '0',
   `title` varchar(50) NOT NULL DEFAULT '',
@@ -2798,6 +2803,7 @@ INSERT INTO `game_vault` (`id`, `title`, `time`, `top_id`, `bottom_id`, `left_id
 -- Структура таблицы `game_works`
 --
 
+DROP TABLE IF EXISTS `game_works`;
 CREATE TABLE IF NOT EXISTS `game_works` (
   `id` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `type_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2821,6 +2827,7 @@ INSERT INTO `game_works` (`id`, `type_id`, `title`, `time`, `price`) VALUES
 -- Структура таблицы `game_works_type`
 --
 
+DROP TABLE IF EXISTS `game_works_type`;
 CREATE TABLE IF NOT EXISTS `game_works_type` (
 `id` int(11) NOT NULL,
   `name` varchar(150) NOT NULL,
@@ -2842,6 +2849,7 @@ INSERT INTO `game_works_type` (`id`, `name`, `level`, `activity`) VALUES
 -- Структура таблицы `magic`
 --
 
+DROP TABLE IF EXISTS `magic`;
 CREATE TABLE IF NOT EXISTS `magic` (
 `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
@@ -2855,6 +2863,7 @@ CREATE TABLE IF NOT EXISTS `magic` (
 -- Структура таблицы `pochta`
 --
 
+DROP TABLE IF EXISTS `pochta`;
 CREATE TABLE IF NOT EXISTS `pochta` (
 `id` int(11) unsigned NOT NULL,
   `user` varchar(35) NOT NULL,
@@ -2871,6 +2880,7 @@ CREATE TABLE IF NOT EXISTS `pochta` (
 -- Структура таблицы `posts`
 --
 
+DROP TABLE IF EXISTS `posts`;
 CREATE TABLE IF NOT EXISTS `posts` (
 `id` bigint(20) NOT NULL,
   `top_id` bigint(20) NOT NULL DEFAULT '0',
@@ -2891,6 +2901,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
 -- Структура таблицы `top`
 --
 
+DROP TABLE IF EXISTS `top`;
 CREATE TABLE IF NOT EXISTS `top` (
 `clan_id` int(10) unsigned NOT NULL,
   `clan` varchar(25) NOT NULL DEFAULT '',
@@ -2907,6 +2918,7 @@ CREATE TABLE IF NOT EXISTS `top` (
 -- Структура таблицы `topics`
 --
 
+DROP TABLE IF EXISTS `topics`;
 CREATE TABLE IF NOT EXISTS `topics` (
 `id` int(11) unsigned NOT NULL,
   `last_update` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2930,6 +2942,7 @@ CREATE TABLE IF NOT EXISTS `topics` (
 -- Структура таблицы `vault_sessions`
 --
 
+DROP TABLE IF EXISTS `vault_sessions`;
 CREATE TABLE IF NOT EXISTS `vault_sessions` (
 `id` int(11) unsigned NOT NULL,
   `player_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -2997,24 +3010,6 @@ ALTER TABLE `game_battle_users`
  ADD PRIMARY KEY (`BattleID`,`FighterID`);
 
 --
--- Индексы таблицы `game_cms_menu`
---
-ALTER TABLE `game_cms_menu`
- ADD PRIMARY KEY (`id`);
-
---
--- Индексы таблицы `game_cms_modules`
---
-ALTER TABLE `game_cms_modules`
- ADD PRIMARY KEY (`id`);
-
---
--- Индексы таблицы `game_cms_rights`
---
-ALTER TABLE `game_cms_rights`
- ADD PRIMARY KEY (`id`);
-
---
 -- Индексы таблицы `game_comments`
 --
 ALTER TABLE `game_comments`
@@ -3027,21 +3022,9 @@ ALTER TABLE `game_complects`
  ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `game_config`
---
-ALTER TABLE `game_config`
- ADD PRIMARY KEY (`key`);
-
---
 -- Индексы таблицы `game_donations`
 --
 ALTER TABLE `game_donations`
- ADD PRIMARY KEY (`id`);
-
---
--- Индексы таблицы `game_errors`
---
-ALTER TABLE `game_errors`
  ADD PRIMARY KEY (`id`);
 
 --
@@ -3093,6 +3076,12 @@ ALTER TABLE `game_market`
  ADD PRIMARY KEY (`id`), ADD KEY `otdel` (`group_id`), ADD KEY `name` (`object_id`);
 
 --
+-- Индексы таблицы `game_modules`
+--
+ALTER TABLE `game_modules`
+ ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `game_news`
 --
 ALTER TABLE `game_news`
@@ -3105,10 +3094,22 @@ ALTER TABLE `game_objects`
  ADD PRIMARY KEY (`id`), ADD KEY `user` (`user_id`), ADD KEY `tip` (`tip`);
 
 --
+-- Индексы таблицы `game_options`
+--
+ALTER TABLE `game_options`
+ ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `game_sclad`
 --
 ALTER TABLE `game_sclad`
  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `game_sessions`
+--
+ALTER TABLE `game_sessions`
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `token` (`token`);
 
 --
 -- Индексы таблицы `game_shop`
@@ -3289,21 +3290,6 @@ MODIFY `BattleID` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `game_battle_log`
 MODIFY `HitID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `game_cms_menu`
---
-ALTER TABLE `game_cms_menu`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=32;
---
--- AUTO_INCREMENT для таблицы `game_cms_modules`
---
-ALTER TABLE `game_cms_modules`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=36;
---
--- AUTO_INCREMENT для таблицы `game_cms_rights`
---
-ALTER TABLE `game_cms_rights`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=92;
---
 -- AUTO_INCREMENT для таблицы `game_comments`
 --
 ALTER TABLE `game_comments`
@@ -3319,15 +3305,10 @@ MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
 ALTER TABLE `game_donations`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `game_errors`
---
-ALTER TABLE `game_errors`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
 -- AUTO_INCREMENT для таблицы `game_friends`
 --
 ALTER TABLE `game_friends`
-MODIFY `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT для таблицы `game_items`
 --
@@ -3337,12 +3318,12 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=818;
 -- AUTO_INCREMENT для таблицы `game_log_chat`
 --
 ALTER TABLE `game_log_chat`
-MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=59;
 --
 -- AUTO_INCREMENT для таблицы `game_log_items`
 --
 ALTER TABLE `game_log_items`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT для таблицы `game_log_transfers`
 --
@@ -3359,6 +3340,11 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `game_market`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT для таблицы `game_modules`
+--
+ALTER TABLE `game_modules`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
 -- AUTO_INCREMENT для таблицы `game_news`
 --
 ALTER TABLE `game_news`
@@ -3367,12 +3353,22 @@ MODIFY `id` smallint(4) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT для таблицы `game_objects`
 --
 ALTER TABLE `game_objects`
-MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
+--
+-- AUTO_INCREMENT для таблицы `game_options`
+--
+ALTER TABLE `game_options`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT для таблицы `game_sclad`
 --
 ALTER TABLE `game_sclad`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT для таблицы `game_sessions`
+--
+ALTER TABLE `game_sessions`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT для таблицы `game_shop`
 --
@@ -3387,7 +3383,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=814;
 -- AUTO_INCREMENT для таблицы `game_slots`
 --
 ALTER TABLE `game_slots`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=12;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=58;
 --
 -- AUTO_INCREMENT для таблицы `game_tribes`
 --
@@ -3407,7 +3403,7 @@ MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT для таблицы `game_users`
 --
 ALTER TABLE `game_users`
-MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=12;
+MODIFY `id` int(11) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=57;
 --
 -- AUTO_INCREMENT для таблицы `game_users_auth`
 --
