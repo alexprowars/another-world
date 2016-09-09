@@ -64,9 +64,9 @@
 																		<td>
 
 																			<? if ($otdel == 100)
-																				include(ROOT_DIR.ROOT_PATH . 'controllers/mapPage/city_1/sclad/sale.php');
+																				include(ROOT_DIR.ROOT_PATH . '/controllers/mapPage/city_1/sclad/sale.php');
 																			else
-																				include(ROOT_DIR.ROOT_PATH . 'controllers/mapPage/city_1/sclad/_otdels.php');
+																				include(ROOT_DIR.ROOT_PATH . '/controllers/mapPage/city_1/sclad/_otdels.php');
 																			?>
 																		</td>
 																	</tr>

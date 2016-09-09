@@ -101,7 +101,7 @@ class Battle extends Component
 
 		// Основные боевые константы
 		/** @var array $priem_full */
-		include(ROOT_PATH.'/app/config/vars.php');
+		include(ROOT_PATH.'/app/config/battle.php');
 
 		// Вычисляем основные параметры надетых на игрока вещей
 		$left_wear = $this->updateUserParams($this->user);

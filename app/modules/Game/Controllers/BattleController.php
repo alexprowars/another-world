@@ -40,7 +40,7 @@ class BattleController extends Controller
 
 		if ($this->user->room == 2 && !$this->user->battle)
 		{
-			include(ROOT_PATH . 'app/includes/city/city_1/trening.php');
+			include(ROOT_PATH . '/app/includes/city/city_1/trening.php');
 
 			return;
 		}
@@ -160,7 +160,7 @@ class BattleController extends Controller
 						if ($page == "start" || $page == '')
 							$this->startOffer($battleType);
 
-						include(ROOT_PATH."app/includes/battle/show_offers_".$battleType.".php");
+						include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
 					}
 
 					break;
@@ -174,7 +174,7 @@ class BattleController extends Controller
 						if ($page == "start" || $page == '')
 							$this->startOffer($battleType);
 
-						include(ROOT_PATH."app/includes/battle/show_offers_".$battleType.".php");
+						include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
 					}
 
 					break;
@@ -184,7 +184,7 @@ class BattleController extends Controller
 					if ($page == "start")
 						$this->startOffer($battleType);
 
-					include(ROOT_PATH."app/includes/battle/show_offers_".$battleType.".php");
+					include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
 
 			}
 

@@ -263,7 +263,7 @@ class PersController extends Controller
 		/**
 		 * @var array $priem_full
 		 */
-		include(ROOT_PATH.'app/library/Battle/vars.php');
+		include(ROOT_PATH.'/app/library/Battle/vars.php');
 
 		$onset_priem = $this->request->getQuery('onset_priem', 'int', 0);
 		$unset_priem = $this->request->getQuery('unset_priem', 'int', 0);

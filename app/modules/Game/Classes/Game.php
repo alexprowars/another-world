@@ -237,7 +237,7 @@ class Game extends Component
 											$this->setRequestStatus(0);
 
 											// ----- # Читаем свиток # ----- //
-											include(ROOT_PATH.'app/includes/magic/list.php');
+											include(ROOT_PATH.'/app/includes/magic/list.php');
 										}
 										else
 											$message = "Для чтения данного свитка необходимо владеть определенными навыками!";
