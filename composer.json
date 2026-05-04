@@ -1,0 +1,89 @@
+{
+    "name": "alexprowars/another-world",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "require": {
+        "php": "^8.5",
+        "filament/filament": "^5.6",
+        "laravel/framework": "^13.7",
+        "laravel/reverb": "^1.10",
+        "laravel/socialite": "^5.27",
+        "socialiteproviders/vkid": "^5.1",
+        "socialiteproviders/vkontakte": "^5.1",
+        "spatie/laravel-permission": "^7.4",
+        "spatie/laravel-settings": "^3.8",
+        "technikermathe/blade-lucide-icons": "^3.150"
+	},
+    "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.0",
+        "laravel/pail": "^1.2",
+        "mockery/mockery": "^1.6",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-faker": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.1",
+        "phpstan/phpstan": "^2.1"
+    },
+    "replace": {
+        "symfony/polyfill-mbstring": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*",
+        "symfony/polyfill-php85": "*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-intl-idn": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "app/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan schedule:run\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" --names=server,schedule,queue,logs"
+        ],
+        "test": "vendor/bin/pest",
+        "analyse": "vendor/bin/phpstan analyse"
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "prefer-stable": true
+}

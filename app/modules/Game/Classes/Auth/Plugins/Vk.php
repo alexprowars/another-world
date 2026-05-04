@@ -2,13 +2,7 @@
 
 namespace Game\Auth\Plugins;
 
-/**
- * @author AlexPro
- * @copyright 2008 - 2016 XNova Game Group
- * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
- */
-
-use Game\Models\User;
+use App\Models\User;
 use Phalcon\Mvc\User\Component;
 use Phalcon\Text;
 use Sky\Core\Options;

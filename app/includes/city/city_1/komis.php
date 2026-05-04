@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \Game\Controllers\MapController $this
+ * @var \App\Http\Controllers\MapController $this
  */
 
 $otdel = $this->request->get('otdel', 'int', 0);
@@ -126,7 +126,7 @@ if ($otdel == 0)
 	$builder = $this->modelsManager->createBuilder();
 
 	$objects =  $builder->columns(Array('object.*', 'market.*', 'user.username'))
-						->from(['object' => 'Game\Models\Objects', 'market' => 'Game\Models\Market', 'user' => 'Game\Models\Users'])
+						->from(['object' => 'App\Models\Objects', 'market' => 'App\Models\Market', 'user' => 'Game\Models\Users'])
 						->where('user.id = market.user_id AND object.id = market.object_id AND object.komis = 1')
 						->orderBy('market.time DESC')
 						->limit(10)
@@ -137,7 +137,7 @@ elseif ($otdel < 40)
 	$builder = $this->modelsManager->createBuilder();
 
 	$objects =  $builder->columns(Array('object.*', 'market.*', 'user.username'))
-						->from(['object' => 'Game\Models\Objects', 'market' => 'Game\Models\Market', 'user' => 'Game\Models\Users'])
+						->from(['object' => 'App\Models\Objects', 'market' => 'App\Models\Market', 'user' => 'Game\Models\Users'])
 						->where('user.id = market.user_id AND object.id = market.object_id AND object.komis = 1 AND market.group_id = :group:', Array('group' => $otdel))
 						->orderBy('market.price ASC')
 						->getQuery()->execute();

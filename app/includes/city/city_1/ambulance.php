@@ -1,7 +1,7 @@
 <?
 
 /**
- * @var \Game\Controllers\MapController $this
+ * @var \App\Http\Controllers\MapController $this
  */
 
 if ($this->user->level < 4)

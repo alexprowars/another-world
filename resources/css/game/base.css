@@ -1,0 +1,27 @@
+html {
+    height: 100%;
+    max-height: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+	font-size: 13px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Tahoma", "Helvetica", sans-serif;
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    background: #ffe9c0;
+    height: 100%;
+    width: 100%;
+}
+
+a {
+    color: #000;
+}
+
+td,
+th {
+	padding: 0;
+}

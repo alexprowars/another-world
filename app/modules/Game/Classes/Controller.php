@@ -2,16 +2,10 @@
 
 namespace Game;
 
-/**
- * @author AlexPro
- * @copyright 2008 - 2016 XNova Game Group
- * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
- */
-
-use Sky\Core\Lang;
 use Phalcon\Mvc\Controller as PhalconController;
 use Phalcon\Mvc\View;
 use Phalcon\Tag;
+use Sky\Core\Lang;
 
 /**
  * Class Application
@@ -27,7 +21,7 @@ use Phalcon\Tag;
  * @property \Phalcon\Mvc\Router router
  * @property \Phalcon\Cache\Backend\Memcache cache
  * @property \Phalcon\Mvc\Url url
- * @property \Game\Models\User user
+ * @property \App\Models\User user
  * @property \Sky\Core\Access\Auth auth
  * @property \Phalcon\Mvc\Dispatcher dispatcher
  * @property \Phalcon\Flash\Direct flash

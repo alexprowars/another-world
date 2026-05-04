@@ -195,30 +195,3 @@ function pagination ($count, $per_page, $link, $page = 0)
 
 	return $pages;
 }
-
-function _getText()
-{
-	$args = array_merge(['game'], func_get_args());
-
-	return \Sky\Core\Lang::getText($args);
-}
-
-function getClassName ($className)
-{
-	$return = ['name' => '', 'namespace' => ''];
-
-	$parts = explode('\\', $className);
-
-	if (count($parts) > 1)
-	{
-		$return['name'] = $parts[count($parts) - 1];
-
-		array_pop($parts);
-
-		$return['namespace'] = implode('\\', $parts);
-	}
-	else
-		$return['name'] = $className;
-
-	return $return;
-}

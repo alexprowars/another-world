@@ -3,12 +3,6 @@
 namespace Game\Auth\Plugins;
 
 /**
- * @author AlexPro
- * @copyright 2008 - 2016 XNova Game Group
- * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
- */
-
-/**
  * @property \Phalcon\Mvc\View view
  * @property \Phalcon\Tag tag
  * @property \Phalcon\Assets\Manager assets

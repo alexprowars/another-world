@@ -2,13 +2,7 @@
 
 namespace Game;
 
-/**
- * @author AlexPro
- * @copyright 2008 - 2016 XNova Game Group
- * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
- */
-
-use Game\Models\User;
+use App\Models\User;
 use Phalcon\Mvc\User\Component;
 
 /**
@@ -23,7 +17,7 @@ use Phalcon\Mvc\User\Component;
  * @property \Phalcon\Http\Response response
  * @property \Phalcon\Mvc\Router router
  * @property \Phalcon\Cache\Backend\Memcache cache
- * @property \Game\Models\User user
+ * @property \App\Models\User user
  * @property \Sky\Core\Access\Auth auth
  * @property \Phalcon\Mvc\Dispatcher dispatcher
  * @property \Phalcon\Registry|\stdClass registry

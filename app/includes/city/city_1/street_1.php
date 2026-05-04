@@ -1,14 +1,14 @@
 <?
 
 /**
- * @var \Game\Controllers\MapController $this
+ * @var \App\Http\Controllers\MapController $this
  */
 
 
 if ($this->request->has('room'))
 {
 	$room = $this->request->get('room', 'int');
-	
+
 	if ($this->user->room == 101)
 	{
 		$new_set = 0;

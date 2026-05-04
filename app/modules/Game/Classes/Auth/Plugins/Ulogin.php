@@ -2,13 +2,7 @@
 
 namespace Game\Auth\Plugins;
 
-/**
- * @author AlexPro
- * @copyright 2008 - 2016 XNova Game Group
- * Telegram: @alexprowars, Skype: alexprowars, Email: alexprowars@gmail.com
- */
-
-use Game\Models\User;
+use App\Models\User;
 use Phalcon\Mvc\User\Component;
 use Sky\Core\Options;
 
@@ -17,7 +11,7 @@ class Ulogin extends Component implements AuthInterface
 	private $token = '';
 	private $data = array();
 	private $isLogin = false;
-	
+
 	public function check ()
 	{
 		if ($this->request->has('token') && $this->request->get('token') != '')

@@ -1,18 +1,33 @@
 {
-	"name": "another-world",
-	"version": "1.0.0",
-	"description": "Another World Styles",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/alexprowars/another-world.git"
-	},
-	"main": "index.php",
-	"author": "AlexPro (alexprowars@gmail.com)",
-	"license": "ISC",
-	"dependencies": {
-		"gulp": "^3.9.1",
-		"gulp-autoprefixer": "^3.1.0",
-		"gulp-sass": "^2.3.1",
-		"gulp-uglifycss": "^1.0.6"
-	}
+    "name": "another-world",
+    "version": "1.0.0",
+    "description": "Another World Styles",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexprowars/another-world.git"
+    },
+    "main": "index.php",
+    "author": "AlexPro (alexprowars@gmail.com)",
+    "license": "ISC",
+    "scripts": {
+        "dev": "vite --host 0.0.0.0",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@fancyapps/ui": "^6.1.13",
+        "@popperjs/core": "^2.11.8",
+        "@tailwindcss/vite": "^4.2.4",
+        "@zxing/library": "^0.22.0",
+        "laravel-echo": "^2.3.4",
+        "laravel-vite-plugin": "^3.0",
+        "mini-svg-data-uri": "^1.4.4",
+        "pusher-js": "^8.5.0",
+        "vite": "^8.0.10"
+    },
+    "dependencies": {
+        "animated-scroll-to": "^2.3.2",
+        "chart.js": "^4.5.1",
+        "lodash-es": "^4.18.1",
+        "tailwindcss": "^4.2.4"
+    }
 }
