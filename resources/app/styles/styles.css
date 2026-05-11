@@ -282,23 +282,23 @@ html #room, html #chat {
 .topfon {
 	width: 100%;
     height: 60px;
-	background: url(/public/images/frames/topfon.jpg) repeat-x;
+	background: url(/assets/images/frames/topfon.jpg) repeat-x;
 }
 
 .fonr {
-	background: url(/public/images/frames/topfon.jpg) no-repeat fixed;
+	background: url(/assets/images/frames/topfon.jpg) no-repeat fixed;
 }
 
 .fonl {
-	background: url(/public/images/frames/topfon.jpg) no-repeat fixed top right;
+	background: url(/assets/images/frames/topfon.jpg) no-repeat fixed top right;
 }
 
 .scfon {
-    background-image: url(/public/images/frames/bodyfon.jpg);
+    background-image: url(/assets/images/frames/bodyfon.jpg);
 }
 
 .dfon {
-    background-image: url(/public/images/frames/dfon.png);
+    background-image: url(/assets/images/frames/dfon.png);
     height: 34px;
 }
 
@@ -312,26 +312,26 @@ html #room, html #chat {
 }
 
 .hlfon {
-    background-image: url(/public/images/frames/hlfon.jpg);
+    background-image: url(/assets/images/frames/hlfon.jpg);
     width: 30px;
     height: 100%
 }
 
 .hrfon {
-    background-image: url(/public/images/frames/hrfon.jpg);
+    background-image: url(/assets/images/frames/hrfon.jpg);
     width: 30px;
     height: 100%
 }
 
 .linefon {
-    background-image: url(/public/images/frames/linefon.jpg);
+    background-image: url(/assets/images/frames/linefon.jpg);
     width: 100%;
     height: 12px;
     z-index: 101;
 }
 
 .chatroom {
-    background-image: url(/public/images/frames/chatfon.png);
+    background-image: url(/assets/images/frames/chatfon.png);
     width: 50%;
     height: 68px;
     position: absolute;
@@ -342,7 +342,7 @@ html #room, html #chat {
 }
 
 .visitroom {
-    background-image: url(/public/images/frames/chatfon.png);
+    background-image: url(/assets/images/frames/chatfon.png);
     width: 286px;
     height: 68px;
     position: absolute;
@@ -353,7 +353,7 @@ html #room, html #chat {
 }
 
 .in {
-    background-image: url(/public/images/frames/in.jpg);
+    background-image: url(/assets/images/frames/in.jpg);
     width: 130px;
 }
 
@@ -361,7 +361,7 @@ html #room, html #chat {
     font-size: 12px;
     font-weight: bold;
     color: #000000;
-    background-image: url(/public/images/frames/timefon.jpg);
+    background-image: url(/assets/images/frames/timefon.jpg);
     width: 54px;
 }
 
@@ -382,13 +382,13 @@ input.txt:focus {
 }
 
 .btnfon {
-    background-image: url(/public/images/frames/btn.jpg);
+    background-image: url(/assets/images/frames/btn.jpg);
     width: 75px;
     height: 39px;
 }
 
 .subbtn {
-	background: transparent url(/public/images/frames/z.gif);
+	background: transparent url(/assets/images/frames/z.gif);
 	width: 46px;
     border:0;
     margin: 0;
@@ -396,7 +396,7 @@ input.txt:focus {
 }
 
 .gerb {
-    background-image: url(/public/images/frames/gerb.jpg);
+    background-image: url(/assets/images/frames/gerb.jpg);
     width: 210px;
     height: 60px;
     padding-left: 1px;
@@ -420,12 +420,12 @@ a.fm_n:hover {
 }
 
 .header .corner.left {
-	background: url(/public/images/frames/topfl2.jpg) no-repeat;
+	background: url(/assets/images/frames/topfl2.jpg) no-repeat;
 	left: -30px;
 }
 
 .header .corner.right {
-	background: url(/public/images/frames/topfr2.jpg) no-repeat;
+	background: url(/assets/images/frames/topfr2.jpg) no-repeat;
 	right: -30px;
 }
 
@@ -438,12 +438,12 @@ a.fm_n:hover {
 }
 
 .bottom .corner.left {
-	background: url(/public/images/frames/lbd_.jpg) no-repeat;
+	background: url(/assets/images/frames/lbd_.jpg) no-repeat;
 	left: -30px;
 }
 
 .bottom .corner.right {
-	background: url(/public/images/frames/rbd.jpg) no-repeat;
+	background: url(/assets/images/frames/rbd.jpg) no-repeat;
 	right: -30px;
 	width: 64px;
 }
@@ -478,7 +478,7 @@ a.fm_n:hover {
 .button {
 	display: inline-block;
 	height: 22px;
-	background: url(/public/images/main/btnf.jpg) repeat-x;
+	background: url(/assets/images/main/btnf.jpg) repeat-x;
 	padding: 2px 22px 0;
 	position: relative;
 	font-size: 13px;
@@ -488,7 +488,7 @@ a.fm_n:hover {
 
 .button:before {
 	content:"";
-	background: url(/public/images/main/lbtn.jpg) no-repeat;
+	background: url(/assets/images/main/lbtn.jpg) no-repeat;
 	width: 22px;
 	height: 100%;
 	display: block;
@@ -499,7 +499,7 @@ a.fm_n:hover {
 
 .button:after {
 	content:"";
-	background: url(/public/images/main/rbtn.jpg) no-repeat;
+	background: url(/assets/images/main/rbtn.jpg) no-repeat;
 	width: 22px;
 	height: 100%;
 	display: block;

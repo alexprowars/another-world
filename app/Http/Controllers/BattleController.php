@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace App\Http\Controllers;
 
@@ -65,7 +65,7 @@ class BattleController extends Controller
 			$battleType = min(3, max(1, $battleType));
 
 			$this->user->getSlotsInfo();
-			$this->user->checkEffects();
+			$this->user->calculate();
 
 			$message = '';
 			$alert = '';

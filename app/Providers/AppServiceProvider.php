@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Facades\Vars;
 use App\Factories\PlanetServiceFactory;
+use App\Http\PageResponseFactory;
 use App\Services\GalaxyService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Inertia\ResponseFactory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -67,5 +69,7 @@ class AppServiceProvider extends ServiceProvider
 		if (!str_starts_with(request()->path(), 'api') || isset($_SERVER['LARAVEL_OCTANE'])) {
 			$this->app->register(AdminPanelProvider::class);
 		}
+
+		$this->app->singleton(ResponseFactory::class, PageResponseFactory::class);
 	}
 }

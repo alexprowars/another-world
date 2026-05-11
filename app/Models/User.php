@@ -13,13 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasName
+class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 {
 	use HasRoles;
 	use Notifiable;
 	use SoftDeletes;
+	use InteractsWithMedia;
 
 	public $data 		= array();
 	private $options 	= array('security' => 0);
@@ -60,13 +63,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 	public $t_level;
 
 	public $hp = 0;
-	public $hp_now;
-	public $hp_max = 0;
 	public $energy = 0;
-	public $energy_now;
-	public $energy_max = 0;
-	public $ustal_now;
-	public $ustal_max = 0;
 
 	// Вычисляемые игровые характеристики
 	public $strength;
@@ -148,6 +145,14 @@ class User extends Authenticatable implements FilamentUser, HasName
 	public function authentications(): HasMany
 	{
 		return $this->hasMany(UserAuthentication::class, 'user_id');
+	}
+
+	public function registerMediaCollections(): void
+	{
+		$this->addMediaCollection('default')
+			->storeConversionsOnDisk('resize')
+			->singleFile()
+			->useDisk('media');
 	}
 
 	/** @return Attribute<string, string> */
@@ -244,7 +249,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 		return $result;
 	}
 
-	public function checkEffects()
+	public function calculate()
 	{
 		if ($this->provin == 1) {
 			$this->battery = 1;
@@ -286,7 +291,6 @@ class User extends Authenticatable implements FilamentUser, HasName
 
 			$this->effects++;
 		}
-
 		// Конец эффектов
 
 		foreach (Vars::getStats() as $stat) {
@@ -296,26 +300,14 @@ class User extends Authenticatable implements FilamentUser, HasName
 		}
 
 		// HP, Energy, Battery
+		$this->hp_max = $this->vitality * 5 + $this->hp;
+		$this->hp_now = min($this->hp_now, $this->hp_max);
 
-		$hp_max = $this->vitality * 5 + $this->hp;
 		$this->energy_max = ceil($this->power * 5 + $this->energy);
+		$this->energy_now = min($this->energy_now, $this->energy_max);
+
 		$this->ustal_max = $this->battery * 20;
-
-		if ($this->hp_max != $hp_max) {
-			$this->hp_max = $hp_max;
-		}
-
-		if ($this->hp_now > $this->hp_max) {
-			$this->hp_now = $this->hp_max;
-		}
-
-		if ($this->energy_now > $this->energy_max) {
-			$this->energy_now = $this->energy_max;
-		}
-
-		if ($this->ustal_now > $this->ustal_max) {
-			$this->ustal_now = $this->ustal_max;
-		}
+		$this->ustal_now = min($this->ustal_now, $this->ustal_max);
 
 		$this->update();
 	}
@@ -487,7 +479,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 		}
 
 		$parse += $this->getSlotsInfo();
-		$this->checkEffects();
+		$this->calculate();
 
 		$parse += $this->toArray();
 

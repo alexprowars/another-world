@@ -3,14 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controller;
+use App\Models\Level;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class PersonController extends Controller
 {
 	public function index()
 	{
+		$user = auth()->user();
+
+		$up = Level::query()
+			->select(['l1.up', 'l2.exp'])
+			->from('levels as l1')
+			->join('levels as l2', 'l2.id', '=', DB::raw('l1.id + 1'))
+			->where('l1.up', $user->up)
+			->where('l1.level', $user->level)
+			->toBase()
+			->first();
+
+		$slots = $user->getSlotsInfo();
+
+		$user->calculate();
+
+		$person = [
+			'id' => $user->id,
+			'name' => $user->nickname,
+			'avatar' => $user->obraz,
+			'rank' => 0,
+			'gender' => $user->gender,
+			'level' => $user->level,
+			'slots' => $slots,
+			'hp_now' => $user->hp_now ?: 0,
+			'hp_max' => $user->hp_max ?: 0,
+			'energy_now' => $user->energy_now ?: 0,
+			'energy_max' => $user->energy_max ?: 0,
+			'ustal_now' => $user->ustal_now ?: 0,
+			'ustal_max' => $user->ustal_max ?: 0,
+		];
+
+		return Inertia::render('Person/Index', [
+			'person' => $person,
+		]);
+
 		//$this->tag->prependTitle('Персонаж');
 
 		return view('pages.person.view');
+	}
+
+	protected function getPercent($current, $max)
+	{
+		if ($max <= 0) {
+			return 0;
+		}
+
+		$result = ($current / $max) * 100;
+		$result = min(100, max(0, $result));
+
+		return $result;
 	}
 
 	public function configAction ()

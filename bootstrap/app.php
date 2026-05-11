@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LocaleDetect;
 use App\Http\Middleware\LogUserIP;
 use Illuminate\Foundation\Application;
@@ -15,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
 		health: '/up',
 	)
 	->withMiddleware(function (Middleware $middleware) {
-		$middleware->appendToGroup('api', [
+		$middleware->appendToGroup('web', [
+			HandleInertiaRequests::class,
 			LogUserIP::class,
 			LocaleDetect::class,
 		]);

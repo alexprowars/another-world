@@ -4,11 +4,11 @@ vendor
 node_modules/*
 Thumbs.db
 .DS_Store
-*.log
-*.txt
-*.map
-*.lock
-*.json
+/*.log
+/*.txt
+/*.map
+/*.lock
+/*.json
 !package*.json
 !composer*.json
 *.phar

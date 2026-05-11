@@ -45,7 +45,7 @@ class InfoController extends Controller
 			$parse['~'.$key] = $value;
 
 		$parse += $info->getSlotsInfo();
-		$info->checkEffects();
+		$info->calculate();
 
 		$t = $info->toArray();
 

@@ -6,11 +6,10 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<link rel="shortcut icon" href="/favicon.ico">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	@vite('resources/css/styles.css')
 </head>
 <body>
 	@yield('content')
-	@vite('resources/js/game.js')
+	@vite('resources/app/app.js')
 	@stack('scripts')
 </body>
 </html>

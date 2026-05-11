@@ -216,7 +216,7 @@ class Game extends Component
 									if ($enemy->isFree())
 									{
 										$this->user->calculateParams();
-										$this->user->checkEffects();
+										$this->user->calculate();
 
 										if (
 												$obj_min[0] <= $this->user->level &&

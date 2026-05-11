@@ -11,7 +11,7 @@ class UserAuthentication extends Model
 	protected $guarded = [];
 
 	protected $casts = [
-		'login_date' => 'immutable_datetime',
+		'login_at' => 'immutable_datetime',
 	];
 
 	/** @return BelongsTo<User, $this> */

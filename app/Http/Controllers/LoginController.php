@@ -46,7 +46,7 @@ class LoginController extends Controller
 			->where('provider_id', $profile->getId())->first();
 
 		if ($authData) {
-			$authData->login_date = now();
+			$authData->login_at = now();
 			$authData->save();
 
 			Auth::loginUsingId($authData->user_id, true);

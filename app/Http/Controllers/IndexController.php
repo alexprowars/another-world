@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace App\Http\Controllers;
 
@@ -86,6 +86,8 @@ class IndexController extends Controller
 
 	public function index()
 	{
+		auth()->loginUsingId(1);
+
 		/*$this->tag->prependTitle('Браузерная онлайн игра');
 
 		$page = $this->request->getQuery('p', 'int', 1);

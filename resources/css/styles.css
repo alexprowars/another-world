@@ -1,8 +1,0 @@
-@import "tailwindcss";
-
-@import "./game/base.css";
-@import "./game/frame.css";
-@import "./game/styles.css";
-@import "./game/main.css";
-@import "./game/shop.css";
-@import "./game/info.css";

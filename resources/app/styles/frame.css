@@ -11,7 +11,7 @@
 		.header {
 			width: 100%;
 			height: 60px;
-			background: url(/public/images/frames/topfon.jpg) repeat-x;
+			background: url(/assets/images/frames/topfon.jpg) repeat-x;
 			position: absolute;
 			top: -38px;
 			left: 0;
@@ -38,7 +38,7 @@
 		background: #ffe9c0;
 
 		.line {
-			background-image: url(/public/images/frames/linefon.jpg);
+			background-image: url(/assets/images/frames/linefon.jpg);
 			width: 100%;
 			height: 12px;
 			position: absolute;
@@ -83,12 +83,12 @@
 		height: 100%;
 
 		&.left {
-			background: url(/public/images/frames/hlfon.jpg) repeat-y;
+			background: url(/assets/images/frames/hlfon.jpg) repeat-y;
 			left: 0;
 		}
 
 		&.right {
-			background: url(/public/images/frames/hrfon.jpg) repeat-y;
+			background: url(/assets/images/frames/hrfon.jpg) repeat-y;
 			right: 0;
 		}
 	}

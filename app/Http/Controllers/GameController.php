@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controller;
+use Inertia\Inertia;
 
 class GameController extends Controller
 {
@@ -18,6 +19,9 @@ class GameController extends Controller
 
 	public function index()
 	{
+		return Inertia::render('Game', [
+		]);
+
 		return view('game');
 	}
 

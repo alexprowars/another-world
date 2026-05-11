@@ -12,13 +12,13 @@
 }
 
 .nmenu, .tmenu {
-    background-image: url(/public/images/main/tmenufon.jpg);
+    background-image: url(/assets/images/main/tmenufon.jpg);
     font-weight: bold;
     color: white;
 }
 
 .nmenus, .tmenus {
-    background: url(/public/images/main/cp.jpg) repeat-x;
+    background: url(/assets/images/main/cp.jpg) repeat-x;
     font-weight: bold;
     color: white;
 }
@@ -95,13 +95,13 @@ a.fm:hover {
 }
 
 .lpfon {
-	background: url(/public/images/main/lpfon.jpg) repeat-x;
+	background: url(/assets/images/main/lpfon.jpg) repeat-x;
 	width: 100%;
     height: 100%
 }
 
 .dpfon {
-	background: url(/public/images/main/dpfon.gif) repeat-x;
+	background: url(/assets/images/main/dpfon.gif) repeat-x;
 	width: 100%;
 }
 
@@ -119,14 +119,14 @@ a.fm:hover {
 }
 
 .submenufon {
-    background-image: url(/public/images/main/smenufon.jpg);
+    background-image: url(/assets/images/main/smenufon.jpg);
     font-weight: bold;
     width: 100%;
     height: 100%
 }
 
 .submenufon_t {
-    background-image: url(/public/images/main/smenufon.jpg);
+    background-image: url(/assets/images/main/smenufon.jpg);
     height: 100%;
     padding-left: 5px;
     padding-right: 5px;
@@ -135,7 +135,7 @@ a.fm:hover {
 .smf {
     font-weight: bold;
     font-size: 12px;
-    background-image: url(/public/images/main/smf.gif);
+    background-image: url(/assets/images/main/smf.gif);
     color: #A90303;
     padding-left: 4px;
     padding-right: 4px;
@@ -171,28 +171,28 @@ a.fm:hover {
 }
 
 .btnf {
-    background-image: url(/public/images/main/btnf.jpg);
+    background-image: url(/assets/images/main/btnf.jpg);
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 1px;
 }
 
 .fsm {
-    background-image: url(/public/images/main/fsm.png);
+    background-image: url(/assets/images/main/fsm.png);
     width: 100%;
 }
 
 .tph {
-	background: url(/public/images/main/bodyfon.jpg) repeat-x;
+	background: url(/assets/images/main/bodyfon.jpg) repeat-x;
 	height: 100%
 }
 
 .tpfn {
-    background-image: url(/public/images/main/lbnmf.png);
+    background-image: url(/assets/images/main/lbnmf.png);
 }
 
 .tpfnr {
-    background-image: url(/public/images/main/mnf.jpg);
+    background-image: url(/assets/images/main/mnf.jpg);
     width: 152px;
     font-size: 11px;
     font-weight: bold;
@@ -214,12 +214,12 @@ a.fm:hover {
 }
 
 .dlfl {
-	background: url(/public/images/main/lr.gif) no-repeat left top;
+	background: url(/assets/images/main/lr.gif) no-repeat left top;
 	width: 100%;
     height: 100%
 }
 
-/*.dlfr {background-image : url(/public/images/main/rr.gif); background-repeat : no-repeat;  background-position: right top; width:100%; height:100%; padding-left:19px; padding-top:1px;}*/
+/*.dlfr {background-image : url(/assets/images/main/rr.gif); background-repeat : no-repeat;  background-position: right top; width:100%; height:100%; padding-left:19px; padding-top:1px;}*/
 .dlfr {
     width: 100%;
     height: 100%;
@@ -263,17 +263,17 @@ a.fm:hover {
 }
 
 .g_line {
-    background: url(/public/images/main/g_line.gif) repeat-x;
+    background: url(/assets/images/main/g_line.gif) repeat-x;
     height: 8px;
 }
 
 .b_line {
-    background: url(/public/images/main/b_line.gif) repeat-x;
+    background: url(/assets/images/main/b_line.gif) repeat-x;
     height: 8px;
 }
 
 .h_line {
-    background: url(/public/images/main/h_line.gif) repeat-x;
+    background: url(/assets/images/main/h_line.gif) repeat-x;
     height: 8px;
 }
 
@@ -286,24 +286,24 @@ a.fm:hover {
 }
 
 .inffon {
-    background: url(/public/images/main/inffon.png) repeat-x;
+    background: url(/assets/images/main/inffon.png) repeat-x;
     height: 100%;
     width: 100%
 }
 
 .binffon {
-	background: url(/public/images/main/binffon.png) repeat-x left bottom;
+	background: url(/assets/images/main/binffon.png) repeat-x left bottom;
 	height: 100%;
     width: 100%
 }
 
 .bgl {
-	background: url(/public/images/main/bgl.gif) repeat-x;
+	background: url(/assets/images/main/bgl.gif) repeat-x;
 	width: 100%
 }
 
 .dbgl {
-	background: url(/public/images/main/dbgl.gif) repeat-x;
+	background: url(/assets/images/main/dbgl.gif) repeat-x;
 	width: 100%
 }
 
@@ -333,7 +333,7 @@ a.fm:hover {
 }
 
 .dgfon {
-    background-image: url(/public/images/main/dgfon.gif);
+    background-image: url(/assets/images/main/dgfon.gif);
     height: 12px;
     width: 100%
 }
@@ -345,7 +345,7 @@ a.fm:hover {
 .spell_tbl {
     width: 235px;
     height: 42px;
-    background-image: url(/public/images/main/spell_but.jpg);
+    background-image: url(/assets/images/main/spell_but.jpg);
 }
 
 .tint, .int {
@@ -379,11 +379,11 @@ a.fm:hover {
 }
 
 .btn_f {
-    background-image: url(/public/images/main/btn_f.gif);
+    background-image: url(/assets/images/main/btn_f.gif);
 }
 
 .in_f {
-    background-image: url(/public/images/main/in_f.gif);
+    background-image: url(/assets/images/main/in_f.gif);
 }
 
 .h_popup {
@@ -412,7 +412,7 @@ a.fm:hover {
 }
 
 .l_z_f {
-    background: url(/public/images/main/lpr.jpg) repeat-x;
+    background: url(/assets/images/main/lpr.jpg) repeat-x;
     white-space: nowrap;
     font-size: 15px;
     font-weight: bold;
@@ -422,24 +422,24 @@ a.fm:hover {
 }
 
 .m_f_l {
-    background-image: url(/public/images/main/m_f_l.gif);
+    background-image: url(/assets/images/main/m_f_l.gif);
     width: 12px;
     height: 100%
 }
 
 .m_f_r {
-    background-image: url(/public/images/main/m_f_r.gif);
+    background-image: url(/assets/images/main/m_f_r.gif);
     width: 12px;
     height: 100%
 }
 
 .m_f_d {
-    background-image: url(/public/images/main/m_f_d.gif);
+    background-image: url(/assets/images/main/m_f_d.gif);
     width: 100%
 }
 
 .m_f_t {
-    background-image: url(/public/images/main/m_f_t.gif);
+    background-image: url(/assets/images/main/m_f_t.gif);
     width: 100%
 }
 
@@ -483,7 +483,7 @@ html body hr {
 }
 
 .h_fon {
-    background-image: url(/public/images/main/h_fon.jpg);
+    background-image: url(/assets/images/main/h_fon.jpg);
 }
 
 .button {
@@ -604,20 +604,20 @@ a.small, a.small:active, a.small:hover {
     font-weight: bold;
     text-decoration: none;
 	border: 1px solid #636363;
-	background: #9a9996 url('/public/images/main/buttons_bg.gif') repeat-x right;
+	background: #9a9996 url('/assets/images/main/buttons_bg.gif') repeat-x right;
 	height: 20px;
 }
 
 b.butt2 {
     height: 15px;
     font-size: 15px;
-    background: url('/public/images/main/btn2-c-left.gif') left top no-repeat;
+    background: url('/assets/images/main/btn2-c-left.gif') left top no-repeat;
 }
 
 b.butt2 b {
     height: 15px;
     font-size: 15px;
-    background: url('/public/images/main/btn2-c-right.gif') right top no-repeat;
+    background: url('/assets/images/main/btn2-c-right.gif') right top no-repeat;
 }
 
 b.butt2 input, b.butt2 button, .butt2 {
@@ -628,7 +628,7 @@ b.butt2 input, b.butt2 button, .butt2 {
     text-decoration: none;
     display: block;
     line-height: 14px;
-    background: transparent url('/public/images/main/btn2-center.gif') repeat-x;
+    background: transparent url('/assets/images/main/btn2-center.gif') repeat-x;
 }
 
 .butt2:hover {
@@ -641,7 +641,7 @@ b.butt2 input, b.butt2 button, .butt2 {
     content:"";
     float: left;
     display: block;
-    background: url('/public/images/main/btn2-c-left.gif') right top no-repeat;
+    background: url('/assets/images/main/btn2-c-left.gif') right top no-repeat;
 }
 
 .butt2:after {
@@ -650,7 +650,7 @@ b.butt2 input, b.butt2 button, .butt2 {
     content:"";
     float: right;
     display: block;
-    background: url('/public/images/main/btn2-c-right.gif') right top no-repeat;
+    background: url('/assets/images/main/btn2-c-right.gif') right top no-repeat;
 }
 
 .tmain a {
@@ -689,7 +689,7 @@ table.parameters td {
 }
 
 .mapHints li {
-    list-style: url('/public/images/images/ico/up.gif') inside;
+    list-style: url('/assets/images/images/ico/up.gif') inside;
 }
 
 .shopotdels {
@@ -770,7 +770,7 @@ table.parameters td {
 }
 
 .top .header .logo {
-    background: url('/public/images/frames/gerb.jpg') no-repeat 0 0;
+    background: url('/assets/images/frames/gerb.jpg') no-repeat 0 0;
     width: 210px;
     height: 60px;
 }
@@ -786,7 +786,7 @@ iframe {
 }
 
 td.delem {
-    background: url(/public/images/main/tbm.gif) no-repeat 10px 0;
+    background: url(/assets/images/main/tbm.gif) no-repeat 10px 0;
     width: 25px;
 }
 
@@ -866,23 +866,23 @@ form {
 }
 
 .header .links .icon_1 {
-    background: url('/public/images/menu/m1.jpg') 0 0 no-repeat;
+    background: url('/assets/images/menu/m1.jpg') 0 0 no-repeat;
 }
 .header .links .icon_2 {
-    background: url('/public/images/menu/m2.jpg') 0 0 no-repeat;
+    background: url('/assets/images/menu/m2.jpg') 0 0 no-repeat;
 }
 .header .links .icon_4 {
-    background: url('/public/images/menu/m4.jpg') 5px 0 no-repeat;
+    background: url('/assets/images/menu/m4.jpg') 5px 0 no-repeat;
     width: 84px;
 }
 .header .links .icon_5 {
-    background: url('/public/images/menu/m5.jpg') 0 0 no-repeat;
+    background: url('/assets/images/menu/m5.jpg') 0 0 no-repeat;
 }
 .header .links .icon_6 {
-    background: url('/public/images/menu/m6.jpg') 0 0 no-repeat;
+    background: url('/assets/images/menu/m6.jpg') 0 0 no-repeat;
 }
 .header .links .icon_7 {
-    background: url('/public/images/menu/m7.jpg') 0 0 no-repeat;
+    background: url('/assets/images/menu/m7.jpg') 0 0 no-repeat;
 }
 
 .frame .top .header .links > div.left > span {
@@ -1008,7 +1008,7 @@ p.message {
 
 .personName {
 	width: 244px;
-	background: url(/public/images/main/mnf.jpg) repeat-x;
+	background: url(/assets/images/main/mnf.jpg) repeat-x;
 	font-size: 12px;
 	font-weight: normal;
 	color: #FFFFFF;
@@ -1028,7 +1028,7 @@ p.message {
 .personName:after {
 	display: inline-block;
 	content: "";
-	background: url(/public/images/main/rlnm.jpg) no-repeat;
+	background: url(/assets/images/main/rlnm.jpg) no-repeat;
 	height: 28px;
 	width: 46px;
 	position: absolute;
@@ -1039,7 +1039,7 @@ p.message {
 .personName:before {
 	display: inline-block;
 	content: "";
-	background: url(/public/images/main/btn_on.jpg) no-repeat;
+	background: url(/assets/images/main/btn_on.jpg) no-repeat;
 	height: 28px;
 	width: 46px;
 	position: absolute;
@@ -1090,7 +1090,7 @@ p.message {
 
 .personMenu {
 	width: 100%;
-	background: url(/public/images/main/tmenufon.jpg) repeat-x;
+	background: url(/assets/images/main/tmenufon.jpg) repeat-x;
 	font-weight: bold;
 	color: white;
 	text-align: center;
@@ -1105,7 +1105,7 @@ p.message {
 
 .personMenu:before {
 	content: "";
-	background: url(/public/images/main/ltmenu.jpg) no-repeat;
+	background: url(/assets/images/main/ltmenu.jpg) no-repeat;
 	width: 37px;
 	height: 100%;
 	display: block;
@@ -1116,7 +1116,7 @@ p.message {
 
 .personMenu:after {
 	content: "";
-	background: url(/public/images/main/rtmenu.jpg) no-repeat;
+	background: url(/assets/images/main/rtmenu.jpg) no-repeat;
 	width: 37px;
 	height: 100%;
 	display: block;
@@ -1129,7 +1129,7 @@ p.message {
 .button {
 	display: inline-block;
 	height: 22px;
-	background: url(/public/images/main/btnf.jpg) repeat-x;
+	background: url(/assets/images/main/btnf.jpg) repeat-x;
 	padding: 2px 22px 0;
 	position: relative;
 	font-size: 13px;
@@ -1139,7 +1139,7 @@ p.message {
 
 .button:before {
 	content:"";
-	background: url(/public/images/main/lbtn.jpg) no-repeat;
+	background: url(/assets/images/main/lbtn.jpg) no-repeat;
 	width: 22px;
 	height: 100%;
 	display: block;
@@ -1150,7 +1150,7 @@ p.message {
 
 .button:after {
 	content:"";
-	background: url(/public/images/main/rbtn.jpg) no-repeat;
+	background: url(/assets/images/main/rbtn.jpg) no-repeat;
 	width: 22px;
 	height: 100%;
 	display: block;
@@ -1174,7 +1174,7 @@ p.message {
 .shopotdels table {
 	border: 1px solid #D8C792;
 	width: 100%;
-	background: url(/public/images/inman_fon2.gif);
+	background: url(/assets/images/inman_fon2.gif);
 }
 
 .jq-toast-wrap {

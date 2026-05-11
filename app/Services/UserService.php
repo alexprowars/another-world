@@ -46,4 +46,26 @@ class UserService
 
 		return $user;
 	}
+
+	public static function calculateRating(User $user): int
+	{
+		$s_p = 0;
+		$s_s = $user->strength + $user->agility + $user->dex + $user->vitality + $user->razum + $user->battery + $user->power + $user->duh - 14;
+		$s_i = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
+
+		return (int) round(((($s_p / 1000) + ($s_s / 10)) * $s_i) + ($user->level / 2), 2);
+	}
+
+	public static function regenerationParams(User $user)
+	{
+		$hp = 0;
+
+		if ($user->battle_id == 0 && $user->r_type != 2 && ($user->hp_now < $user->hp_max) && $user->hp_max > 0) {
+			$hp = round($user->hp_max * 0.025, 1);
+
+			if (($stat['hp_now'] + $add_hp) > $stat['hp_maxi']) {
+				$hp = $stat['hp_maxi'] - $stat['hp_now'];
+			}
+		}
+	}
 }

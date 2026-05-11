@@ -30,7 +30,7 @@ class PersonView extends Component
 
 		$slots = $this->user->getSlotsInfo();
 
-		$this->user->checkEffects();
+		$this->user->calculate();
 
 		$parse['w_h'] = $this->getPercent($this->user->hp_now, $this->user->hp_max);
 		$parse['w_e'] = $this->getPercent($this->user->energy_now, $this->user->energy_max);
