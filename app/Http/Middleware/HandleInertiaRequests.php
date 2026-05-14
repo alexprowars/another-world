@@ -14,6 +14,7 @@ class HandleInertiaRequests extends Middleware
 	public function share(Request $request): array
 	{
 		$state = [
+			'locale' => 'ru',
 			'user' => null,
 		];
 

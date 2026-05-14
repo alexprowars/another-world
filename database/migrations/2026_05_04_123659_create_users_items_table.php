@@ -12,7 +12,7 @@ return new class extends Migration {
 			$table->foreignId('user_id')->index()->constrained('users')->cascadeOnDelete();
 			$table->string('inf')->nullable();
 			$table->string('min')->nullable();
-			$table->unsignedTinyInteger('tip');
+			$table->unsignedTinyInteger('type');
 			$table->smallInteger('br1')->nullable();
 			$table->smallInteger('br2')->nullable();
 			$table->smallInteger('br3')->nullable();

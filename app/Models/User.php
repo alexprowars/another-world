@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Facades\Vars;
+use App\Services\UserService;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -24,26 +25,15 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	use SoftDeletes;
 	use InteractsWithMedia;
 
-	public $data 		= array();
-	private $options 	= array('security' => 0);
-
 	private $auraInfo = array();
 	public $effects = 0;
 
 	private $isEdit = false;
 
 	public $tutorial;
-	public $silence;
-	public $battle;
-	public $r_type;
-	public $r_time;
-	public $rank;
 	public $sign;
-	public $vip;
 	public $obraz;
 	public $provin;
-	public $reit;
-	public $proff;
 	public $s_updates;
 	public $o_updates;
 	public $item_type;
@@ -77,8 +67,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	/**
 	 * Вычисляемые модификаторы
 	 */
-	public $rating = 0;
-
 	public $br1 = 0;
 	public $br2 = 0;
 	public $br3 = 0;
@@ -100,8 +88,12 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	public $mkrit	= 0;
 
 	protected $casts = [
+		'hp_now' => 'float',
 		'blocked_at' => 'immutable_datetime',
 		'onlinetime' => 'immutable_datetime',
+		'r_date' => 'immutable_datetime',
+		'silence' => 'immutable_datetime',
+		'invisible' => 'immutable_datetime',
 	];
 
 	protected static function booted(): void
@@ -127,6 +119,12 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	public function tribe(): BelongsTo
 	{
 		return $this->belongsTo(Tribe::class, 'user_id');
+	}
+
+	/** @return BelongsTo<Battle, $this> */
+	public function battle(): BelongsTo
+	{
+		return $this->belongsTo(Battle::class, 'battle_id');
 	}
 
 	/** @return HasMany<UserItem, $this> */
@@ -166,69 +164,20 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 
 	public function isAdmin(): bool
 	{
-		if ($this->id > 0) {
-			return $this->hasRole('admin');
-		}
-
-		return false;
+		return $this->hasRole('admin');
 	}
 
-	public function onConstruct()
+	public function isFree(): bool
 	{
-		if ($this->getDI()->getShared('router')->getControllerName() == 'edit') {
-			$this->isEdit = true;
-		}
+		return !$this->r_time;
 	}
 
-	public function unpackOptions($opt, $isToggle = true)
+	public function isOnline(): bool
 	{
-		$result = array();
-
-		if ($isToggle) {
-			$o = array_reverse(str_split(decbin($opt)));
-
-			$i = 0;
-
-			foreach ($this->options as $k => $v) {
-				$result[$k] = (isset($o[$i]) ? $o[$i] : 0);
-
-				$i++;
-			}
-		}
-
-		return $result;
+		return $this->onlinetime->diffInSeconds() < 180;
 	}
 
-	public function packOptions($opt, $isToggle = true)
-	{
-		if ($isToggle) {
-			$r = array();
-
-			foreach ($this->options as $k => $v) {
-				if (isset($opt[$k])) {
-					$v = $opt[$k];
-				}
-
-				$r[] = $v;
-			}
-
-			return bindec(implode('', array_reverse($r)));
-		} else {
-			return 0;
-		}
-	}
-
-	public function isFree()
-	{
-		return ($this->r_time == 0 && $this->r_type == 0);
-	}
-
-	public function isOnline()
-	{
-		return (time() - $this->onlinetime < 180);
-	}
-
-	public function isBot()
+	public function isBot(): bool
 	{
 		return $this->rank == 60;
 	}
@@ -236,196 +185,44 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	public function checkRoom($room)
 	{
 		if ($room != $this->room) {
-			$this->room = $room;
-			$this->update();
+			$this->setAttribute('room', $room);
+			$this->save();
 		}
-	}
-
-	public function getPercent($current, $max)
-	{
-		$result = ($current / $max) * 100;
-		$result = min(100, max(0, $result));
-
-		return $result;
 	}
 
 	public function calculate()
 	{
-		if ($this->provin == 1) {
-			$this->battery = 1;
-		}
-
-		//$user['hp'] = 0;
-		//$user['energy'] = 0;
-
-		if ($this->isEdit) {
-			// МФ
-			$this->krit		+= ($this->dex * 5);
-			$this->unkrit	+= ($this->dex * 5);
-			$this->uv		+= ($this->agility * 5);
-			$this->unuv		+= ($this->agility * 5);
-		}
-
-		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
-		$effects = $this->effects()
-			->whereFuture('date')
-			->get();
-
-		/** @var Effect $effect */
-		foreach ($effects as $effect) {
-			$this->auraInfo[] = $effect;
-
-			foreach (Vars::getStats() as $stat) {
-				if (isset($effect[$stat])) {
-					$this->{$stat} += $effect[$stat];
-				}
-			}
-
-			$this->br1 += $effect->br1 ?? 0;
-			$this->br2 += $effect->br2 ?? 0;
-			$this->br3 += $effect->br3 ?? 0;
-			$this->br4 += $effect->br4 ?? 0;
-			$this->br5 += $effect->br5 ?? 0;
-			$this->min += $effect->min ?? 0;
-			$this->max += $effect->max ?? 0;
-
-			$this->effects++;
-		}
-		// Конец эффектов
-
-		foreach (Vars::getStats() as $stat) {
-			if ($this->{$stat} < 0) {
-				$this->{$stat} = 0;
-			}
-		}
-
-		// HP, Energy, Battery
-		$this->hp_max = $this->vitality * 5 + $this->hp;
-		$this->hp_now = min($this->hp_now, $this->hp_max);
-
-		$this->energy_max = ceil($this->power * 5 + $this->energy);
-		$this->energy_now = min($this->energy_now, $this->energy_max);
-
-		$this->ustal_max = $this->battery * 20;
-		$this->ustal_now = min($this->ustal_now, $this->ustal_max);
-
-		$this->update();
+		UserService::calculateWearsStats($this);
+		UserService::calculateStats($this);
 	}
 
 	public function getSlot()
 	{
 		if (!$this->slots) {
 			$this->slots()->make()->save();
-
-			return $this->slots;
-		} else {
-			return $this->slots;
 		}
-	}
 
-	public function calculateParams()
-	{
-		$slot = $this->getSlot();
-
-		$wears = $slot->getWearsObjects();
-
-		foreach ($wears as $object) {
-			foreach (Vars::getStats() as $stat) {
-				if (isset($object->{$stat})) {
-					$this->{$stat} += $object->{$stat};
-				}
-			}
-
-			$this->hp			+= $object->hp;
-			$this->energy		+= $object->energy;
-
-			$this->br1		+= $object->br1;
-			$this->br2		+= $object->br2;
-			$this->br3		+= $object->br3;
-			$this->br4		+= $object->br4;
-			$this->br5		+= $object->br5;
-
-			$this->krit		+= $object->krit;
-			$this->mkrit	+= $object->mkrit;
-			$this->unkrit	+= $object->unkrit;
-			$this->uv		+= $object->uv;
-			$this->unuv		+= $object->unuv;
-
-			$this->pblock	+= $object->pblock;
-			$this->mblock	+= $object->mblock;
-			$this->pbr		+= $object->pbr;
-			$this->kbr		+= $object->kbr;
-
-			$this->min		+= $object->min_d;
-			$this->max		+= $object->max_d;
-		}
+		return $this->slots;
 	}
 
 	public function getSlotsInfo()
 	{
-		/**
-		 * @var Objects[] $result
-		 */
-		$result = array();
+		$result = [];
 
 		// Выбираем все вещи которые одеты на игроке
-		$slot = $this->getSlot();
-
-		$wears = $slot->getWearsItems();
+		$wears = $this->getSlot()->getWearsItems();
 
 		foreach ($wears as $object) {
-			if ($object->life > 0 && $object->life < time()) {
-				$slot->unsetObject($object->onset);
-
-				continue;
-			}
-
 			// В какой слот одета вещь
 			$i = $object->onset;
 
-			if ($i == 16 && !isset($result['slot_' . $i])) {
+			if ($i == 16 && empty($result['slot_' . $i])) {
 				$i = 4;
 			}
 
 			$object->setPosition($i);
 
-			foreach (Vars::getStats() as $stat) {
-				if (isset($object->{$stat})) {
-					$this->{$stat} += $object->{$stat};
-				}
-			}
-
-			$this->hp			+= $object->hp;
-			$this->energy		+= $object->energy;
-
-			if ($this->isEdit) {
-				$this->br1		+= $object->br1;
-				$this->br2		+= $object->br2;
-				$this->br3		+= $object->br3;
-				$this->br4		+= $object->br4;
-				$this->br5		+= $object->br5;
-
-				$this->krit		+= $object->krit;
-				$this->mkrit	+= $object->mkrit;
-				$this->unkrit	+= $object->unkrit;
-				$this->uv		+= $object->uv;
-				$this->unuv		+= $object->unuv;
-
-				$this->pblock	+= $object->pblock;
-				$this->mblock	+= $object->mblock;
-				$this->pbr		+= $object->pbr;
-				$this->kbr		+= $object->kbr;
-
-				$this->min		+= $object->min_d;
-				$this->max		+= $object->max_d;
-			}
-
 			$info = $object->getInf();
-
-			// Для вычисления рейтинга (стоимость вещи)
-			if ($info[2] != 0) {
-				$this->rating += $info[2];
-			}
 
 			if ($this->isEdit) {
 				$info[1] = "Снять " . $info[1];
@@ -434,25 +231,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 
 			$result['slot_' . $i] = $object;
 		}
-
-		// Для пустых слотов
-		for ($i = 1; $i < 23; $i++) {
-			if (!isset($result['slot_' . $i])) {
-				$result['slot_' . $i] = new UserItem();
-				$result['slot_' . $i]->setPosition($i);
-			}
-		}
-
-		return $result;
-	}
-
-	public function getUserRaiting()
-	{
-		// Вычисление рейтинга крутизны (цена вещей, статы, процент побед)
-		$a = $this->strength + $this->agility + $this->dex + $this->vitality + $this->razum + $this->battery + $this->power - 14;
-		$b = round($this->wins / ($this->losses + $this->wins + 0.000001), 2);
-
-		$result = round(((($this->rating / 1000) + ($a / 10)) * $b) + ($this->level / 2), 2);
 
 		return $result;
 	}
@@ -529,7 +307,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 		return $this->getDI()->getShared('view')->getPartial('shared/person', array('parse' => $parse));
 	}
 
-	function renderUserStatus()
+	public function renderUserStatus()
 	{
 		$result = "";
 
@@ -593,11 +371,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 		}
 
 		return $result;
-	}
-
-	public function saveData($fields, $userId = 0)
-	{
-		$this->db->updateAsDict($this->getSource(), $fields, ['conditions' => 'id = ?', 'bind' => array(($userId > 0 ? $userId : $this->id))]);
 	}
 
 	public function toArray($columns = null)

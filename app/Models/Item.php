@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\Vars;
 use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
@@ -9,11 +10,11 @@ class Item extends Model
 	protected $table = 'items';
 	protected $guarded = [];
 
-	public function getMinDemands()
+	public function getMinDemands(): string
 	{
 		$result = '';
 
-		$user = $this->getDI()->getShared('user');
+		$user = auth()->user();
 
 		if ($this->min_level > 0) {
 			if ($user->level < $this->min_level) {
@@ -23,33 +24,33 @@ class Item extends Model
 			}
 		}
 
-		foreach (_getText('stats') as $code => $name) {
+		foreach (Vars::getStats() as $code) {
 			if (!isset($this->{"min_" . $code})) {
 				continue;
 			}
 
 			if ($this->{"min_" . $code} > 0) {
 				if ($user->{$code} < $this->{"min_" . $code}) {
-					$result .= "<font color=red>" . $name . ": " . $this->{"min_" . $code} . "</font><br>";
+					$result .= "<font color=red>" . __('main.stats.' . $code) . ": " . $this->{"min_" . $code} . "</font><br>";
 				} else {
-					$result .= $name . ": " . $this->{"min_" . $code} . "<br>";
+					$result .= __('main.stats.' . $code) . ": " . $this->{"min_" . $code} . "<br>";
 				}
 			}
 		}
 
 		// Проверка професии
 		if ($this->min_proff > 0) {
-			if ($user->proff != $this->min_proff) {
-				$result .= "<font color=red>Профессия: " . _getText('proffessions', $this->min_proff) . "</font><br>";
+			if ($user->profession != $this->min_proff) {
+				$result .= "<font color=red>Профессия: " . __('main.proffessions.' . $this->min_proff) . "</font><br>";
 			} else {
-				$result .= "Профессия: " . _getText('proffessions', $this->min_proff) . "<br>";
+				$result .= "Профессия: " . __('main.proffessions.' . $this->min_proff) . "<br>";
 			}
 		}
 
 		return $result;
 	}
 
-	public function getBounus()
+	public function getBounus(): string
 	{
 		$result = '';
 
@@ -81,13 +82,13 @@ class Item extends Model
 			$result .= "Броня ног: " . $this->formatStat($this->br5) . "<br>";
 		}
 
-		foreach (_getText('stats') as $code => $name) {
+		foreach (Vars::getStats() as $code) {
 			if (!isset($this->{$code})) {
 				continue;
 			}
 
 			if ($this->{$code} != 0) {
-				$result .= $name . ": " . $this->formatStat($this->{$code}) . "<br>";
+				$result .= __('main.stats.' . $code) . ": " . $this->formatStat($this->{$code}) . "<br>";
 			}
 		}
 
@@ -138,8 +139,8 @@ class Item extends Model
 
 	public function getVipPrice()
 	{
-		if ($this->f_price > 0) {
-			return round($this->f_price * 0.67, 2);
+		if ($this->credits > 0) {
+			return round($this->credits * 0.67, 2);
 		} else {
 			return round($this->price * 0.85, 2);
 		}
@@ -150,44 +151,40 @@ class Item extends Model
 		$inf = $this->name . "|" . $this->title . "|" . $this->price . "|0|" . (int) $this->isSecondHand() . "|" . $this->art . "|0|" . $this->iznos;
 		$min = $this->min_level . "|" . $this->min_strength . "|" . $this->min_dex . "|" . $this->min_agility . "|" . $this->min_vitality . "|" . $this->min_razum . "|0|" . $this->min_proff;
 
-		return $this->getDI()->getShared('db')->insertAsDict(
-			"game_objects",
-			array
-			(
-				'user_id'	=> $userId,
-				'inf'		=> $inf,
-				'min'		=> $min,
-				'type'		=> $this->type,
-				'br1'		=> $this->br1,
-				'br2'		=> $this->br2,
-				'br3'		=> $this->br3,
-				'br4'		=> $this->br4,
-				'br5'		=> $this->br5,
-				'min_d'		=> $this->min,
-				'max_d'		=> $this->max,
-				'hp'		=> $this->hp,
-				'energy'	=> $this->energy,
-				'strength'	=> $this->strength,
-				'dex'		=> $this->dex,
-				'agility'	=> $this->agility,
-				'vitality'	=> $this->vitality,
-				'razum'		=> $this->razum,
-				'krit'		=> $this->krit,
-				'mkrit'		=> $this->mkrit,
-				'unkrit'	=> $this->unkrit,
-				'uv'		=> $this->uv,
-				'unuv'		=> $this->unuv,
-				'pblock'	=> $this->pblock,
-				'mblock'	=> $this->mblock,
-				'pbr'		=> $this->pbr,
-				'time'		=> time(),
-				'about'		=> $this->about,
-				'class'		=> $this->class,
-				'otravl'	=> $this->otravl,
-				'use_mana'	=> $this->use_mana,
-				'magic'		=> $this->magic,
-				'life'		=> $this->life > 0 ? (time() + $this->life) : 0
-			)
-		);
+		return UserItem::query()->create([
+			'user_id'	=> $userId,
+			'inf'		=> $inf,
+			'min'		=> $min,
+			'type'		=> $this->type,
+			'br1'		=> $this->br1,
+			'br2'		=> $this->br2,
+			'br3'		=> $this->br3,
+			'br4'		=> $this->br4,
+			'br5'		=> $this->br5,
+			'min_d'		=> $this->min,
+			'max_d'		=> $this->max,
+			'hp'		=> $this->hp,
+			'energy'	=> $this->energy,
+			'strength'	=> $this->strength,
+			'dex'		=> $this->dex,
+			'agility'	=> $this->agility,
+			'vitality'	=> $this->vitality,
+			'razum'		=> $this->razum,
+			'krit'		=> $this->krit,
+			'mkrit'		=> $this->mkrit,
+			'unkrit'	=> $this->unkrit,
+			'uv'		=> $this->uv,
+			'unuv'		=> $this->unuv,
+			'pblock'	=> $this->pblock,
+			'mblock'	=> $this->mblock,
+			'pbr'		=> $this->pbr,
+			'time'		=> time(),
+			'about'		=> $this->about,
+			'class'		=> $this->class,
+			'otravl'	=> $this->otravl,
+			'use_mana'	=> $this->use_mana,
+			'magic'		=> $this->magic,
+			'life'		=> $this->life > 0 ? (time() + $this->life) : 0
+		]);
 	}
 }

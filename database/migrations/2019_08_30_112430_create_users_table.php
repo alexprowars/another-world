@@ -27,7 +27,7 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('wins')->default(0);
 			$table->unsignedSmallInteger('losses')->default(0);
 			$table->unsignedSmallInteger('draws')->default(0);
-			$table->unsignedSmallInteger('room')->nullable();
+			$table->unsignedSmallInteger('room')->default(0);
 			$table->unsignedSmallInteger('rank')->nullable();
 			$table->unsignedSmallInteger('s_strength')->default(3);
 			$table->unsignedSmallInteger('s_dex')->default(3);
@@ -39,7 +39,7 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('updates')->default(0);
 			$table->unsignedSmallInteger('obraz')->nullable();
 			$table->unsignedSmallInteger('profession')->nullable();
-			$table->unsignedInteger('hp_now')->default(0);
+			$table->decimal('hp_now', 12, 4)->default(0);
 			$table->unsignedInteger('hp_max')->default(0);
 			$table->timestamp('hp_updated')->nullable();
 			$table->unsignedInteger('energy_now')->default(0);
@@ -50,9 +50,14 @@ return new class extends Migration {
 			$table->timestamp('ustal_updated')->nullable();
 			$table->unsignedInteger('rating')->default(0);
 			$table->foreignId('tribe_id')->nullable()->constrained('tribes')->nullOnDelete();
-			$table->foreignId('battle_id')->nullable();
+			$table->foreignId('battle_id')->nullable()->constrained('battles')->nullOnDelete();
 			$table->integer('r_type')->nullable();
 			$table->timestamp('r_date')->nullable();
+			$table->timestamp('silence')->nullable();
+			$table->timestamp('travma')->nullable();
+			$table->timestamp('invisible')->nullable();
+			$table->timestamp('vip')->nullable();
+			$table->smallInteger('otravl')->default(0);
 			$table->rememberToken();
 			$table->timestamps();
 			$table->softDeletes();

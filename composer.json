@@ -80,7 +80,7 @@
 		],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan schedule:run\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,schedule,queue,logs,vite"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan schedule:run\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan reverb:start --host=\"0.0.0.0\" --port=8080\" \"npm run dev\" --names=server,schedule,queue,logs,reverb,vite"
         ],
         "test": "vendor/bin/pest",
         "analyse": "vendor/bin/phpstan analyse"

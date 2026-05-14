@@ -2,61 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controller;
 use Game\Battle\Battle;
-use Game\Controller;
+use Illuminate\Http\Request;
 
-/**
- * @RoutePrefix("/battle")
- * @Route("/")
- * @Route("/{action}/")
- * @Route("/{action}{params:(/.*)*}")
- * @Private
- */
 class BattleController extends Controller
 {
-	public function initialize ()
+	public function index(Request $request)
 	{
-		parent::initialize();
-	}
-
-    public function indexAction()
-    {
-		if ($this->request->hasQuery('teleport'))
-		{
-			$this->db->updateAsDict(
-			   	"game_users",
-				['room' => 1],
-			   	"id = ".$this->user->getId()
-			);
-
+		if ($request->has('teleport')) {
 			$this->user->room = 1;
+			$this->user->save();
 		}
 
-		if ($this->user->room == 2 && !$this->user->battle)
-		{
-			include(ROOT_PATH . '/app/includes/city/city_1/trening.php');
-
-			return;
+		if ($this->user->room == 2 && !$this->user->battle_id) {
+			return include(app_path('/includes/city/city_1/trening.php'));
 		}
 
-		if ($this->user->battle > 0)
-		{
-			if ($this->request->get('mode', null, '') == "ajax" && $this->user->battle)
-			{
-				$battle = new Battle();
-				$battle->init();
-				$json = $battle->show();
+		if ($this->user->battle_id) {
+			$battle = new Battle();
+			$battle->init();
 
-				$this->response->setJsonContent($json);
-				$this->response->setContentType('text/json', 'utf8');
-				$this->response->send();
-				$this->view->disable();
-
-				die();
-			}
-		}
-		else
-		{
+			return response()->json($battle->show());
+		} else {
 			$this->view->pick('battle/list');
 
 			$offerId 	= $this->request->get('offer', 'int', 0);
@@ -71,115 +39,104 @@ class BattleController extends Controller
 			$alert = '';
 			$userOffer = $this->getCurrentUserRequest();
 
-			if (isset($userOffer['BattleID']))
+			if (isset($userOffer['BattleID'])) {
 				$battleType = $userOffer['BattleType'];
+			}
 
 			$this->view->setVar('battleType', $battleType);
 
-			switch ($page)
-			{
+			switch ($page) {
 				case "take_it":
-
 					$message = $this->takeOffer($offerId);
 
 					echo $message;
 
-					if ($message == '')
+					if ($message == '') {
 						$userOffer = $this->getCurrentUserRequest();
+					}
 
 					break;
 
 				case "dismiss":
-
-					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1)
-					{
-						if (!$userOffer['Team'])
-						{
+					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
+						if (!$userOffer['Team']) {
 							$opponent = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $userOffer['BattleID'] . " AND f.Team = 1 AND f.FighterID = u.id")->fetch();
 
 							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` != " . $this->user->getId() . "");
 
-							if (isset($opponent['user']))
+							if (isset($opponent['user'])) {
 								$this->game->insertInChat("<b>" . $this->user->username . "</b> отказал в поединке!", $opponent['username'], true);
-						}
-						else
+							}
+						} else {
 							$message = "Что-то тут не так...";
-					}
-					else
+						}
+					} else {
 						$message = 'Заявки несуществует или истек срок её размещения';
+					}
 
 					break;
 
 				case "take_back":
-
-					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1)
-					{
-						if (!$userOffer['Team'])
-						{
+					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
+						if (!$userOffer['Team']) {
 							$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
 							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
-						}
-						else
-						{
+						} else {
 							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . $this->user->getId() . "");
 						}
 
 						unset($userOffer);
-					}
-					else
+					} else {
 						$message = 'Заявки несуществует или истек срок её размещения';
+					}
 
 					break;
 
 				case "newbattle":
-
 					$this->createOffer($battleType);
 
-					if ($message == '')
+					if ($message == '') {
 						$userOffer = $this->getCurrentUserRequest();
+					}
 
-				break;
+					break;
 			}
 
 			ob_start();
 
-			switch ($battleType)
-			{
+			switch ($battleType) {
 				case 2:
-
-					if ($this->user->level < 2)
+					if ($this->user->level < 2) {
 						$message = 'Извините, групповые бои с 2-ого уровня';
-					else
-					{
-						if ($page == "start" || $page == '')
+					} else {
+						if ($page == "start" || $page == '') {
 							$this->startOffer($battleType);
+						}
 
-						include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
+						include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
 					}
 
 					break;
 
 				case 3:
-
-					if ($this->user->level < 3)
+					if ($this->user->level < 3) {
 						$message = 'Извините, хаотические бои с 3-ого уровня';
-					else
-					{
-						if ($page == "start" || $page == '')
+					} else {
+						if ($page == "start" || $page == '') {
 							$this->startOffer($battleType);
+						}
 
-						include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
+						include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
 					}
 
 					break;
 
 				default:
-
-					if ($page == "start")
+					if ($page == "start") {
 						$this->startOffer($battleType);
+					}
 
-					include(ROOT_PATH."/app/includes/battle/show_offers_".$battleType.".php");
-
+					include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
 			}
 
 			$list = ob_get_contents();
@@ -190,22 +147,19 @@ class BattleController extends Controller
 			$this->view->setVar('list', $list);
 			$this->view->setVar('battleId', (isset($userOffer['BattleID']) ? $userOffer['BattleID'] : 0));
 		}
-    }
+	}
 
-	private function startOffer ($battleType)
+	private function startOffer($battleType)
 	{
-		if ($battleType == 1)
-		{
+		if ($battleType == 1) {
 			$user_offer = $this->db->query("SELECT b.BattleID, b.WeaponUsing FROM game_battle b, game_battle_users f WHERE b.StartTime > " . time() . " AND b.BattleType = 1 AND b.Status = 'Zayavka' AND f.FighterID = " . $this->user->getId() . " AND b.BattleID = f.BattleID")->fetch();
 
-			if (isset($user_offer['BattleID']))
-			{
+			if (isset($user_offer['BattleID'])) {
 				// Узнаём сколько человек в бою
 				$participants = $this->db->query("SELECT count(distinct Team) AS num FROM game_battle_users WHERE BattleID = " . $user_offer['BattleID'] . "")->fetch()['num'];
 
 				// Если в бою 2 чела
-				if ($participants == 2)
-				{
+				if ($participants == 2) {
 					// Записываем что бой начался
 					$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $user_offer['BattleID'] . "");
 
@@ -217,15 +171,13 @@ class BattleController extends Controller
 					// Узнаём кто в бою (ид, ник и комнату)
 					$members = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $user_offer['BattleID'] . " AND f.FighterID = u.id");
 
-					while ($member = $members->fetch())
-					{
+					while ($member = $members->fetch()) {
 						// Добовляем перса в поединок и выводим системку в чат
 						$this->db->query("UPDATE `game_users` SET `battle` = '" . $user_offer['BattleID'] . "' WHERE `id` = '" . $member['FighterID'] . "'");
 						$this->game->insertInChat("Часы показывали <U>$bdate</U>, когда Ваш бой начался!", $member['username'], true);
 
 						// Если кулачный бой то снимаем вещи с перса
-						if ($user_offer['WeaponUsing'] == 1)
-						{
+						if ($user_offer['WeaponUsing'] == 1) {
 							$this->db->query("UPDATE slots SET slots.1=0, slots.2=0, slots.3=0, slots.4=0, slots.5=0, slots.6=0, slots.7=0, slots.8=0, slots.9=0, slots.10=0, slots.11=0, slots.12=0, slots.13=0, slots.14=0, slots.15=0, slots.16=0, slots.17=0, slots.18=0, slots.19=0, slots.20=0, slots.21=0, slots.22=0 WHERE id='" . $member['FighterID'] . "'");
 						}
 					}
@@ -234,25 +186,20 @@ class BattleController extends Controller
 					$this->view->disable();
 				}
 			}
-		}
-		elseif ($battleType == 2)
-		{
+		} elseif ($battleType == 2) {
 			$currentOffer = $this->db->query("SELECT b.BattleID FROM game_battle b, game_battle_users f WHERE b.StartTime <= " . (time() - 10) . " AND f.FighterID = " . $this->user->getId() . " AND b.BattleType = '2' AND b.Status = 'Zayavka' AND b.BattleID = f.BattleID")->fetch();
 
-			if (isset($currentOffer['BattleID']))
-			{
+			if (isset($currentOffer['BattleID'])) {
 				$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $currentOffer['BattleID']);
 
 				$participants = $this->db->query("SELECT count(distinct Team) AS num FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'])->fetch()['num'];
 
-				if ($participants >= 2)
-				{
+				if ($participants >= 2) {
 					$this->db->query("INSERT INTO game_battle_log (HitID, BattleID, HitTime, RedComment) VALUES (0, " . $currentOffer['BattleID'] . ", " . time() . ", 71)");
 
 					$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id");
 
-					while ($member = $members->fetch())
-					{
+					while ($member = $members->fetch()) {
 						$this->db->query("UPDATE `game_users` SET `battle` = " . $currentOffer['BattleID'] . ", `side` = " . $member['Team'] . " WHERE `id` = " . $member['FighterID'] . "");
 
 						$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i:s", time()) . "</U>, когда Ваш бой начался!", $member['username'], true);
@@ -260,47 +207,40 @@ class BattleController extends Controller
 
 					$this->response->redirect('battle/');
 					$this->view->disable();
-				}
-				else
-				{
+				} else {
 					$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
 					$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
 
 					$this->game->insertInChat("Ваш бой не может начаться, т.к. группа не набрана!", $this->user->username, true);
 				}
 			}
-		}
-		elseif ($battleType == 3)
-		{
+		} elseif ($battleType == 3) {
 			$currentOffer = $this->db->query("SELECT b.BattleID, b.alg FROM game_battle b, game_battle_users f WHERE b.StartTime <= " . (time() - 10) . " AND f.FighterID = " . $this->user->getId() . " AND b.BattleType = '3' AND b.Status = 'Zayavka' AND b.BattleID = f.BattleID")->fetch();
 
-			if (isset($currentOffer['BattleID']))
-			{
+			if (isset($currentOffer['BattleID'])) {
 				$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
 
 				$participants = $this->db->query("SELECT count(distinct FighterID) AS num FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'])->fetch()['num'];
 
 				$parts_num = $participants - $participants % 2;
 
-				if ($parts_num >= 4)
-				{
+				if ($parts_num >= 4) {
 					$ms = 3;
 					$kol = 0;
 
 					$this->db->query("INSERT INTO game_battle_log (HitID, BattleID, HitTime, RedComment) VALUES (0, " . $currentOffer['BattleID'] . ", " . time() . ", 71)");
 
-					if ($currentOffer['alg'] == 2)
+					if ($currentOffer['alg'] == 2) {
 						$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room, u.reit FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id ORDER BY u.reit ASC");
-					else
+					} else {
 						$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room, u.reit FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id ORDER by RAND()");
+					}
 
-					if ($currentOffer['alg'] == 1 || $currentOffer['alg'] == 2)
-					{
+					if ($currentOffer['alg'] == 1 || $currentOffer['alg'] == 2) {
 						$a = array();
 						$b = array();
 
-						while ($member = $members->fetch())
-						{
+						while ($member = $members->fetch()) {
 							$a[] = $members['reit'];
 							$b[] = array('id' => $members['FighterID'], 'user' => $members['username']);
 						}
@@ -314,17 +254,14 @@ class BattleController extends Controller
 						$c1 = 0;
 						$c2 = count($a) - 1;
 
-						while ($col > 0)
-						{
-							if (array_sum($a1) <= array_sum($a2))
-							{
+						while ($col > 0) {
+							if (array_sum($a1) <= array_sum($a2)) {
 								$a1[] = $a[$c1];
 								$b1[] = $b[$c1];
 								$c1++;
 								$col--;
 							}
-							if (array_sum($a1) > array_sum($a2))
-							{
+							if (array_sum($a1) > array_sum($a2)) {
 								$a2[] = $a[$c2];
 								$b2[] = $b[$c2];
 								$c2--;
@@ -332,27 +269,21 @@ class BattleController extends Controller
 							}
 						}
 
-						foreach ($b1 as $id => $data)
-						{
+						foreach ($b1 as $id => $data) {
 							$this->db->query("UPDATE game_battle_users SET Team = '1' WHERE FighterID = " . $data['id'] . " and BattleID = " . $currentOffer['BattleID'] . "");
 							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = 1 WHERE id = " . $data['id'] . "");
 
-							$this->game->insertInChat("Часы показывали <U>".date("d.m.y H:i", time())."</U>, когда Ваш бой начался!", $data['user'], true);
+							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $data['user'], true);
 						}
 
-						foreach ($b2 as $id => $data)
-						{
+						foreach ($b2 as $id => $data) {
 							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = 0 WHERE id = " . $data['id'] . "");
 
-							$this->game->insertInChat("Часы показывали <U>".date("d.m.y H:i", time())."</U>, когда Ваш бой начался!", $data['user'], true);
+							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $data['user'], true);
 						}
-					}
-					else
-					{
-						while ($member = $members->fetch())
-						{
-							if ($ms < 2 || $kol >= $parts_num)
-							{
+					} else {
+						while ($member = $members->fetch()) {
+							if ($ms < 2 || $kol >= $parts_num) {
 								$this->db->query("UPDATE game_battle_users SET Team = '1' WHERE FighterID = " . $member['FighterID'] . " and BattleID = " . $currentOffer['BattleID'] . "");
 								$participant['Team'] = 1;
 							}
@@ -362,15 +293,13 @@ class BattleController extends Controller
 
 							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = " . $member['Team'] . " WHERE id = " . $member['FighterID'] . "");
 
-							$this->game->insertInChat("Часы показывали <U>".date("d.m.y H:i", time())."</U>, когда Ваш бой начался!", $member['username'], true);
+							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $member['username'], true);
 						}
 					}
 
 					$this->response->redirect('battle/');
 					$this->view->disable();
-				}
-				else
-				{
+				} else {
 					$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
 					$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
 
@@ -380,17 +309,16 @@ class BattleController extends Controller
 		}
 	}
 
-	private function getCurrentUserRequest ()
+	private function getCurrentUserRequest()
 	{
 		return $this->db->query("SELECT b.BattleID, b.StartTime, b.BattleType, f.Team FROM game_battle b, game_battle_users f WHERE b.StartTime > " . time() . " AND b.Status = 'Zayavka' AND f.BattleID = b.BattleID AND f.FighterID = " . $this->user->getId() . "")->fetch();
 	}
 
-	private function createOffer ($battleType)
+	private function createOffer($battleType)
 	{
 		$userOffer = $this->getCurrentUserRequest();
 
-		switch ($this->request->getPost('timeout', 'int', 0))
-		{
+		switch ($this->request->getPost('timeout', 'int', 0)) {
 			case 1:
 				$timeout = 90;
 				break;
@@ -412,16 +340,13 @@ class BattleController extends Controller
 
 		$message = '';
 
-		if (isset($userOffer['BattleID']))
+		if (isset($userOffer['BattleID'])) {
 			$message = "Для начала с одной заявкой разберись...";
-		elseif ($this->user->hp_now < $this->user->hp_max / 3)
+		} elseif ($this->user->hp_now < $this->user->hp_max / 3) {
 			$message = "Вы слишком ослаблены для поединка! Восстановитесь...";
-		else
-		{
-			switch ($battleType)
-			{
+		} else {
+			switch ($battleType) {
 				case 1:
-
 					$this->db->insertAsDict(
 						"game_battle",
 						array
@@ -434,7 +359,7 @@ class BattleController extends Controller
 							'Status' 			=> 'Zayavka',
 							'Comment' 			=> $comment,
 							'IsBlood' 			=> min(1, max(0, $this->request->getPost('blood', 'int', 0))),
-							'WeaponUsing' 		=> min(1, max(0, $this->request->getPost('kulak', 'int', 0)))
+							'WeaponUsing' 		=> min(1, max(0, $this->request->getPost('kulak', 'int', 0))),
 						)
 					);
 
@@ -447,25 +372,23 @@ class BattleController extends Controller
 							'Team' 			=> 0,
 							'isBot' 		=> 0,
 							'currentTime' 	=> time(),
-							'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+							'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 						)
 					);
 
 					break;
 
 				case 2:
-
-					if ($this->user->level < 2)
+					if ($this->user->level < 2) {
 						$message = 'Извините, групповые бои с 2-ого уровня';
-					else
-					{
+					} else {
 						$time_battle_start = $this->request->getPost('time_battle_start', 'int', 0);
 
-						if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900)
+						if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
 							$time_battle_start = 180;
+						}
 
-						switch ($this->request->getPost('offer_level_1', 'int'))
-						{
+						switch ($this->request->getPost('offer_level_1', 'int')) {
 							case 2:
 								$level_l_min = $this->user->level;
 								$level_l_max = $this->user->level;
@@ -483,8 +406,7 @@ class BattleController extends Controller
 								$level_l_max = 12;
 						}
 
-						switch ($this->request->getPost('offer_level_2', 'int'))
-						{
+						switch ($this->request->getPost('offer_level_2', 'int')) {
 							case 2:
 								$level_r_min = $this->user->level;
 								$level_r_max = $this->user->level;
@@ -506,11 +428,13 @@ class BattleController extends Controller
 						$size_right = $this->request->getPost('size_right', 'int', 2);
 
 						// Размеры команд
-						if ($size_left < 2 || $size_left > 25)
+						if ($size_left < 2 || $size_left > 25) {
 							$size_left = 2;
+						}
 
-						if ($size_right < 2 || $size_right > 25)
+						if ($size_right < 2 || $size_right > 25) {
 							$size_right = 2;
+						}
 
 						$this->db->insertAsDict(
 							"game_battle",
@@ -526,7 +450,7 @@ class BattleController extends Controller
 								'minRedLevel'		=> $level_l_min,
 								'maxRedLevel'		=> $level_l_max,
 								'minBlueLevel'		=> $level_r_min,
-								'maxBlueLevel'		=> $level_r_max
+								'maxBlueLevel'		=> $level_r_max,
 							)
 						);
 
@@ -539,7 +463,7 @@ class BattleController extends Controller
 								'Team' 			=> 0,
 								'isBot' 		=> 0,
 								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 							)
 						);
 					}
@@ -547,11 +471,9 @@ class BattleController extends Controller
 					break;
 
 				case 3:
-
-					if ($this->user->level < 3)
+					if ($this->user->level < 3) {
 						$message = 'Извините, хаотические бои с 3-ого уровня';
-					else
-					{
+					} else {
 						$time_battle_start = $this->request->getPost('time_battle_start', 'int', 0);
 
 						$alg = $this->request->getPost('alg', 'int', 1);
@@ -561,12 +483,12 @@ class BattleController extends Controller
 						$inv = min(1, max(0, $inv));
 
 						// Время до начала поединка
-						if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900)
+						if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
 							$time_battle_start = 180;
+						}
 
 						// Уровни
-						switch ($this->request->getPost('offer_level_1', 'int'))
-						{
+						switch ($this->request->getPost('offer_level_1', 'int')) {
 							case 2:
 								$level_l_min = $this->user->level;
 								$level_l_max = $this->user->level;
@@ -599,7 +521,7 @@ class BattleController extends Controller
 								'minRedLevel'		=> $level_l_min,
 								'maxRedLevel'		=> $level_l_max,
 								'alg'				=> $alg,
-								'inv'				=> $inv
+								'inv'				=> $inv,
 							)
 						);
 
@@ -612,7 +534,7 @@ class BattleController extends Controller
 								'Team' 			=> 0,
 								'isBot' 		=> 0,
 								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 							)
 						);
 					}
@@ -624,34 +546,29 @@ class BattleController extends Controller
 		return $message;
 	}
 
-	private function takeOffer ($offerId)
+	private function takeOffer($offerId)
 	{
 		$userOffer = $this->getCurrentUserRequest();
 
 		$message = '';
 
-		if (isset($userOffer['BattleID']))
+		if (isset($userOffer['BattleID'])) {
 			$message = "Для начала с одной заявкой разберись...";
-		elseif ($this->user->hp_now < $this->user->hp_max / 3)
+		} elseif ($this->user->hp_now < $this->user->hp_max / 3) {
 			$message = "Вы слишком ослаблены для поединка, подлечитесь!";
-		else
-		{
+		} else {
 			$offerInfo = $this->db->query("SELECT * FROM `game_battle` WHERE `BattleID` = '" . $offerId . "'")->fetch();
 
-			if ($offerInfo['BattleType'] == 1)
-			{
+			if ($offerInfo['BattleType'] == 1) {
 				$participants = $this->db->query("SELECT `BattleID` FROM `game_battle_users` WHERE BattleID = " . $offerId . "")->numRows();
 
-				switch ($participants)
-				{
+				switch ($participants) {
 					case 1:
-
 						$opponent = $this->db->query("SELECT f.`FighterID`, u.`username`, u.`room`, u.`ip` FROM `game_battle_users` f, game_users u WHERE f.BattleID = " . $offerId . " AND f.Team = 0 AND f.FighterID = u.id")->fetch();
 
-						if ($opponent['ip'] == $this->user->ip && !$this->user->isAdmin())
+						if ($opponent['ip'] == $this->user->ip && !$this->user->isAdmin()) {
 							$message = "Вы не можете выступать против персонажа с таким же IP как у вас!";
-						else
-						{
+						} else {
 							$this->db->insertAsDict(
 								"game_battle_users",
 								array
@@ -661,7 +578,7 @@ class BattleController extends Controller
 									'Team' 			=> 1,
 									'isBot' 		=> 0,
 									'currentTime' 	=> time(),
-									'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+									'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 								)
 							);
 
@@ -675,37 +592,32 @@ class BattleController extends Controller
 					default:
 						$message = "Боец отозвал заявку или её не существует!";
 				}
-			}
-			elseif ($offerInfo['BattleType'] == 2)
-			{
-				if ($this->user->level < 2)
+			} elseif ($offerInfo['BattleType'] == 2) {
+				if ($this->user->level < 2) {
 					$message = 'Извините, групповые бои с 2-ого уровня';
-				else
-				{
+				} else {
 					$side = min(1, max(0, $this->request->get('battle_side', 'int', 0)));
 
 					$side_0 = $this->db->query("SELECT COUNT(*) AS num FROM `game_battle_users` WHERE `BattleID` = '" . $offerId . "' && `Team` = '0'")->fetch()['num'];
 					$side_1 = $this->db->query("SELECT COUNT(*) AS num FROM `game_battle_users` WHERE `BattleID` = '" . $offerId . "' && `Team` = '1'")->fetch()['num'];
 
-					if ($side_0 >= $offerInfo['RedTeamCapacity'] && $side == 0)
+					if ($side_0 >= $offerInfo['RedTeamCapacity'] && $side == 0) {
 						$message = "<br>Группа уже набрана!";
-					elseif ($side_1 >= $offerInfo['BlueTeamCapacity'] && $side == 1)
+					} elseif ($side_1 >= $offerInfo['BlueTeamCapacity'] && $side == 1) {
 						$message = "<br>Группа уже набрана!";
-
-					elseif ($this->user->level < $offerInfo['minRedLevel'] && $side == 0)
+					} elseif ($this->user->level < $offerInfo['minRedLevel'] && $side == 0) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel']) && $side == 0)
+					} elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel']) && $side == 0) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif ($this->user->level > $offerInfo['maxRedLevel'] && $side == 0)
+					} elseif ($this->user->level > $offerInfo['maxRedLevel'] && $side == 0) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif ($this->user->level < $offerInfo['minBlueLevel'] && $side == 1)
+					} elseif ($this->user->level < $offerInfo['minBlueLevel'] && $side == 1) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif (($offerInfo['minBlueLevel'] == $offerInfo['maxBlueLevel']) && ($this->user->level != $offerInfo['minBlueLevel']) && $side == 1)
+					} elseif (($offerInfo['minBlueLevel'] == $offerInfo['maxBlueLevel']) && ($this->user->level != $offerInfo['minBlueLevel']) && $side == 1) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif ($this->user->level > $offerInfo['maxBlueLevel'] && $side == 1)
+					} elseif ($this->user->level > $offerInfo['maxBlueLevel'] && $side == 1) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					else
-					{
+					} else {
 						$this->db->insertAsDict(
 							"game_battle_users",
 							array
@@ -715,28 +627,24 @@ class BattleController extends Controller
 								'Team' 			=> $side,
 								'isBot' 		=> 0,
 								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 							)
 						);
 
 						$this->db->query("UPDATE game_users SET `side` = '" . $side . "', `offer` = '" . $offerId . "' WHERE `id` = '" . $this->user->id . "'");
 					}
 				}
-			}
-			elseif ($offerInfo['BattleType'] == 3)
-			{
-				if ($this->user->level < 3)
+			} elseif ($offerInfo['BattleType'] == 3) {
+				if ($this->user->level < 3) {
 					$message = 'Извините, хаотические бои с 3-ого уровня';
-				else
-				{
-					if ($this->user->level < $offerInfo['minRedLevel'])
+				} else {
+					if ($this->user->level < $offerInfo['minRedLevel']) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel']))
+					} elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel'])) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					elseif ($this->user->level > $offerInfo['maxRedLevel'])
+					} elseif ($this->user->level > $offerInfo['maxRedLevel']) {
 						$message = "<br>Эта заявка не может быть принята Вами!";
-					else
-					{
+					} else {
 						$this->db->insertAsDict(
 							"game_battle_users",
 							array
@@ -746,7 +654,7 @@ class BattleController extends Controller
 								'Team' 			=> 0,
 								'isBot' 		=> 0,
 								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level)
+								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
 							)
 						);
 
@@ -759,13 +667,14 @@ class BattleController extends Controller
 		return $message;
 	}
 
-	public function getBaseLevelExp ($level)
+	public function getBaseLevelExp($level)
 	{
 		$level = $this->db->query("SELECT base FROM game_levels WHERE level = '" . intval($level) . "'")->fetch();
 
-		if (isset($level['base']))
+		if (isset($level['base'])) {
 			return $level['base'];
-		else
+		} else {
 			return 0;
+		}
 	}
 }

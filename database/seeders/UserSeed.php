@@ -12,10 +12,14 @@ class UserSeed extends Seeder
 	{
 		if (!User::find(1)) {
 			$user = UserService::creation([
-				'username' => 'admin',
-				'email'    => 'admin@admin.com',
-				'password' => 'password',
+				'name' 		=> 'admin',
+				'email'    	=> 'admin@admin.com',
+				'password' 	=> 'password',
 			]);
+
+			$user->moneys = 500;
+			$user->credits = 200;
+			$user->save();
 
 			$user->assignRole('admin');
 		}

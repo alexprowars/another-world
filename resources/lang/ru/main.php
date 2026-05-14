@@ -44,7 +44,9 @@ return [
 		5 => 'Документы',
 		6 => 'Прочее'
 	],
-	'stopwords' => [],
+	'stopwords' => [
+		'хуй' => '***',
+	],
 	'colors' => [
 		0  => array('black', ''),
 		1  => array('black', 'Черный'),

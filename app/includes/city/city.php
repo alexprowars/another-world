@@ -1,34 +1,45 @@
-<?
-/**
- * @var \App\Http\Controllers\MapController $this
- */
+<?php
+
+use App\Models\Battle;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Inertia\Inertia;
 
 $message = '';
 
-$room = $this->request->get('room', 'int', 0);
+$room = request()->integer('room');
 
-if ($room == 23 || $room == 2 || $room == 8)
-{
-	$userOffer = $this->db->query("select game_battle.StartTime, game_battle.BattleType, game_battle_users.Team from game_battle, game_battle_users WHERE game_battle.StartTime > ".time()." and game_battle.Status = 'Zayavka' and game_battle_users.BattleID = game_battle.BattleID and game_battle_users.FighterID = ".$this->user->getId()."")->fetch();
+if ($room == 23 || $room == 2 || $room == 8) {
+	$existBattleRequest = Battle::query()
+		->where('type', 'request')
+		->whereHas('members', function (Builder $query) {
+			$query->whereBelongsTo($this->user);
+		})
+		->exists();
 
-	if (empty($userOffer['StartTime']))
-	{
-		$this->db->query("UPDATE `game_users` SET room = " . $room . " WHERE id = '" . $this->user->getId() . "'");
+	if ($existBattleRequest) {
+		Inertia::share('message', 'Вы подали заявку и пытаетесь убежать с поля битвы! Нехорошо...');
+	} else {
+		$this->user->room = $room;
+		$this->user->save();
 
-		$this->response->redirect('map/');
-		$this->view->disable();
+		return redirect()->route('map');
 	}
-	else
-		$message = "Вы подали заявку и пытаетесь убежать с поля битвы! Нехорошо...";
-}
-elseif ($room == 1)
-{
-	$this->response->redirect('battle/');
-	$this->view->disable();
+} elseif ($room == 1) {
+	return redirect()->route('battle');
 }
 
-$this->view->pick('shared/city/city');
+$room_1_members = User::query()
+	->where('room', 1)
+	->where('onlinetime', '>', now()->subMinutes(5))
+	->count();
 
-$this->view->setVar('room_1_members', $this->db->query("SELECT COUNT(`id`) AS num FROM `game_users` WHERE `room` = 1 AND `onlinetime` > '" . (time() - 180) . "'")->fetch()['num']);
-$this->view->setVar('room_2_members', $this->db->query("SELECT COUNT(`id`) AS num FROM `game_users` WHERE `room` = 2 AND `onlinetime` > '" . (time() - 180) . "'")->fetch()['num']);
-$this->view->setVar('message', $message);
+$room_2_members = User::query()
+	->where('room', 2)
+	->where('onlinetime', '>', now()->subMinutes(5))
+	->count();
+
+return Inertia::render('City', [
+	'room_1_members' => $room_1_members,
+	'room_2_members' => $room_2_members,
+]);

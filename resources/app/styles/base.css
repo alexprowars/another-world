@@ -25,3 +25,8 @@ td,
 th {
 	padding: 0;
 }
+
+img {
+	max-width: initial;
+	display: inline-block;
+}

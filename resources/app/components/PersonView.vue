@@ -57,9 +57,9 @@
 						</table>
 					</div>
 					<div>
-						<table class="person_slots" style="width:240px; height:260px;border:solid #e1d0b0 1.5pt;" bgcolor=bfbfbf>
+						<table class="person_slots" style="border:solid #e1d0b0 1.5pt;" bgcolor=bfbfbf>
 							<tr>
-								<td width="60" height="260" valign="top" class="left">
+								<td valign="top" class="left">
 									<PersonViewSlot :position="1"/>
 									<PersonViewSlot :position="21"/>
 									<PersonViewSlot :position="2"/>
@@ -75,13 +75,12 @@
 										<img :src="avatar" width="120" height="220" :alt="person.nickname">
 									</a>
 									<div style="height:20px;"></div>
-									<div class="text-xs-center">
+									<div class="text-xs-center flex justify-center gap-2">
 										<PersonViewSlot :position="17"/>
-										&nbsp;&nbsp;&nbsp;
 										<PersonViewSlot :position="18"/>
 									</div>
 								</td>
-								<td width="60" height="260" valign="top" class="right">
+								<td valign="top" class="right">
 									<PersonViewSlot :position="14"/>
 									<PersonViewSlot :position="15"/>
 									<PersonViewSlot :position="5"/>

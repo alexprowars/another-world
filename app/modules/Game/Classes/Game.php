@@ -215,7 +215,7 @@ class Game extends Component
 								{
 									if ($enemy->isFree())
 									{
-										$this->user->calculateParams();
+										$this->user->calculateWearsStats();
 										$this->user->calculate();
 
 										if (

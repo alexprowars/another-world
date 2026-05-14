@@ -2,404 +2,298 @@
 
 namespace App\Http\Controllers;
 
-use Game\Controller;
-use Phalcon\Mvc\View;
-use Sky\Core\Lang;
+use App\Events\ChatPublicMessage;
+use App\Events\ChatPrivateMessage;
+use App\Exceptions\Exception;
+use App\Http\Controller;
+use App\Http\Resources\ChatMessageResource;
+use App\Models\Chat;
+use App\Models\User;
+use App\Services\ChatService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-/**
- * @RoutePrefix("/chat")
- * @Route("/")
- * @Route("/{action}/")
- * @Route("/{action}{params:(/.*)*}")
- * @Private
- */
 class ChatController extends Controller
 {
-	public function initialize()
+	public function last()
 	{
-		Lang::includeLang('main', 'game');
+		$items = Chat::query()
+			->with(['user'])
+			->orderByDesc('id')
+			->limit(30);
+
+		$lastMessage = Chat::query()
+			->orderByDesc('id')
+			->value('id') ?? 0;
+
+		if ($lastMessage) {
+			$items->where(function ($query) use ($lastMessage) {
+				$query->where('id', '>=', $lastMessage - 30)
+					->orWhere('date', '>', Carbon::now()->subMinutes(30));
+			});
+		}
+
+		$items = $items->get();
+
+		return ChatMessageResource::collection($items->reverse());
 	}
 
-    public function indexAction()
-    {
-		$this->view->disable();
+	public function send(Request $request)
+	{
+		$message = trim(addslashes(Str::sanitize($request->post('message'))));
 
-		$result = array('messages' => []);
+		if (empty($message)) {
+			throw new Exception('Введите текст сообщения');
+		}
 
-		if ($this->request->has('message_id'))
-		{
-			$addHp = 0;
+		$user = $request->user();
 
-			if ($this->user->battle == 0 && $this->user->r_type != 2 && ($this->user->hp_now < $this->user->hp_max) && $this->user->hp_max != 0 && $this->user->onlinetime > 0)
-			{
-				$addHp = round($this->user->hp_max * ((time() - $this->user->onlinetime) / 600), 10);
-
-				if (($this->user->hp_now + $addHp) > $this->user->hp_max)
-					$addHp = $this->user->hp_max - $this->user->hp_now;
-			}
-
-			$update = ['onlinetime' => time()];
-
-			if ($addHp > 0)
-				$update['hp_now'] = $this->user->hp_now + $addHp;
-
-			$this->db->updateAsDict(
-			   	"game_users",
-				$update,
-			   	"id = ".$this->user->getId()
+		if ($user->silence?->isFuture()) {
+			ChatService::sendSystemMessage(
+				$user,
+				'Коментатор',
+				'На вас наложено заклинание молчания. Осталось молчать до: ' . $user->silence->format('d.m.Y H:i') . '!'
 			);
 
-			$room_messages = json_decode($this->cache->get("game_chat"), true);
-
-			$mess_id = $this->request->get('message_id', 'int');
-			$last_message_id = $mess_id;
-
-			if (count($room_messages) > 0)
-			{
-				$color_massive = _getText('colors');
-
-				foreach ($room_messages as $id => $message)
-				{
-					if ($message[0] <= $mess_id)
-						continue;
-
-					$message[5] = nl2br(preg_replace("[\n\r]", "", $message[5]));
-
-					if ($message[6] > 0)
-						$message[5] = "<font color=\"" . $color_massive[$message[6]][0] . "\">" . $message[5] . "</font>";
-
-					if (!is_array($message[3]))
-						$message[3] = $message[3] == false ? array() : array($message[3]);
-
-					$msg = ['time' => $message[1], 'user' => $message[2], 'to' => $message[3], 'text' => $message[5], 'private' => ($message[4] > 0 ? 1 : 0), 'me' => -1, 'my' => -1];
-
-					if ($message[4] == 0 && count($message[3]) > 0)
-					{
-						$msg['me'] = in_array($this->user->username, $message[3]) ? 1 : 0;
-						$msg['my'] = ($message[2] == $this->user->username) ? 1 : 0;
-					}
-					elseif ($message[4] > 0 && count($message[3]) > 0 && ($message[2] == $this->user->username || in_array($this->user->username, $message[3])))
-					{
-						if ($message[2] == '')
-							$msg['to'] = [];
-
-						$msg['me'] = $message[2] == $this->user->username ? 0 : 1;
-						$msg['my'] = $msg['me'] ? 0 : 1;
-					}
-					elseif (count($message[3]) == 0)
-					{
-						$msg['me'] = 0;
-						$msg['my'] = $message[2] == $this->user->username ? 1 : 0;
-					}
-
-					$last_message_id = $message[0];
-
-					if ($msg['me'] >= 0 && $msg['my'] >= 0)
-						$result['messages'][] = $msg;
-				}
-			}
-
-			$result['last_message'] = (int) $last_message_id;
-			$result['hp_now'] = $this->user->hp_now + $addHp;
-			$result['hp_add'] = $addHp;
-
-			$this->response->setJsonContent($result);
-			$this->response->setContentType('text/json', 'utf8');
-			$this->response->send();
-			die();
+			return;
 		}
-    }
 
-	public function sendAction ()
-	{
-		$this->view->disable();
+		if (session()->get('chat_spam', 0) == 0) {
+			session()->put('chat_spam', time() - 5);
+		}
 
-		$result = ['success' => 0, 'messages' => []];
+		if (session()->get('chat_alert') === null) {
+			session()->put('chat_alert', 0);
+		}
 
-		if ($this->request->has('msg') && $this->request->get('msg') != '')
-		{
-			$message = trim(htmlspecialchars(addslashes($this->request->get('msg'))));
+		if (session()->get('chat_spam', 0) >= time()) {
+			ChatService::sendSystemMessage(
+				$user,
+				'Коментатор',
+				'Не более 1 сообщения в 5 секунд! Осталось предупреждений: ' . (2 - session()->get('chat_alert', 0))
+			);
 
-			if ($message != '' && $this->user->silence < time())
-			{
-				if ($this->session->get('chat_spam', 0) == 0)
-					$this->session->set('chat_spam', time() - 5);
-				if ($this->session->get('chat_alert', '') === '')
-					$this->session->set('chat_alert',0);
-
-				if ($this->session->get('chat_spam', 0) >= time() && $this->user->silence < time())
-				{
-					$result['messages'][] =
-					[
-						'time' 		=> time(),
-						'user' 		=> 'Коментатор',
-						'to' 		=> [],
-						'text' 		=> 'Не более 1 сообщения в 5 секунд! Осталось предупреждений: ' . (2 - $this->session->get('chat_alert', 0)) . '',
-						'private' 	=> 0,
-						'me' 		=> 1,
-						'my' 		=> 0
-					];
-
-					if ($this->session->get('chat_alert', 0) === 0)
-						$this->session->set('chat_alert_time', time());
-
-					$this->session->set('chat_alert', $this->session->get('chat_alert', 0) + 1);
-
-					if ($this->session->get('chat_alert', 0) > 2 && $this->session->get('chat_alert_time', 0) > time() - 60)
-					{
-						$this->db->query("UPDATE `game_users` SET `silence` = ".time()." + 600 WHERE `id` = '" . $this->user->id . "'");
-
-						$this->user->silence = time() + 600;
-
-						$this->game->insertInChat("<u><b>Комментатор</b></u> запретил общение  персонажу <u><b>" . $this->user->username . "</b></u> за флуд, сроком 10 минут!", "", false);
-					}
-
-					$message = '';
-				}
-				else
-				{
-					$this->session->set('chat_spam', time() + 5);
-					if ($this->session->get('chat_alert_time', 0) < time() - 60)
-						$this->session->set('chat_alert', 0);
-				}
-
-				if ($message != '')
-				{
-					$message = str_replace('\\', '', $message);
-					$message = str_replace('\\\'', '\'', $message);
-					$message = str_replace('\\\\', '\\', $message);
-					$message = str_replace('\\&quot;', '&quot;', $message);
-
-					$this->db->insertAsDict(
-						"game_log_chat",
-						Array
-						(
-							'user' => $this->user->id,
-							'time' => time(),
-							'text' => $message
-						)
-					);
-
-					$lastId =$this->db->lastInsertId();
-
-					$now = time();
-
-					if (preg_match_all("/приватно \[(.*?)\]/u", $message, $private))
-					{
-						$message = preg_replace("/приватно \[(.*?)\]/u", '', $message);
-					}
-
-					if (preg_match_all("/для \[(.*?)\]/u", $message, $to_login))
-					{
-						$message = preg_replace("/для \[(.*?)\]/u", '', $message);
-
-						if (isset($private['1']) && count($private[1]) > 0)
-						{
-							$private[1] = array_merge($private[1], $to_login[1]);
-							unset($to_login[1]);
-						}
-					}
-
-					$message = trim($message);
-					$message = strtr($message, _getText('stopwords'));
-
-					$username = $this->user->username;
-
-					$config = json_decode($this->session->get('config', '{}'), true);
-
-					if ($this->user->authlevel > 0 && (strpos($message, '/kick') !== false || $message == '/speak') && isset($to_login['1']))
-					{
-						$check = $this->db->query("SELECT id, authlevel FROM game_users WHERE username = '".$to_login['1']."' LIMIT 1")->fetch();
-
-						if (isset($check['id']) && $check['authlevel'] == 0)
-						{
-							if ($message == '/speak')
-							{
-								$this->db->query("UPDATE game_users SET silence = 0 WHERE id = ".$check['id']."");
-
-								$message = 'Модератор '.$this->user->username.' разрешил общение пользователю '.$to_login['1'].'.';
-							}
-							else
-							{
-								$time = 15;
-
-								if (strpos($message, '30') !== false)
-									$time = 30;
-								elseif (strpos($message, '60') !== false)
-									$time = 60;
-								elseif (strpos($message, '1440') !== false)
-									$time = 1440;
-
-								$this->db->query("UPDATE game_users SET silence = ".(time() + $time * 60)." WHERE id = ".$check['id']."");
-
-								$message = 'Модератор '.$this->user->username.' запретил общение пользователю '.$to_login['1'].' на '.$time.' минут.';
-							}
-
-							$username = '';
-							unset($to_login[1]);
-							unset($private[1]);
-							$config['color'] = 0;
-						}
-					}
-
-					$chat = json_decode($this->cache->get("game_chat"), true);
-
-					if (!is_array($chat))
-						$chat = array();
-
-					if (count($chat) > 0)
-					{
-						foreach ($chat as $id => $m)
-						{
-							if ($m[1] == $now)
-								$now++;
-						}
-					}
-
-					if (!isset($to_login[1]))
-						$to_login[1] = array();
-
-					$isPrivate = false;
-
-					if (isset($private['1']) && count($private[1]) > 0)
-					{
-						$to_login[1] = $private[1];
-						$isPrivate = true;
-					}
-
-					$to_login[1] = array_unique($to_login[1]);
-
-					$chat = array_reverse($chat);
-
-					foreach ($chat as $i => $mess)
-					{
-						if ($i >= 25 && $mess[0] < (time() - 120))
-							unset($chat[$i]);
-					}
-
-					$chat = array_reverse($chat);
-
-					$config['color'] = 0;
-
-					$chat[] = array($lastId, $now, $username, $to_login[1], $isPrivate, $message, ($config['color'] + 0), '');
-
-					$this->cache->save("game_chat", json_encode($chat), 86400);
-
-					$result['success'] = 1;
-				}
+			if (session()->get('chat_alert', 0) === 0) {
+				session()->put('chat_alert_time', time());
 			}
 
-			if ($this->user->silence > time())
-			{
-				$result['messages'][] =
-				[
-					'time' 		=> time(),
-					'user' 		=> 'Коментатор',
-					'to' 		=> [],
-					'text' 		=> 'На вас наложено заклинание молчания. Осталось молчать до: ' . date("d.m.Y H:i", $this->user->silence) . '!',
-					'private' 	=> 0,
-					'me' 		=> 1,
-					'my' 		=> 0
-				];
+			session()->put('chat_alert', session()->get('chat_alert', 0) + 1);
+
+			if (session()->get('chat_alert', 0) > 2 && session()->get('chat_alert_time', 0) > time() - 60) {
+				$user->silence = now()->addMinutes(10);
+				$user->save();
+
+				ChatService::insertInChat(
+					null,
+					'<u><b>Комментатор</b></u> запретил общение  персонажу <u><b>' . $user->nickname . '</b></u> за флуд, сроком 10 минут!',
+					false
+				);
+			}
+
+			return;
+		} else {
+			session()->put('chat_spam', time() + 5);
+
+			if (session()->get('chat_alert_time', 0) < time() - 60) {
+				session()->put('chat_alert', 0);
 			}
 		}
 
-		$this->response->setJsonContent($result);
-		$this->response->setContentType('text/json', 'utf8');
-		$this->response->send();
-		die();
+		$message = str_replace(['\\', '\\\'', '\\\\', '\\&quot;'], ['', '\'', '\\', '&quot;'], $message);
+
+		$users = [];
+		$private = false;
+
+		if (preg_match_all('/приватно \[(.*?)]/iu', $message, $match)) {
+			$message = preg_replace("/приватно \[(.*?)]/u", '', $message);
+			$users = array_map('trim', $match[1]);
+			$private = true;
+		}
+
+		if (preg_match_all('/для \[(.*?)]/iu', $message, $match)) {
+			$message = preg_replace("/для \[(.*?)]/u", '', $message);
+			$users = array_map('trim', $match[1]);
+
+			if (!empty($users)) {
+				$users = array_unique(array_merge($users, $users));
+			}
+		}
+
+		$stopwords = __('main.stopwords');
+
+		if (!is_array($stopwords)) {
+			$stopwords = [];
+		}
+
+		$message = trim($message);
+		$message = strtr($message, $stopwords);
+
+		$recipients = User::query()
+			->select(['id', 'nickname'])
+			->whereIn('nickname', $users)
+			->get();
+
+		if ((str_starts_with($message, '/kick') || str_starts_with($message, '/speak')) && $recipients->isNotEmpty() && $user->isAdmin()) {
+			if (str_starts_with($message, '/speak')) {
+				User::query()
+					->whereKey($recipients->modelKeys())
+					->update(['silence' => null]);
+
+				ChatService::insertInChat(
+					null,
+					'Модератор ' . $user->nickname . ' разрешил общение пользовател(ю/ям) ' . $recipients->pluck('nickname')->implode(', ') . '.',
+					false
+				);
+			} else {
+				$time = 15;
+
+				if (str_contains($message, '30')) {
+					$time = 30;
+				} elseif (str_contains($message, '60')) {
+					$time = 60;
+				} elseif (str_contains($message, '1440')) {
+					$time = 1440;
+				}
+
+				User::query()
+					->whereKey($recipients->modelKeys())
+					->update(['silence' => now()->addMinutes($time)]);
+
+				ChatService::insertInChat(
+					null,
+					'Модератор ' . $user->nickname . ' запретил общение пользовател(ю/ям) ' . $recipients->pluck('nickname')->implode(', ') . ' на ' . $time . ' минут.',
+					false
+				);
+
+				return;
+			}
+		}
+
+		$chatMessage = Chat::create([
+			'user_id' => $user->id,
+			'message' => $message,
+			'recipients' => $recipients->modelKeys(),
+			'private' => $private,
+			'date' => now(),
+		]);
+
+		$parsedMessage = ChatMessageResource::make($chatMessage)->resolve();
+
+		if ($chatMessage->private) {
+			foreach ($chatMessage->recipients as $userId) {
+				event(new ChatPrivateMessage($userId, $parsedMessage));
+			}
+
+			event(new ChatPrivateMessage(auth()->id(), $parsedMessage));
+		} else {
+			event(new ChatPublicMessage($parsedMessage));
+		}
 	}
 
-	public function onlineAction ()
+	public function online()
 	{
+		/*
 		$cookie = [];
 
-		if (!$this->cookies->has($this->config->cookie->prefix."_chat_sort"))
+		if (!$this->cookies->has($this->config->cookie->prefix . "_chat_sort")) {
 			$cookie['chat_sort'] = 1;
-		if (!$this->cookies->has($this->config->cookie->prefix."_chat_show"))
+		}
+		if (!$this->cookies->has($this->config->cookie->prefix . "_chat_show")) {
 			$cookie['chat_show'] = 1;
+		}
 
-		$sort = $this->cookies->get($this->config->cookie->prefix."_chat_sort")->getValue();
+		$sort = $this->cookies->get($this->config->cookie->prefix . "_chat_sort")->getValue();
 
-		if ($this->request->hasQuery('sort'))
-		{
+		if ($this->request->hasQuery('sort')) {
 			$sort = $this->request->get('sort', 'int');
 
 			$cookie['chat_sort'] = $sort;
 		}
 
-		$show = $this->cookies->get($this->config->cookie->prefix."_chat_show")->getValue();
+		$show = $this->cookies->get($this->config->cookie->prefix . "_chat_show")->getValue();
 
-		if ($this->request->hasQuery('show'))
-		{
+		if ($this->request->hasQuery('show')) {
 			$show = $this->request->get('show', 'int');
 
 			$cookie['chat_show'] = $show;
 		}
 
-		if (count($cookie))
-		{
-			foreach ($cookie as $key => $value)
-			{
-				$this->cookies->set($this->config->cookie->prefix."_".$key, $value);
+		if (count($cookie)) {
+			foreach ($cookie as $key => $value) {
+				$this->cookies->set($this->config->cookie->prefix . "_" . $key, $value);
 			}
 
 			$this->cookies->send();
-		}
+		}*/
 
-		switch ($sort)
-		{
+		$show = 1;
+		$sort = 1;
+
+		$users = User::query()
+			->with(['tribe'])
+			->whereNot('rank', 60)
+			->where('onlinetime', '<', now()->addMinutes(5));
+
+		switch ($sort) {
 			case 2:
-				$sql_order = "username DESC";
+				$users->orderByDesc('nickname');
 				break;
 			case 3:
-				$sql_order = "level ASC";
+				$users->orderBy('level');
 				break;
 			case 4:
-				$sql_order = "level DESC";
+				$users->orderByDesc('level');
 				break;
 			default:
-				$sql_order = "username ASC";
+				$users->orderBy('nickname');
 				break;
 		}
 
-		switch ($show)
-		{
+		switch ($show) {
 			case 2:
-				$sql_show = "AND room = " . $this->user->room;
-				break;
-			default:
-				$sql_show = "";
+				$users->where('room', auth()->user()->room);
 				break;
 		}
-
-		$this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
 
 		$userList = array();
 
-		$users = $this->db->query("SELECT id, username, silence, rank, tribe, level, status, invisible, battle, travma, proff FROM `game_users` WHERE `rank` != '60' AND `onlinetime` > " . (time() - 180) . " " . $sql_show . " ORDER BY " . $sql_order . "");
+		$users = $users->get();
 
-		while ($pl = $users->fetch())
-		{
-			if ($pl['invisible'] > time())
-			{
-				$pl['username'] = "Тень";
+		foreach ($users as $user) {
+			$pl = [
+				'id' => $user->id,
+				'name' => $user->nickname,
+				'rank' => $user->rank,
+				'tribe' => $user->tribe?->name,
+				'level' => $user->level,
+				'battle' => $user->battle,
+				'profession' => $user->profession,
+				'status' => $user->status,
+				'travma' => $user->travma?->utc()->toAtomString(),
+				'silence' => $user->travma?->utc()->toAtomString(),
+			];
+
+			if ($user->invisible?->isFuture()) {
+				$pl['name'] = 'Тень';
 				$pl['rank'] = 0;
-				$pl['tribe'] = "";
-				$pl['level'] = "??";
-				$pl['id'] = "1699638901";
-				$pl['travma'] = 0;
-				$pl['battle'] = 0;
-				$pl['silence'] = 0;
-				$pl['proff'] = 0;
+				$pl['tribe'] = '';
+				$pl['level'] = '??';
+				$pl['id'] = 1699638901;
+				$pl['travma'] = null;
+				$pl['battle'] = null;
+				$pl['silence'] = null;
+				$pl['profession'] = 0;
 				$pl['status'] = 0;
 			}
 
 			$userList[] = $pl;
 		}
 
-		$this->view->setVar('users', $userList);
-		$this->view->setVar('sort', $sort);
-		$this->view->setVar('show', $show);
+		return response()->json([
+			'sort'	=> $sort,
+			'show'	=> $show,
+			'users'	=> $userList,
+		]);
 	}
 }

@@ -14,11 +14,6 @@ use Game\Controller;
  */
 class EditController extends Controller
 {
-	public function initialize ()
-	{
-		parent::initialize();
-	}
-
     public function indexAction()
     {
 		$message = '';

@@ -11,7 +11,10 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import en from 'dayjs/locale/en';
 import ru from 'dayjs/locale/ru';
 import { createVfm } from 'vue-final-modal';
-import AppLayout from '~/layouts/AppLayout.vue';
+import GameLayout from '~/layouts/Game.vue';
+import { createState, StateSymbol } from '~/composables/useState.js';
+import FloatingVue from 'floating-vue';
+import toastPlugin from './plugins/toast';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -25,7 +28,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 createInertiaApp({
 	title: (title) => (title ? `${title} - ${appName}` : appName),
 	layout: () => {
-		return [AppLayout];
+		return [GameLayout];
 	},
 	defaults: {
 		visitOptions: (href, options) => {
@@ -38,11 +41,25 @@ createInertiaApp({
 		},
 	},
 	withApp(app) {
+		app.provide(StateSymbol, createState());
+
 		app.use(i18n);
 
 		dayjs.locale(en, null, true);
 		dayjs.locale(ru, null, true);
 
+		app.use(FloatingVue);
+
+		app.config.globalProperties.$formatDate = (value, format) => {
+			return dayjs(value).tz().format(format)
+		};
+
+		app.use(toastPlugin);
+
 		app.use(createVfm());
+
+		app.config.errorHandler = (error) => {
+			console.error(error);
+		}
 	}
 });

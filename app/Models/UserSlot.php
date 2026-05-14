@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
@@ -39,47 +40,55 @@ class UserSlot extends Model
 		return collect();
 	}
 
-	public function getInventoryObjects($type = 1, $filter = '')
+	public function getInventoryObjects(int $type = 1)
 	{
 		$items = $this->getItemsId();
 
+		$result = UserItem::query()
+			->where('user_id', $this->user_id)
+			->where('bank', 0)
+			->where('komis', 0)
+			->where('sclad', 0)
+			->orderByDesc('created_at');
+
 		switch ($type) {
 			case 1:
-				$query = "((tip >= 1 AND tip <= 11) OR (tip >= 24 AND tip <= 25))";
+				$result->where(function (Builder $query) {
+					$query->where(fn(Builder $query) => $query->where('type', '>=', 1)->where('type', '<=', 11))
+						->orWhere(fn(Builder $query) => $query->where('type', '>=', 24)->where('type', '<=', 25));
+				});
 				break;
 			case 2:
-				$query = "((tip >= 12 AND tip <= 13) OR tip >= 26)";
+				$result->where(function (Builder $query) {
+					$query->where(fn(Builder $query) => $query->where('type', '>=', 12)->where('type', '<=', 13))
+						->orWhere(fn(Builder $query) => $query->where('type', '>=', 26));
+				});
 				break;
 			case 3:
-				$query = "tip = 14";
+				$result->where('type', 14);
 				break;
 			case 4:
-				$query = "tip >= 19 AND tip <= 20";
+				$result->where('type', '>=', 19)->where('type', '<=', 20);
 				break;
 			case 5:
-				$query = "tip = 21";
+				$result->where('type', 21);
 				break;
 			case 6:
-				$query = "tip >= 15 AND tip <= 18";
+				$result->where('type', '>=', 15)->where('type', '<=', 18);
 				break;
 			case 7:
-				$query = "tip = 22";
+				$result->where('type', 22);
 				break;
 			case 8:
-				$query = "tip = 23";
-				break;
-			default:
-				$query = "";
+				$result->where('type', 23);
 				break;
 		}
-
-		$result = Objects::query()->where('user_id = :user: AND bank = 0 AND komis = 0 AND sclad = 0 ' . ($query != '' ? 'AND ' . $query : '') . ' ' . ($filter != '' ? 'AND ' . $filter : '') . '')->bind(array('user' => $this->user_id))->orderBy('time DESC');
 
 		if (count($items)) {
-			$result = $result->notInWhere('id', $items);
+			$result->whereNotIn('id', $items);
 		}
 
-		return $result->execute();
+		return $result->get();
 	}
 
 	public function getItemsId(): array
@@ -137,11 +146,11 @@ class UserSlot extends Model
 		if (
 			$user->level >= $min[0] && $info[6] < $info[7] &&
 			$user->strength >= $min[1] && $user->dex >= $min[2] && $user->agility >= $min[3] && $user->vitality >= $min[4] && $user->razum >= $min[5] &&
-			($min[7] == 0 || $user->proff == $min[7]) && !in_array($object->tip, array(15, 16, 19, 20, 21, 22, 23)) && ($object->life == 0 || $object->life > time())
+			($min[7] == 0 || $user->proff == $min[7]) && !in_array($object->type, array(15, 16, 19, 20, 21, 22, 23)) && ($object->life == 0 || $object->life > time())
 		) {
 			$slot = null;
 
-			switch ($object->tip) {
+			switch ($object->type) {
 				case 1:
 				case 17:
 					if ($this->i3 && $info[4]) {

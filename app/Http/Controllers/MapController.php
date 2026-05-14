@@ -2,47 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Game\Controller;
+use App\Exceptions\Exception;
+use App\Http\Controller;
+use App\Http\Controllers\Map\City\StreetController;
+use Illuminate\Http\Request;
 
-/**
- * @RoutePrefix("/map")
- * @Route("/")
- * @Route("/{action}/")
- * @Route("/{action}{params:(/.*)*}")
- * @Private
- */
 class MapController extends Controller
 {
-    public function indexAction()
-    {
-		if ($this->request->has('refer'))
-		{
-			if ($this->user->r_time > 0 || $this->user->r_type > 0)
-				$this->game->setRequestMessage('Нельзя перемещаться по городу пока занят работой');
-			else
-			{
-				$refer = $this->request->get('refer', 'int');
+	public function index(Request $request)
+	{
+		$user = $request->user();
 
-				if ($refer != $this->user->room)
-					$this->game->setRequestMessage('Типа читанул?');
-				else
-				{
+		if ($request->has('refer')) {
+			if ($user->r_date > 0 || $user->r_type) {
+				throw new Exception('Нельзя перемещаться по городу пока занят работой');
+			} else {
+				$refer = $request->integer('refer');
+
+				if ($refer != $user->room) {
+					throw new Exception('Типа читанул?');
+				} else {
 					$this->setRoom($refer);
 				}
 			}
 		}
 
-		$this->checkRoom($this->user->room);
-    }
+		return $this->checkRoom($user->room);
+	}
 
-	private function setRoom ($oldRoom)
+	private function setRoom($oldRoom)
 	{
 		$new_room = 0;
 
-		switch ($oldRoom)
-		{
-			case  2:
-			case  9:
+		switch ($oldRoom) {
+			case 2:
+			case 9:
 			case 28:
 				$new_room = 23;
 				break;
@@ -62,12 +56,12 @@ class MapController extends Controller
 			case 30:
 			case 14:
 			case 27:
-			case  8:
+			case 8:
 			case 29:
 			case 22:
 				$new_room = 101;
 				break;
-			case  7:
+			case 7:
 			case 11:
 			case 15:
 			case 17:
@@ -99,101 +93,95 @@ class MapController extends Controller
 				break;
 		}
 
-		if ($new_room != 0)
-		{
+		if ($new_room != 0) {
 			$this->user->room = $new_room;
-			$this->user->update();
+			$this->user->save();
 		}
 	}
 
-	public function checkRoom ($roomId)
+	public function checkRoom($roomId)
 	{
-		switch ($roomId)
-		{
-			case   1:
-				include(ROOT_PATH.'/app/includes/city/city.php');
+		switch ($roomId) {
+			case 1:
+				return include(app_path('/includes/city/city.php'));
 				break; // Арена
-			case   2:
-				include(ROOT_PATH.'/app/includes/city/city_1/trening.php');
+			case 2:
+				return include(app_path('/includes/city/city_1/trening.php'));
 				break; // Тренировочная
-			case   7:
-				include(ROOT_PATH.'/app/includes/city/city_1/shop.php');
+			case 7:
+				return to_route('map.city.shop');
+				return include(app_path('/includes/city/city_1/shop.php'));
 				break; // Магазин
-			case   8:
-				include(ROOT_PATH.'/app/includes/city/city_1/ambulance.php');
+			case 8:
+				return include(app_path('/includes/city/city_1/ambulance.php'));
 				break; // Больница
-			case   9:
-				include(ROOT_PATH.'/app/includes/city/city_1/academy.php');
+			case 9:
+				return include(app_path('/includes/city/city_1/academy.php'));
 				break; // Академия
 			case 10:
-				include(ROOT_PATH.'/app/includes/city/city_1/mshop.php');
+				return include(app_path('/includes/city/city_1/mshop.php'));
 				break; // Лавка мага
 			case 11:
-				include(ROOT_PATH.'/app/includes/city/city_1/repair.php');
+				return include(app_path('/includes/city/city_1/repair.php'));
 				break; // Кузница
 			case 12:
-				include(ROOT_PATH.'/app/includes/city/city_1/gamblinghouse.php');
+				return include(app_path('/includes/city/city_1/gamblinghouse.php'));
 				break; // Игорный дом
 			case 13:
-				include(ROOT_PATH.'/app/includes/city/city_1/gshop.php');
+				return include(app_path('/includes/city/city_1/gshop.php'));
 				break; // Сувениры
 			case 14:
-				include(ROOT_PATH.'/app/includes/city/city_1/administ.php');
+				return include(app_path('/includes/city/city_1/administ.php'));
 				break; // Админка
 			case 16:
-				include(ROOT_PATH.'/app/includes/city/city_1/works.php');
+				return include(app_path('/includes/city/city_1/works.php'));
 				break; // Центр занятости
 			case 17:
-				include(ROOT_PATH.'/app/includes/city/city_1/bank.php');
+				return include(app_path('/includes/city/city_1/bank.php'));
 				break; // Банк
 			case 19:
-				include(ROOT_PATH.'/app/includes/city/city_1/ambar.php');
+				return include(app_path('/includes/city/city_1/ambar.php'));
 				break; // Приём ресоф
 			case 20:
-				include(ROOT_PATH.'/app/includes/city/city_1/komis.php');
+				return include(app_path('/includes/city/city_1/komis.php'));
 				break; // Рынок
 			case 22:
-				include(ROOT_PATH.'/app/includes/city/city_1/brak.php');
+				return include(app_path('/includes/city/city_1/brak.php'));
 				break; // Церковь
 			case 25:
-				include(ROOT_PATH.'/app/includes/city/city_1/pochta.php');
+				return include(app_path('/includes/city/city_1/pochta.php'));
 				break; // Почта
 			case 27:
-				include(ROOT_PATH.'/app/includes/city/city_1/znahar.php');
+				return include(app_path('/includes/city/city_1/znahar.php'));
 				break; // Знахарка
 			case 28:
-				include(ROOT_PATH.'/app/includes/city/city_1/sclad.php');
+				return include(app_path('/includes/city/city_1/sclad.php'));
 				break; // Склад
 			case 29:
-				include(ROOT_PATH.'/app/includes/city/city_1/butik.php');
+				return include(app_path('/includes/city/city_1/butik.php'));
 				break; // Бутик
 			case 35:
-				include(ROOT_PATH.'/app/includes/city/city_1/kwest.php');
+				return include(app_path('/includes/city/city_1/kwest.php'));
 				break; // Таверна
 			case 666:
-				include(ROOT_PATH.'/app/includes/city/city_1/prison.php');
+				return include(app_path('/includes/city/city_1/prison.php'));
 				break; // Тюрьма
 			case 101:
-				include(ROOT_PATH.'/app/includes/city/city_1/street_1.php');
-				break;
+				return to_route('map.city.street', [1]);
 			case 103:
-				include(ROOT_PATH.'/app/includes/city/city_1/street_2.php');
-				break;
+				return to_route('map.city.street', [2]);
 			case 104:
-				include(ROOT_PATH.'/app/includes/city/city_1/street_3.php');
-				break;
-			case   23:
-				include(ROOT_PATH.'/app/includes/city/city_1/street_4.php');
-				break;
+				return to_route('map.city.street', [3]);
+			case 23:
+				return to_route('map.city.street', [4]);
 			case 105:
-				include(ROOT_PATH.'/app/includes/city/city_1/street_5.php');
-				break;
+				return to_route('map.city.street', [5]);
 			default:
-				if ($this->user->room >= 200 && $this->user->room <= 370)
-					include(ROOT_PATH.'/app/includes/city/city_1/vault.php');
-				else
-					include(ROOT_PATH.'/app/includes/city/city.php');
+				if ($this->user->room >= 200 && $this->user->room <= 370) {
+					return include(app_path('/includes/city/city_1/vault.php'));
+				} else {
+					return include(app_path('/includes/city/city.php'));
+				}
 		}
 	}
-
 }
