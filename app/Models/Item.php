@@ -145,46 +145,4 @@ class Item extends Model
 			return round($this->price * 0.85, 2);
 		}
 	}
-
-	public function addInInventory($userId)
-	{
-		$inf = $this->name . "|" . $this->title . "|" . $this->price . "|0|" . (int) $this->isSecondHand() . "|" . $this->art . "|0|" . $this->iznos;
-		$min = $this->min_level . "|" . $this->min_strength . "|" . $this->min_dex . "|" . $this->min_agility . "|" . $this->min_vitality . "|" . $this->min_razum . "|0|" . $this->min_proff;
-
-		return UserItem::query()->create([
-			'user_id'	=> $userId,
-			'inf'		=> $inf,
-			'min'		=> $min,
-			'type'		=> $this->type,
-			'br1'		=> $this->br1,
-			'br2'		=> $this->br2,
-			'br3'		=> $this->br3,
-			'br4'		=> $this->br4,
-			'br5'		=> $this->br5,
-			'min_d'		=> $this->min,
-			'max_d'		=> $this->max,
-			'hp'		=> $this->hp,
-			'energy'	=> $this->energy,
-			'strength'	=> $this->strength,
-			'dex'		=> $this->dex,
-			'agility'	=> $this->agility,
-			'vitality'	=> $this->vitality,
-			'razum'		=> $this->razum,
-			'krit'		=> $this->krit,
-			'mkrit'		=> $this->mkrit,
-			'unkrit'	=> $this->unkrit,
-			'uv'		=> $this->uv,
-			'unuv'		=> $this->unuv,
-			'pblock'	=> $this->pblock,
-			'mblock'	=> $this->mblock,
-			'pbr'		=> $this->pbr,
-			'time'		=> time(),
-			'about'		=> $this->about,
-			'class'		=> $this->class,
-			'otravl'	=> $this->otravl,
-			'use_mana'	=> $this->use_mana,
-			'magic'		=> $this->magic,
-			'life'		=> $this->life > 0 ? (time() + $this->life) : 0
-		]);
-	}
 }

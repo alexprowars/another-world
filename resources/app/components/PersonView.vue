@@ -60,15 +60,15 @@
 						<table class="person_slots" style="border:solid #e1d0b0 1.5pt;" bgcolor=bfbfbf>
 							<tr>
 								<td valign="top" class="left">
-									<PersonViewSlot :position="1"/>
-									<PersonViewSlot :position="21"/>
-									<PersonViewSlot :position="2"/>
-									<PersonViewSlot :position="3"/>
-									<PersonViewSlot :position="4"/>
-									<PersonViewSlot :position="9"/>
-									<PersonViewSlot :position="6"/>
-									<PersonViewSlot :position="7"/>
-									<PersonViewSlot :position="8"/>
+									<PersonViewSlot :position="1" :item="person.slots.slot_1 || null"/>
+									<PersonViewSlot :position="21" :item="person.slots.slot_21 || null"/>
+									<PersonViewSlot :position="2" :item="person.slots.slot_2 || null"/>
+									<PersonViewSlot :position="3" :item="person.slots.slot_3 || null"/>
+									<PersonViewSlot :position="4" :item="person.slots.slot_4 || null"/>
+									<PersonViewSlot :position="9" :item="person.slots.slot_9 || null"/>
+									<PersonViewSlot :position="6" :item="person.slots.slot_6 || null"/>
+									<PersonViewSlot :position="7" :item="person.slots.slot_7 || null"/>
+									<PersonViewSlot :position="8" :item="person.slots.slot_8 || null"/>
 								</td>
 								<td width="120" valign="top">
 									<a href="/avatar">

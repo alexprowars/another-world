@@ -31,12 +31,13 @@ class ChatService
 			'id' => null,
 			'date' => now()->utc()->toAtomString(),
 			'user' => $from,
-			'tou' => [$user->nickname],
+			'tou' => [$user->name],
 			'toi' => [$user->id],
 			'text' => $message,
 			'private' => $isPrivate,
 			'me' => true,
 			'my' => null,
+			'redirect' => $redirect,
 		];
 
 		if ($isPrivate) {

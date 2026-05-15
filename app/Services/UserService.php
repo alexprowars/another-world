@@ -25,9 +25,9 @@ class UserService
 		$user = User::create([
 			'email' => $data['email'] ?? '',
 			'password' => Hash::make($data['password']),
-			'nickname' => $data['name'] ?? '',
+			'name' => $data['name'] ?? '',
 			'ip' => Request::ip(),
-			'onlinetime' => now(),
+			'online' => now(),
 			'locale' => Locale::getPreferredLocale(),
 		]);
 
@@ -49,10 +49,18 @@ class UserService
 		return $user;
 	}
 
+	public static function checkRoom(User $user, int $room)
+	{
+		if ($room != $user->room) {
+			$user->room = $room;
+			$user->save();
+		}
+	}
+
 	public static function getUserRaiting(User $user): int
 	{
 		// Вычисление рейтинга крутизны (цена вещей, статы, процент побед)
-		$a = $user->strength + $user->agility + $user->dex + $user->vitality + $user->razum + $user->battery + $user->power - 14;
+		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->battery + $user->power - 14;
 		$b = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
 
 		return round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
@@ -62,8 +70,8 @@ class UserService
 	{
 		$result = 0;
 
-		if ($user->battle == 0 && $user->r_type != 2 && ($user->hp_now < $user->hp_max) && $user->hp_max != 0 && $user->onlinetime) {
-			$result = round($user->hp_max * (((int) $user->onlinetime->diffInSeconds()) / 600), 4);
+		if ($user->battle == 0 && $user->r_type != 2 && ($user->hp_now < $user->hp_max) && $user->hp_max != 0 && $user->online) {
+			$result = round($user->hp_max * (((int) $user->online->diffInSeconds()) / 600), 4);
 
 			if (($user->hp_now + $result) > $user->hp_max) {
 				$result = $user->hp_max - $user->hp_now;
@@ -83,8 +91,8 @@ class UserService
 		//$user['energy'] = 0;
 
 		// МФ
-		$user->krit		+= ($user->dex * 5);
-		$user->unkrit	+= ($user->dex * 5);
+		$user->krit		+= ($user->dexterity * 5);
+		$user->unkrit	+= ($user->dexterity * 5);
 		$user->uv		+= ($user->agility * 5);
 		$user->unuv		+= ($user->agility * 5);
 
@@ -103,11 +111,11 @@ class UserService
 				}
 			}
 
-			$user->br1 += $effect->br1 ?? 0;
-			$user->br2 += $effect->br2 ?? 0;
-			$user->br3 += $effect->br3 ?? 0;
-			$user->br4 += $effect->br4 ?? 0;
-			$user->br5 += $effect->br5 ?? 0;
+			$user->armor1 += $effect->armor1 ?? 0;
+			$user->armor2 += $effect->armor2 ?? 0;
+			$user->armor3 += $effect->armor3 ?? 0;
+			$user->armor4 += $effect->armor4 ?? 0;
+			$user->armor5 += $effect->armor5 ?? 0;
 			$user->min += $effect->min ?? 0;
 			$user->max += $effect->max ?? 0;
 
@@ -125,24 +133,24 @@ class UserService
 		$user->hp_max = $user->vitality * 5 + $user->hp;
 		$user->hp_now = min($user->hp_now, $user->hp_max);
 
-		$user->energy_max = ceil($user->power * 5 + $user->energy);
+		$user->energy_max = ceil($user->magic * 5 + $user->energy);
 		$user->energy_now = min($user->energy_now, $user->energy_max);
 
 		$user->ustal_max = $user->battery * 20;
 		$user->ustal_now = min($user->ustal_now, $user->ustal_max);
 
-		$user->update();
+		$user->save();
 	}
 
 	public static function calculateWearsStats(User $user)
 	{
 		$slot = $user->getSlot();
 
-		$wears = $slot->getWearsItems();
+		$wears = $slot->getItems();
 
 		foreach ($wears as $object) {
 			if ($object->life?->isPast()) {
-				$slot->unsetObject($object->onset);
+				InventoryService::unsetObject($user, $object->onset);
 
 				continue;
 			}
@@ -153,14 +161,14 @@ class UserService
 				}
 			}
 
-			$user->hp			+= $object->hp;
-			$user->energy		+= $object->energy;
+			$user->hp		+= $object->hp;
+			$user->energy	+= $object->energy;
 
-			$user->br1		+= $object->br1;
-			$user->br2		+= $object->br2;
-			$user->br3		+= $object->br3;
-			$user->br4		+= $object->br4;
-			$user->br5		+= $object->br5;
+			$user->armor1	+= $object->armor1;
+			$user->armor2	+= $object->armor2;
+			$user->armor3	+= $object->armor3;
+			$user->armor4	+= $object->armor4;
+			$user->armor5	+= $object->armor5;
 
 			$user->krit		+= $object->krit;
 			$user->mkrit	+= $object->mkrit;
@@ -173,14 +181,12 @@ class UserService
 			$user->pbr		+= $object->pbr;
 			$user->kbr		+= $object->kbr;
 
-			$user->min		+= $object->min_d;
-			$user->max		+= $object->max_d;
-
-			$info = $object->getInf();
+			$user->min		+= $object->min;
+			$user->max		+= $object->max;
 
 			// Для вычисления рейтинга (стоимость вещи)
-			if ($info[2] != 0) {
-				$user->rating += (float) $info[2];
+			if ($object->price) {
+				$user->rating += $object->price;
 			}
 		}
 	}

@@ -31,7 +31,7 @@ class ShopController extends Controller
 				$message = $e->getMessage();
 			}
 
-			return to_route('map.city.shop');
+			//return to_route('map.city.shop');
 		}
 
 		if ($request->integer('sale')) {
@@ -43,7 +43,7 @@ class ShopController extends Controller
 		}
 
 		if ($message) {
-			//throw new Exception($message);
+			throw new Exception($message);
 		}
 
 		$section = $request->integer('section');
@@ -55,7 +55,7 @@ class ShopController extends Controller
 				->where('shop_id', SHOP_ID)
 				->where('count', '>', 0)
 				->joinRelationship('item', function (PowerJoinClause $join) {
-					$join->as('item')->where('min_level', $this->user->level);
+					$join->as('item')->where('req_level', $this->user->level);
 				})
 				->orderByDesc('section_id')
 				->get();
@@ -65,9 +65,9 @@ class ShopController extends Controller
 				->where('count', '>', 0)
 				->where('section_id', $section)
 				->joinRelationship('item', function (PowerJoinClause $join) {
-					$join->as('item')->where('min_level', $this->user->level);
+					$join->as('item')->where('req_level', $this->user->level);
 				})
-				->orderBy('item.min_level')
+				->orderBy('item.req_level')
 				->get();
 		} elseif ($section == 100) {
 			$objects = $this->user->getSlot()->getInventoryObjects();

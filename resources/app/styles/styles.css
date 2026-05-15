@@ -514,3 +514,13 @@ a.fm_n:hover {
 .scrollbox::-webkit-scrollbar-track-piece{background-color:#FFE9C0;-webkit-border-radius:8px;}
 .scrollbox::-webkit-scrollbar-thumb:vertical{height:50px;background-color: #cdbc9d;-webkit-border-radius:8px;}
 .scrollbox::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#cdbc9d;-webkit-border-radius:8px;}
+
+.inventory-item__card {
+	border: 1px solid #DB9F73;
+	background: url('/assets/images/header/sand3.gif');
+}
+
+.inventory-item__text-block {
+	margin: 5px 0;
+	border: 1px solid #d8ad83;
+}

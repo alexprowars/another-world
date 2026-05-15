@@ -14,17 +14,17 @@ class MapController extends Controller
 		$user = $request->user();
 
 		if ($request->has('refer')) {
-			if ($user->r_date > 0 || $user->r_type) {
+			if ($user->r_date || $user->r_type) {
 				throw new Exception('Нельзя перемещаться по городу пока занят работой');
-			} else {
-				$refer = $request->integer('refer');
-
-				if ($refer != $user->room) {
-					throw new Exception('Типа читанул?');
-				} else {
-					$this->setRoom($refer);
-				}
 			}
+
+			$refer = $request->integer('refer');
+
+			if ($refer != $user->room) {
+				throw new Exception('Типа читанул?');
+			}
+
+			$this->setRoom($refer);
 		}
 
 		return $this->checkRoom($user->room);
@@ -110,8 +110,6 @@ class MapController extends Controller
 				break; // Тренировочная
 			case 7:
 				return to_route('map.city.shop');
-				return include(app_path('/includes/city/city_1/shop.php'));
-				break; // Магазин
 			case 8:
 				return include(app_path('/includes/city/city_1/ambulance.php'));
 				break; // Больница

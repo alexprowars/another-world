@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\Exception;
+use App\Services\InventoryService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -77,9 +78,7 @@ class ShopItem extends Model
 		$this->setAttribute('count', $this->count - 1);
 		$this->save();
 
-		$this->item->addInInventory($user->id);
-
-
+		InventoryService::addInInventory($user, $this->item);
 
 		//$game = $this->getDI()->getShared('game');
 		//$game->addToLog($user->id, 'купил', $this->item->title . ' (' . $price . ' ' . ($this->item->f_price > 0 ? 'пл.' : 'зол.') . ')', 'гос магазин');

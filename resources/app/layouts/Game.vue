@@ -5,7 +5,7 @@
 			<div class="top">
 				<Header/>
 				<div class="mainFrame">
-					<div class="w-full max-w-400">
+					<div class="w-full max-w-400 pb-10 h-fit">
 						<slot/>
 					</div>
 				</div>

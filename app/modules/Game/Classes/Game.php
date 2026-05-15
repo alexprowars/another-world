@@ -29,27 +29,6 @@ class Game extends Component
 	private $data = [];
 	public $tutorial = [];
 
-	public function insertInChat ($message, $username, $isPrivate = true, $redirect = '')
-	{
-		$chat = json_decode($this->cache->get("game_chat"), true);
-
-		$this->db->insertAsDict(
-			"game_log_chat",
-			Array
-			(
-				'user' => 0,
-				'time' => time(),
-				'text' => $message
-			)
-		);
-
-		$lastId = $this->db->lastInsertId();
-
-		$chat[] = array((int) $lastId, time(), '', ($username != '' ? Array((string) $username) : false), (bool) $isPrivate, (string) $message, 0, (string) $redirect);
-
-		$this->cache->save("game_chat", json_encode($chat), 86400);
-	}
-
 	public function fight ($user, $type = 1)
 	{
 		$result = '';
@@ -297,49 +276,5 @@ class Game extends Component
 			else
 				$this->db->query("UPDATE `game_objects` SET `inf` = '" . $obj_inf[0] . "|" . $obj_inf[1] . "|" . $obj_inf[2] . "|" . $obj_inf[3] . "|" . $obj_inf[4] . "|" . $obj_inf[5] . "|" . $obj_inf[6] . "|" . $obj_inf[7] . "' WHERE `id` = '" . $object['id'] . "'");
 		}
-	}
-
-	public function loadGameVariables ()
-	{
-		if ($this->registry->offsetExists('loaded_variables'))
-			return;
-
-		require_once(ROOT_PATH."/app/vars.php");
-
-		/** @var array $stats */
-
-		$this->registry->stats = $stats;
-		$this->registry->loaded_variables = true;
-	}
-
-	public function setRequestMessage ($message = '')
-	{
-		$this->message = $message;
-	}
-
-	public function getRequestMessage ()
-	{
-		return $this->message;
-	}
-
-	public function setRequestStatus ($status = '')
-	{
-		$this->status = $status;
-	}
-
-	public function getRequestStatus ()
-	{
-		return $this->status;
-	}
-
-	public function setRequestData ($data = [])
-	{
-		if (is_array($data))
-			$this->data = $data;
-	}
-
-	public function getRequestData ()
-	{
-		return $this->data;
 	}
 }

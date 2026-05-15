@@ -168,15 +168,6 @@ class Controller extends PhalconController
 		return true;
     }
 
-	function checkRoom ($room)
-	{
-		if ($room != $this->user->room)
-		{
-			$this->db->query("UPDATE `game_users` SET `room` = '".$room."' WHERE `id` = '".$this->user->id."'");
-			$this->user->room = $room;
-		}
-	}
-
 	public function message ($text, $title = '', $redirect = '', $timeout = 5)
 	{
 		$this->view->pick('shared/message');

@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Facades\Vars;
 use App\Http\Controller;
+use App\Http\Resources\InventoryItemResource;
 use App\Models\Level;
+use App\Services\InventoryService;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -18,13 +21,34 @@ class PersonController extends Controller
 		//$this->tag->prependTitle('Персонаж');
 	}
 
-	public function inventory()
+	public function inventory(Request $request)
 	{
-		$items = $this->user->getSlot()
-			->getInventoryObjects();
+		$type = $request->integer('item_type', 1);
+
+		$slot = $this->user->getSlot();
+
+		if ($request->integer('onset')) {
+			InventoryService::onsetObject($this->user, $request->integer('onset'));
+
+			return to_route('person.inventory');
+		}
+
+		if ($request->integer('unset') == 'all') {
+			InventoryService::unsetAllObject($this->user);
+
+			return to_route('person.inventory');
+		}
+
+		if ($request->integer('unset')) {
+			InventoryService::unsetObject($this->user, $request->integer('unset'));
+
+			return to_route('person.inventory');
+		}
+
+		$items = InventoryService::getInventoryObjects($this->user, $type);
 
 		return Inertia::render('Person/Inventory', [
-			'items' => $items,
+			'items' => InventoryItemResource::collection($items),
 		]);
 	}
 

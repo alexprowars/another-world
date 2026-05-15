@@ -233,11 +233,11 @@ class ChatController extends Controller
 		$users = User::query()
 			->with(['tribe'])
 			->whereNot('rank', 60)
-			->where('onlinetime', '<', now()->addMinutes(5));
+			->where('online', '<', now()->addMinutes(5));
 
 		switch ($sort) {
 			case 2:
-				$users->orderByDesc('nickname');
+				$users->orderByDesc('name');
 				break;
 			case 3:
 				$users->orderBy('level');
@@ -246,14 +246,12 @@ class ChatController extends Controller
 				$users->orderByDesc('level');
 				break;
 			default:
-				$users->orderBy('nickname');
+				$users->orderBy('name');
 				break;
 		}
 
-		switch ($show) {
-			case 2:
-				$users->where('room', auth()->user()->room);
-				break;
+		if ($show == 2) {
+			$users->where('room', auth()->user()->room);
 		}
 
 		$userList = array();
@@ -263,7 +261,7 @@ class ChatController extends Controller
 		foreach ($users as $user) {
 			$pl = [
 				'id' => $user->id,
-				'name' => $user->nickname,
+				'name' => $user->name,
 				'rank' => $user->rank,
 				'tribe' => $user->tribe?->name,
 				'level' => $user->level,

@@ -10,32 +10,16 @@ class UserItem extends Model
 	protected $table = 'users_items';
 
 	protected $casts = [
-		'time' => 'datetime',
+		'requirements' => 'json:unicode',
+		'bank' => 'boolean',
+		'komis' => 'boolean',
+		'sclad' => 'boolean',
 	];
 
 	/** @return BelongsTo<User, $this> */
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
-	}
-
-	public function getInf()
-	{
-		return explode("|", $this->inf);
-	}
-
-	public function getMin()
-	{
-		return explode("|", $this->min);
-	}
-
-	public function setInf($data)
-	{
-		if (is_array($data)) {
-			$this->inf = implode('|', $data);
-		} else {
-			$this->inf = $data;
-		}
 	}
 
 	public function getPosition()
@@ -46,34 +30,6 @@ class UserItem extends Model
 	public function setPosition($i)
 	{
 		$this->position = $i;
-	}
-
-	public function view($isEdit = false)
-	{
-		if ($this->id) {
-			$info = $this->getInf();
-		} else {
-			$info = ['w' . $this->getPosition()];
-		}
-
-		if ($this->id > 0) {
-			$hint = "it('" . $info[1] . "','" . $info[6] . " [" . $info[7] . "]','" . _getText('weapon', $this->tip) . "','" . $this->min_d . "','" . $this->max_d . "','" . $this->hp . "','" . $this->energy . "','" . $info[3] . "','" . $this->getPosition() . "');";
-		} else {
-			$hint = "it('','','','','','','','','" . $this->getPosition() . "','');";
-		}
-
-		$html = '<img src="/images/items/' . $this->tip . '/' . $info[0] . '.gif" width="" height="" class="tooltip script ' . ($isEdit && $this->id ? 'hand' : '') . '" data-content="' . $hint . '"';
-
-		if ($this->id > 0 && $isEdit) {
-			$html .= ' onclick="load(\'/edit/?unset=' . $this->onset . '\')"';
-		}
-		if (($this->getPosition() == 17 || $this->getPosition() == 18) && $this->id > 0) {
-			$html .= ' onclick="ShowForm(\'' . $info[1] . '\',\'/map/\',\'\',\'\',\'1\',\'' . $info[0] . '\',\'' . $this->id . '\',\'w' . $this->getPosition() . '\',\'\');"';
-		}
-
-		$html .= '>';
-
-		return $html;
 	}
 
 	public function getMinDemands()

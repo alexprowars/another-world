@@ -33,21 +33,20 @@ class UserResource extends JsonResource
 			->toBase()
 			->first();
 
-		$user->calculate();
-
 		$data = [
 			'id' => $user->id,
-			'name' => $user->nickname,
+			'name' => $user->name,
 			'email' => $user->email,
-			'avatar' => $user->obraz,
+			'avatar' => $user->image,
 			'rank' => $user->rank,
 			'vip' => $user->vip?->isFuture() ?? false,
 			'room' => $user->room,
 			'admin' => $user->isAdmin(),
 			'gender' => $user->gender,
 			'level' => $user->level,
+			'level_up' => $up,
 			'slots' => $user->getSlotsInfo(),
-			'experience' => $user->experience,
+			'exp' => $user->exp,
 			'profession' => $user->profession,
 			'moneys' => $user->moneys,
 			'credits' => $user->credits,
@@ -68,17 +67,16 @@ class UserResource extends JsonResource
 			'mblock' => $user->mblock,
 			'pbr' => $user->pbr,
 			'kbr' => $user->kbr,
-			'br1' => $user->br1,
-			'br2' => $user->br2,
-			'br3' => $user->br3,
-			'br4' => $user->br4,
-			'br5' => $user->br5,
-			'damage_min' => $user->strength / 3 + $user->min,
-			'damage_max' => 1 + $user->strength / 1.5 + $user->max,
-			'magic_min' => $user->razum / 1.5,
-			'magic_max' => 1 + $user->razum,
-			'level_up' => $up,
-			'otravl' => $user->otravl,
+			'armor1' => $user->armor1,
+			'armor2' => $user->armor2,
+			'armor3' => $user->armor3,
+			'armor4' => $user->armor4,
+			'armor5' => $user->armor5,
+			'damage_min' => round($user->strength / 3 + $user->min),
+			'damage_max' => round(1 + $user->strength / 1.5 + $user->max),
+			'magic_min' => $user->intelligence / 1.5,
+			'magic_max' => 1 + $user->intelligence,
+			'poison' => $user->poison,
 		];
 
 		if ($user->tribe) {
@@ -88,12 +86,7 @@ class UserResource extends JsonResource
 			];
 		}
 
-		$rating = UserService::getUserRaiting($user);
-
-		if ($user->rating != $rating) {
-			$user->rating = $rating;
-			$user->save();
-		}
+		$user->save();
 
 		$data['rating'] = $user->rating;
 

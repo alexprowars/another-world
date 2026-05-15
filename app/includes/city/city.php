@@ -31,12 +31,12 @@ if ($room == 23 || $room == 2 || $room == 8) {
 
 $room_1_members = User::query()
 	->where('room', 1)
-	->where('onlinetime', '>', now()->subMinutes(5))
+	->where('online', '>', now()->subMinutes(5))
 	->count();
 
 $room_2_members = User::query()
 	->where('room', 2)
-	->where('onlinetime', '>', now()->subMinutes(5))
+	->where('online', '>', now()->subMinutes(5))
 	->count();
 
 return Inertia::render('City', [

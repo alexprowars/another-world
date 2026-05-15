@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\GameMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LocaleDetect;
 use App\Http\Middleware\LogUserIP;
@@ -16,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
 		health: '/up',
 	)
 	->withMiddleware(function (Middleware $middleware) {
+		$middleware->alias([
+			'game' => GameMiddleware::class,
+		]);
+
 		$middleware->appendToGroup('web', [
 			HandleInertiaRequests::class,
 			LogUserIP::class,

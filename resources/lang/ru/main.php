@@ -3,11 +3,11 @@
 return [
 	'stats' => [
 		'strength' => 'Сила',
-		'dex' => 'Удача',
+		'dexterity' => 'Удача',
 		'agility' => 'Ловкость',
 		'vitality' => 'Выносливость',
-		'power' => 'Энергия',
-		'razum' => 'Разум',
+		'magic' => 'Магия',
+		'intelligence' => 'Разум',
 		'battery' => 'Активность',
 	],
 	'stats-info' => [
