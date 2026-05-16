@@ -2,59 +2,16 @@
 	<table class="tmain personBlock">
 		<tr>
 			<td colspan="2" style="width:245px;">
-				<div class="personName">
-					<div v-html="info"></div>
-				</div>
+				<Name :player="person"/>
 			</td>
 		</tr>
 		<tr>
 			<td valign="top">
 				<div>
 					<div class="dlfr">
-						<table id="slotable">
-							<tr>
-								<td>
-									<div class="bdg stbox">
-										<div id="life" class="g_line" :style="{ width: getPercent(person.hp_now, person.hp_max) + '%' }">
-											<img src="/assets/images/main/empty.gif" width="1" height="10" alt="">
-										</div>
-									</div>
-								</td>
-								<td align="right" class="fntc">
-									<span id="text_life">{{ person.hp_now }}</span>
-								</td>
-								<td class="intf">|</td>
-								<td class="minf">{{ person.hp_max }}</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="bdg stbox">
-										<div id="mana" class="b_line" :style="{ width: getPercent(person.energy_now, person.energy_max) + '%' }">
-											<img src="/assets/images/main/empty.gif" width="1" height="10" alt="">
-										</div>
-									</div>
-								</td>
-								<td align="right" class="fntc">
-									<span id="text_mana">{{ person.energy_now }}</span>
-								</td>
-								<td class="intf">|</td>
-								<td class="minf">{{ person.energy_max }}</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="bdg stbox">
-										<div id="ustal" class="h_line" :style="{ width: getPercent(person.ustal_now, person.ustal_max) + '%' }">
-											<img src="/assets/images/main/empty.gif" width="1" height="10" alt="">
-										</div>
-									</div>
-								</td>
-								<td align="right" class="fntc">
-									{{ person.ustal_now }}
-								</td>
-								<td class="intf">|</td>
-								<td class="minf">{{ person.ustal_max }}</td>
-							</tr>
-						</table>
+						<HpLine :current="person.hp_now" :max="person.hp_max" color="g_line"/>
+						<HpLine :current="person.energy_now" :max="person.energy_max" color="b_line"/>
+						<HpLine :current="person.ustal_now" :max="person.ustal_max" color="h_line"/>
 					</div>
 					<div>
 						<table class="person_slots" style="border:solid #e1d0b0 1.5pt;" bgcolor=bfbfbf>
@@ -66,9 +23,9 @@
 									<PersonViewSlot :position="3" :item="person.slots.slot_3 || null"/>
 									<PersonViewSlot :position="4" :item="person.slots.slot_4 || null"/>
 									<PersonViewSlot :position="9" :item="person.slots.slot_9 || null"/>
-									<PersonViewSlot :position="6" :item="person.slots.slot_6 || null"/>
+									<!--<PersonViewSlot :position="6" :item="person.slots.slot_6 || null"/>
 									<PersonViewSlot :position="7" :item="person.slots.slot_7 || null"/>
-									<PersonViewSlot :position="8" :item="person.slots.slot_8 || null"/>
+									<PersonViewSlot :position="8" :item="person.slots.slot_8 || null"/>-->
 								</td>
 								<td width="120" valign="top">
 									<a href="/avatar">
@@ -102,6 +59,8 @@
 <script setup>
 	import PersonViewSlot from './PersonViewSlot.vue';
 	import { computed } from 'vue';
+	import Name from '~/components/Person/Name.vue';
+	import HpLine from '~/components/Person/HpLine.vue';
 
 	const props = defineProps({
 		person: {
@@ -115,47 +74,5 @@
 		}
 
 		return '/assets/images/avatar/1/' + (props.person.gender === 'F' ? '2' : '1') + '.png';
-	});
-
-	function getPercent(current, max) {
-		if (max <= 0) {
-			return 0;
-		}
-
-		return Math.min(100, Math.max(0, (current / max) * 100));
-	}
-
-	const info = computed(() => {
-		var result = '';
-
-		if (props.person.rank > 0) {
-			var hint_rank;
-
-			if (props.person.rank === 0) {
-				hint_rank = 'Смертные';
-			} else if ((props.person.rank >= 10 && props.person.rank <= 14) || props.person.rank === 99) {
-				hint_rank = 'Орден Инквизиции';
-			} else if (props.person.rank === 20) {
-				hint_rank = 'Тьма';
-			} else if (props.person.rank === 30) {
-				hint_rank = 'Дилер';
-			} else if (props.person.rank === 31) {
-				hint_rank = 'Наставник';
-			} else if (props.person.rank === 60) {
-				hint_rank = 'Бот';
-			} else if (props.person.rank === 100) {
-				hint_rank = 'Божество';
-			}
-
-			result += '<img src="/images/rank/' + props.person.rank + '.gif" height="15" alt="' + hint_rank + '">';
-		}
-
-		//if (klan != '' && klan != '0') {
-		//	result += '<img src="/images/tribe/' + klan + '.gif" height="15" alt="Клан ' + klan + '">';
-		//}
-
-		result += '<a href="/info?id=' + props.person.id + '" target=_blank>' + props.person.name + '</a> [' + props.person.level + ']';
-
-		return result;
 	});
 </script>

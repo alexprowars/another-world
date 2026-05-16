@@ -25,8 +25,6 @@ class PersonController extends Controller
 	{
 		$type = $request->integer('item_type', 1);
 
-		$slot = $this->user->getSlot();
-
 		if ($request->integer('onset')) {
 			InventoryService::onsetObject($this->user, $request->integer('onset'));
 
@@ -74,22 +72,22 @@ class PersonController extends Controller
 		}
 	}
 
-	public function updatesAction()
+	public function updates(Request $request)
 	{
 		$msg = '';
 
-		$update = $this->request->getQuery('update', null, '');
+		$update = $request->input('update');
 
 		if (!empty($update)) {
-			if ($this->user->s_updates > 0) {
+			if ($this->user->updates > 0) {
 				$st_name = '';
 
 				switch ($update) {
 					case 'strength':
 						$st_name = "strength";
 						break;
-					case 'dex':
-						$st_name = "dex";
+					case 'dexterity':
+						$st_name = "dexterity";
 						break;
 					case 'agility':
 						$st_name = "agility";
@@ -97,11 +95,11 @@ class PersonController extends Controller
 					case 'vitality':
 						$st_name = "vitality";
 						break;
-					case 'power':
-						$st_name = "power";
+					case 'magic':
+						$st_name = "magic";
 						break;
-					case 'razum':
-						$st_name = "razum";
+					case 'intelligence':
+						$st_name = "intelligence";
 						break;
 					case 'battery':
 						$st_name = "battery";
@@ -112,18 +110,20 @@ class PersonController extends Controller
 				}
 
 				if ($st_name != '') {
-					$this->user->s_updates--;
-					$this->user->{$st_name}++;
+					$this->user->updates--;
+					$this->user->{'s_' . $st_name}++;
 					$this->user->update();
 
-					$msg = "Удачно увеличили физический параметр \"" . _getText('stats', $st_name) . "\"!";
+					$msg = 'Удачно увеличили физический параметр "' . __('stats. ' . $st_name) . '"!';
 				}
 			} else {
-				$msg = "У Вас нет свободных увеличений!";
+				$msg = 'У Вас нет свободных увеличений!';
 			}
 		}
 
-		$this->view->setVar('msg', $msg);
+		return Inertia::render('Person/Updates', [
+			'message' => $msg,
+		]);
 	}
 
 	public function friendsAction()

@@ -106,6 +106,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city.php'));
 				break; // Арена
 			case 2:
+				return to_route('map.arena.training');
 				return include(app_path('/includes/city/city_1/trening.php'));
 				break; // Тренировочная
 			case 7:

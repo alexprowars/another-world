@@ -44,7 +44,7 @@
 		</table>
 
 		<div v-if="page.items.length" class="flex flex-col gap-2">
-			<InventoryItem v-for="item in page.items" :key="item.id" :item="item" @wear="wearItem"/>
+			<InventoryItem v-for="item in page.items" :key="item.id" :item="item" :player="user" @wear="wearItem"/>
 		</div>
 		<div v-else class="text-xs-center">
 			<div class="alert alert-info" role="alert">Отдел рюкзака пуст.</div>
@@ -57,6 +57,8 @@
 	import PersonLayout from '~/layouts/Person.vue';
 	import { Link, router } from '@inertiajs/vue3';
 	import InventoryItem from '~/components/Person/InventoryItem.vue';
+	import useState from '~/composables/useState.js';
+	import { computed } from 'vue';
 
 	defineOptions({
 		layout: [GameLayout, PersonLayout]
@@ -65,6 +67,9 @@
 	defineProps({
 		page: Object,
 	});
+
+	const state = useState();
+	const user = computed(() => state.user);
 
 	function wearItem(item) {
 		router.get('', {

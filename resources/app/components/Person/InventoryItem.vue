@@ -3,7 +3,7 @@
 		<table class="inventory-item__card" width="100%">
 			<tr>
 				<td align="center" width="150">
-					<Popper placement="right-start">
+					<Popper placement="right-start" theme="borderless">
 						<img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title" class="tooltip2 script">
 
 						<template #content>

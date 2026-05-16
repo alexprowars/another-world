@@ -92,6 +92,7 @@ class UserResource extends JsonResource
 
 		foreach (Vars::getStats() as $stat) {
 			$data[$stat] = $user->{$stat};
+			$data['s_' . $stat] = $user->{'s_' . $stat};
 		}
 
 		return $data;

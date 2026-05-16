@@ -24,6 +24,7 @@
 }
 
 a.tm, a.tm:link, a.tm:active {
+	font-size: 13px;
     color: #eece17;
     font-weight: bold;
     text-decoration: none;
@@ -37,6 +38,7 @@ a.tm:hover {
 }
 
 a.smenu, a.smenu:link, a.smenu:active {
+	font-size: 13px;
     color: #eece17;
     font-weight: bold;
     text-decoration: none;
@@ -55,7 +57,7 @@ a.smenu:hover {
 }
 
 .tc_dbl, a.il, a.il:link, a.il:active {
-    font-size: 12px;
+    font-size: 13px;
     color: #E03504;
     text-decoration: none;
 }
@@ -235,13 +237,10 @@ a.fm:hover {
     color: #734803;
     font-size: 11px;
     font-weight: bold;
-    padding-left: 4px;
 }
 
 .intf {
     color: #bbac87;
-    padding-left: 2px;
-    padding-right: 2px;
 }
 
 .minf {
@@ -584,12 +583,7 @@ A.menuItem:hover {
 	display: inline-block;
 }
 
-A {
-    FONT-SIZE: 12px;
-    COLOR: black;
-}
-
-A:hover {
+a:hover {
     COLOR: #FF4400;
 }
 
@@ -853,7 +847,8 @@ form {
 }
 
 .header .links .icon_1_text, .header .links .icon_2_text, .header .links .icon_4_text, .header .links .icon_5_text, .header .links .icon_6_text, .header .links .icon_7_text {
-    width: 74px;
+    font-size: 13px;
+	width: 74px;
     height: 20px;
     color: #ceba0b;
     text-transform: uppercase;
@@ -1003,6 +998,7 @@ p.message {
 	border-right: 0;
 	display: inline-block;
 	max-width: initial;
+	height: inherit;
 }
 
 .person_slots a img {

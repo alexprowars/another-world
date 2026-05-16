@@ -35,8 +35,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	public $sign;
 	public $obraz;
 	public $provin;
-	public $s_updates;
-	public $o_updates;
 	public $item_type;
 	public $b_tribe;
 	public $tribe_rank;
@@ -285,6 +283,15 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 		}
 
 		return $result;
+	}
+
+	public function getAvatar(): string
+	{
+		if ($this->obraz) {
+			return '/assets/images/avatar/obraz/' . $this->obraz . '.png';
+		}
+
+		return '/assets/images/avatar/1/' . ($this->gender === 'F' ? '2' : '1') . '.png';
 	}
 
 	public function canAccessPanel(Panel $panel): bool

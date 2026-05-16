@@ -16,7 +16,7 @@
 				<div class="shopnav">
 					<a href="?section=100"><img src='/assets/images/images/shop_sale.gif' alt='Продать предметы'></a>
 					<a :href="'?section=' + page.section"><img src='/assets/images/images/refresh.gif' alt='Обновить'></a>
-					<a href="?refer=7"><img src='/assets/images/images/back.gif' alt='Вернуться'></a>
+					<a href="/map?refer=7"><img src='/assets/images/images/back.gif' alt='Вернуться'></a>
 				</div>
 				<div align='center' class="shopotdels">
 					<table>

@@ -16,6 +16,13 @@ class UserSlot extends Model
 
 	public const int MAX_SLOTS = 22;
 
+	protected static function booted(): void
+	{
+		self::saved(function (self $slot) {
+			$slot->clearCache();
+		});
+	}
+
 	/** @return BelongsTo<User, $this> */
 	public function user(): BelongsTo
 	{

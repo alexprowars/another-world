@@ -19,6 +19,7 @@ class UserSeed extends Seeder
 
 			$user->moneys = 500;
 			$user->credits = 200;
+			$user->rank = 99;
 			$user->save();
 
 			$user->assignRole('admin');

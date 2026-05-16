@@ -22,7 +22,7 @@ return new class extends Migration {
 			$table->unsignedInteger('exp')->default(0);
 			$table->unsignedTinyInteger('level')->default(0);
 			$table->unsignedTinyInteger('up')->default(0);
-			$table->unsignedTinyInteger('updates')->default(0);
+			$table->unsignedTinyInteger('updates')->default(3);
 			$table->float('moneys', 2)->default(0);
 			$table->float('credits', 2)->default(0);
 			$table->unsignedSmallInteger('wins')->default(0);
@@ -51,6 +51,7 @@ return new class extends Migration {
 			$table->timestamp('r_date')->nullable();
 			$table->timestamp('silence')->nullable();
 			$table->timestamp('injury')->nullable();
+			$table->tinyInteger('injury_type')->nullable();
 			$table->timestamp('invisible')->nullable();
 			$table->timestamp('vip')->nullable();
 			$table->smallInteger('poison')->nullable();

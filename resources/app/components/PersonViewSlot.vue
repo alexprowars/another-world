@@ -1,36 +1,34 @@
 <template>
-	<Popper class="inline">
+	<Popper class="inline" :style="{ width: width + 'px', height: height + 'px' }">
 		<img :src="image" :class="{ 'cursor-pointer': isEdit }" :width="width" :height="height" :alt="title" @click.prevent="unsetItem()">
 
 		<template #content>
-			<table width="170">
+			<div class="w-[170px] text-xs">
 				<template v-if="item">
-					<tr>
-						<td align="center" class="it"><b>{{ item.title }}</b></td>
-					</tr>
-					<tr v-if="item.engraving">
-						<td class=it>&bull; Выгравирована надпись: <b>{{ item.engraving }}</b></td>
-					</tr>
-					<tr v-if="item.wearout_max">
-						<td class=it>&bull; Долговечность: <b>{{ item.wearout }} [{{ item.wearout_max }}]</b></td>
-					</tr>
-					<tr v-if="item.type">
-						<td class=it>&bull; Класс: <b>{{ $t('weapon.' + item.type) }}</b></td>
-					</tr>
-					<tr v-if="item.min || item.max">
-						<td class=it>&bull; Удар: <b>{{ item.min }} - {{ item.max }}</b></td>
-					</tr>
-					<tr v-if="item.hp">
-						<td class=it>&bull; Уровень жизни: +<b>{{ item.hp }} HP</b></td>
-					</tr>
-					<tr v-if="item.energy">
-						<td class=it>&bull; Уровень энергии: +<b>{{ item.energy }} EP</b></td>
-					</tr>
+					<div class="it text-center"><b>{{ item.title }}</b></div>
+					<div v-if="item.engraving" class="it">
+						&bull; Выгравирована надпись: <b>{{ item.engraving }}</b>
+					</div>
+					<div v-if="item.wearout_max" class="it">
+						&bull; Долговечность: <b>{{ item.wearout }} [{{ item.wearout_max }}]</b>
+					</div>
+					<div v-if="item.type" class="it">
+						&bull; Класс: <b>{{ $t('weapon.' + item.type) }}</b>
+					</div>
+					<div v-if="item.min || item.max" class="it">
+						&bull; Удар: <b>{{ item.min }} - {{ item.max }}</b>
+					</div>
+					<div v-if="item.hp" class="it">
+						&bull; Уровень жизни: +<b>{{ item.hp }} HP</b>
+					</div>
+					<div v-if="item.energy" class="it">
+						&bull; Уровень энергии: +<b>{{ item.energy }} EP</b>
+					</div>
 				</template>
-				<tr v-else>
-					<td align=center class=it>Пустой слот <b>{{ positionHint }}</b></td>
-				</tr>
-			</table>
+				<div v-else class="it text-center">
+					Пустой слот <b>{{ positionHint }}</b>
+				</div>
+			</div>
 		</template>
 	</Popper>
 </template>
@@ -91,27 +89,27 @@
 
 	const height = computed(() => {
 		switch (props.position) {
-			case 1: return 58;
-			case 2: return 19;
-			case 3: return 58;
-			case 4: return 78;
+			case 1: return 60;
+			case 2: return 20;
+			case 3: return 75;
+			case 4: return 75;
 			case 5: return 60;
 			case 6: return 20;
 			case 7: return 20;
 			case 8: return 20;
-			case 9: return 28;
+			case 9: return 30;
 			case 10: return 20;
 			case 11: return 20;
 			case 12: return 20;
 			case 13: return 40;
 			case 14: return 40;
 			case 15: return 40;
-			case 16: return 78;
+			case 16: return 80;
 			case 17: return 25;
 			case 18: return 25;
 			case 19: return 25;
 			case 20: return 60;
-			case 21: return 19;
+			case 21: return 20;
 			case 22: return 80;
 		}
 

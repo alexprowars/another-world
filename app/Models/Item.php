@@ -16,34 +16,34 @@ class Item extends Model
 
 		$user = auth()->user();
 
-		if ($this->min_level > 0) {
-			if ($user->level < $this->min_level) {
-				$result .= "<font color=red>Уровень: " . $this->min_level . "</font><br>";
+		if ($this->req_level > 0) {
+			if ($user->level < $this->req_level) {
+				$result .= "<font color=red>Уровень: " . $this->req_level . "</font><br>";
 			} else {
-				$result .= "Уровень: " . $this->min_level . "<br>";
+				$result .= "Уровень: " . $this->req_level . "<br>";
 			}
 		}
 
 		foreach (Vars::getStats() as $code) {
-			if (!isset($this->{"min_" . $code})) {
+			if (!isset($this->{"req_" . $code})) {
 				continue;
 			}
 
-			if ($this->{"min_" . $code} > 0) {
-				if ($user->{$code} < $this->{"min_" . $code}) {
-					$result .= "<font color=red>" . __('main.stats.' . $code) . ": " . $this->{"min_" . $code} . "</font><br>";
+			if ($this->{"req_" . $code} > 0) {
+				if ($user->{$code} < $this->{"req_" . $code}) {
+					$result .= "<font color=red>" . __('main.stats.' . $code) . ": " . $this->{"req_" . $code} . "</font><br>";
 				} else {
-					$result .= __('main.stats.' . $code) . ": " . $this->{"min_" . $code} . "<br>";
+					$result .= __('main.stats.' . $code) . ": " . $this->{"req_" . $code} . "<br>";
 				}
 			}
 		}
 
 		// Проверка професии
 		if ($this->min_proff > 0) {
-			if ($user->profession != $this->min_proff) {
-				$result .= "<font color=red>Профессия: " . __('main.proffessions.' . $this->min_proff) . "</font><br>";
+			if ($user->profession != $this->req_profession) {
+				$result .= "<font color=red>Профессия: " . __('main.proffessions.' . $this->req_profession) . "</font><br>";
 			} else {
-				$result .= "Профессия: " . __('main.proffessions.' . $this->min_proff) . "<br>";
+				$result .= "Профессия: " . __('main.proffessions.' . $this->req_profession) . "<br>";
 			}
 		}
 

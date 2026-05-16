@@ -12,8 +12,10 @@ return new class extends Migration {
 			$table->foreignId('battle_id')->constrained('battles');
 			$table->foreignId('user_id')->constrained('users');
 			$table->unsignedTinyInteger('side');
+			$table->timestamp('finished_at')->nullable();
 			$table->timestamp('died_at')->nullable();
 			$table->unsignedInteger('damage')->default(0);
+			$table->smallInteger('exp');
 			$table->timestamps();
 		});
 	}

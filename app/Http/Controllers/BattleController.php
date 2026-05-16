@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Battle;
 use App\Http\Controller;
-use Game\Battle\Battle;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BattleController extends Controller
 {
@@ -19,134 +20,140 @@ class BattleController extends Controller
 			return include(app_path('/includes/city/city_1/trening.php'));
 		}
 
-		if ($this->user->battle_id) {
-			$battle = new Battle();
-			$battle->init();
+		if ($this->user->battle) {
+			if ($request->expectsJson()) {
+				$battle = new Battle($this->user->battle, $request->user());
+				$battle->init();
 
-			return response()->json($battle->show());
-		} else {
-			$this->view->pick('battle/list');
-
-			$offerId 	= $this->request->get('offer', 'int', 0);
-			$page 		= $this->request->get('page', null, '');
-			$battleType = $this->request->get('battle_type', 'int', 1);
-			$battleType = min(3, max(1, $battleType));
-
-			$this->user->getSlotsInfo();
-			$this->user->calculate();
-
-			$message = '';
-			$alert = '';
-			$userOffer = $this->getCurrentUserRequest();
-
-			if (isset($userOffer['BattleID'])) {
-				$battleType = $userOffer['BattleType'];
+				return response()->json($battle->show());
+			} else {
+				return Inertia::render('Battle', [
+					'id' => $this->user->battle->id,
+				]);
 			}
+		}
 
-			$this->view->setVar('battleType', $battleType);
+		$this->view->pick('battle/list');
 
-			switch ($page) {
-				case "take_it":
-					$message = $this->takeOffer($offerId);
+		$offerId 	= $request->integer('offer');
+		$page 		= $request->input('page');
+		$battleType = $request->integer('battle_type', 1);
+		$battleType = min(3, max(1, $battleType));
 
-					echo $message;
+		$this->user->getSlotsInfo();
+		$this->user->calculate();
 
-					if ($message == '') {
-						$userOffer = $this->getCurrentUserRequest();
-					}
+		$message = '';
+		$alert = '';
+		$userOffer = $this->getCurrentUserRequest();
 
-					break;
+		if (isset($userOffer['BattleID'])) {
+			$battleType = $userOffer['BattleType'];
+		}
 
-				case "dismiss":
-					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
-						if (!$userOffer['Team']) {
-							$opponent = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $userOffer['BattleID'] . " AND f.Team = 1 AND f.FighterID = u.id")->fetch();
+		$this->view->setVar('battleType', $battleType);
 
-							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` != " . $this->user->getId() . "");
+		switch ($page) {
+			case "take_it":
+				$message = $this->takeOffer($offerId);
 
-							if (isset($opponent['user'])) {
-								$this->game->insertInChat("<b>" . $this->user->username . "</b> отказал в поединке!", $opponent['username'], true);
-							}
-						} else {
-							$message = "Что-то тут не так...";
+				echo $message;
+
+				if ($message == '') {
+					$userOffer = $this->getCurrentUserRequest();
+				}
+
+				break;
+
+			case "dismiss":
+				if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
+					if (!$userOffer['Team']) {
+						$opponent = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $userOffer['BattleID'] . " AND f.Team = 1 AND f.FighterID = u.id")->fetch();
+
+						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` != " . $this->user->getId() . "");
+
+						if (isset($opponent['user'])) {
+							$this->game->insertInChat("<b>" . $this->user->username . "</b> отказал в поединке!", $opponent['username'], true);
 						}
 					} else {
-						$message = 'Заявки несуществует или истек срок её размещения';
+						$message = "Что-то тут не так...";
 					}
+				} else {
+					$message = 'Заявки несуществует или истек срок её размещения';
+				}
 
-					break;
+				break;
 
-				case "take_back":
-					if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
-						if (!$userOffer['Team']) {
-							$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
-							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
-						} else {
-							$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . $this->user->getId() . "");
-						}
-
-						unset($userOffer);
+			case "take_back":
+				if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
+					if (!$userOffer['Team']) {
+						$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
+						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
 					} else {
-						$message = 'Заявки несуществует или истек срок её размещения';
+						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . $this->user->getId() . "");
 					}
 
-					break;
+					unset($userOffer);
+				} else {
+					$message = 'Заявки несуществует или истек срок её размещения';
+				}
 
-				case "newbattle":
-					$this->createOffer($battleType);
+				break;
 
-					if ($message == '') {
-						$userOffer = $this->getCurrentUserRequest();
-					}
+			case "newbattle":
+				$this->createOffer($battleType);
 
-					break;
-			}
+				if ($message == '') {
+					$userOffer = $this->getCurrentUserRequest();
+				}
 
-			ob_start();
+				break;
+		}
 
-			switch ($battleType) {
-				case 2:
-					if ($this->user->level < 2) {
-						$message = 'Извините, групповые бои с 2-ого уровня';
-					} else {
-						if ($page == "start" || $page == '') {
-							$this->startOffer($battleType);
-						}
+		ob_start();
 
-						include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
-					}
-
-					break;
-
-				case 3:
-					if ($this->user->level < 3) {
-						$message = 'Извините, хаотические бои с 3-ого уровня';
-					} else {
-						if ($page == "start" || $page == '') {
-							$this->startOffer($battleType);
-						}
-
-						include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
-					}
-
-					break;
-
-				default:
-					if ($page == "start") {
+		switch ($battleType) {
+			case 2:
+				if ($this->user->level < 2) {
+					$message = 'Извините, групповые бои с 2-ого уровня';
+				} else {
+					if ($page == "start" || $page == '') {
 						$this->startOffer($battleType);
 					}
 
 					include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
-			}
+				}
 
-			$list = ob_get_contents();
-			ob_end_clean();
+				break;
 
-			$this->view->setVar('alert', $alert);
-			$this->view->setVar('message', $message);
-			$this->view->setVar('list', $list);
-			$this->view->setVar('battleId', (isset($userOffer['BattleID']) ? $userOffer['BattleID'] : 0));
+			case 3:
+				if ($this->user->level < 3) {
+					$message = 'Извините, хаотические бои с 3-ого уровня';
+				} else {
+					if ($page == "start" || $page == '') {
+						$this->startOffer($battleType);
+					}
+
+					include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
+				}
+
+				break;
+
+			default:
+				if ($page == "start") {
+					$this->startOffer($battleType);
+				}
+
+				include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
 		}
+
+		$list = ob_get_contents();
+		ob_end_clean();
+
+		$this->view->setVar('alert', $alert);
+		$this->view->setVar('message', $message);
+		$this->view->setVar('list', $list);
+		$this->view->setVar('battleId', (isset($userOffer['BattleID']) ? $userOffer['BattleID'] : 0));
 	}
 
 	private function startOffer($battleType)
@@ -544,137 +551,5 @@ class BattleController extends Controller
 		}
 
 		return $message;
-	}
-
-	private function takeOffer($offerId)
-	{
-		$userOffer = $this->getCurrentUserRequest();
-
-		$message = '';
-
-		if (isset($userOffer['BattleID'])) {
-			$message = "Для начала с одной заявкой разберись...";
-		} elseif ($this->user->hp_now < $this->user->hp_max / 3) {
-			$message = "Вы слишком ослаблены для поединка, подлечитесь!";
-		} else {
-			$offerInfo = $this->db->query("SELECT * FROM `game_battle` WHERE `BattleID` = '" . $offerId . "'")->fetch();
-
-			if ($offerInfo['BattleType'] == 1) {
-				$participants = $this->db->query("SELECT `BattleID` FROM `game_battle_users` WHERE BattleID = " . $offerId . "")->numRows();
-
-				switch ($participants) {
-					case 1:
-						$opponent = $this->db->query("SELECT f.`FighterID`, u.`username`, u.`room`, u.`ip` FROM `game_battle_users` f, game_users u WHERE f.BattleID = " . $offerId . " AND f.Team = 0 AND f.FighterID = u.id")->fetch();
-
-						if ($opponent['ip'] == $this->user->ip && !$this->user->isAdmin()) {
-							$message = "Вы не можете выступать против персонажа с таким же IP как у вас!";
-						} else {
-							$this->db->insertAsDict(
-								"game_battle_users",
-								array
-								(
-									'BattleID' 		=> $offerId,
-									'FighterID' 	=> $this->user->getId(),
-									'Team' 			=> 1,
-									'isBot' 		=> 0,
-									'currentTime' 	=> time(),
-									'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
-								)
-							);
-
-							$this->game->insertInChat("<b>" . $this->user->username . "</b> принял Вашу заявку!", $opponent['username'], true);
-						}
-
-						break;
-					case 2:
-						$message = "Кто-то оказался быстрее и перехватил заявку";
-						break;
-					default:
-						$message = "Боец отозвал заявку или её не существует!";
-				}
-			} elseif ($offerInfo['BattleType'] == 2) {
-				if ($this->user->level < 2) {
-					$message = 'Извините, групповые бои с 2-ого уровня';
-				} else {
-					$side = min(1, max(0, $this->request->get('battle_side', 'int', 0)));
-
-					$side_0 = $this->db->query("SELECT COUNT(*) AS num FROM `game_battle_users` WHERE `BattleID` = '" . $offerId . "' && `Team` = '0'")->fetch()['num'];
-					$side_1 = $this->db->query("SELECT COUNT(*) AS num FROM `game_battle_users` WHERE `BattleID` = '" . $offerId . "' && `Team` = '1'")->fetch()['num'];
-
-					if ($side_0 >= $offerInfo['RedTeamCapacity'] && $side == 0) {
-						$message = "<br>Группа уже набрана!";
-					} elseif ($side_1 >= $offerInfo['BlueTeamCapacity'] && $side == 1) {
-						$message = "<br>Группа уже набрана!";
-					} elseif ($this->user->level < $offerInfo['minRedLevel'] && $side == 0) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel']) && $side == 0) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif ($this->user->level > $offerInfo['maxRedLevel'] && $side == 0) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif ($this->user->level < $offerInfo['minBlueLevel'] && $side == 1) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif (($offerInfo['minBlueLevel'] == $offerInfo['maxBlueLevel']) && ($this->user->level != $offerInfo['minBlueLevel']) && $side == 1) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif ($this->user->level > $offerInfo['maxBlueLevel'] && $side == 1) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} else {
-						$this->db->insertAsDict(
-							"game_battle_users",
-							array
-							(
-								'BattleID' 		=> $offerId,
-								'FighterID' 	=> $this->user->getId(),
-								'Team' 			=> $side,
-								'isBot' 		=> 0,
-								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
-							)
-						);
-
-						$this->db->query("UPDATE game_users SET `side` = '" . $side . "', `offer` = '" . $offerId . "' WHERE `id` = '" . $this->user->id . "'");
-					}
-				}
-			} elseif ($offerInfo['BattleType'] == 3) {
-				if ($this->user->level < 3) {
-					$message = 'Извините, хаотические бои с 3-ого уровня';
-				} else {
-					if ($this->user->level < $offerInfo['minRedLevel']) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif (($offerInfo['minRedLevel'] == $offerInfo['maxRedLevel']) && ($this->user->level != $offerInfo['minRedLevel'])) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} elseif ($this->user->level > $offerInfo['maxRedLevel']) {
-						$message = "<br>Эта заявка не может быть принята Вами!";
-					} else {
-						$this->db->insertAsDict(
-							"game_battle_users",
-							array
-							(
-								'BattleID' 		=> $offerId,
-								'FighterID' 	=> $this->user->getId(),
-								'Team' 			=> 0,
-								'isBot' 		=> 0,
-								'currentTime' 	=> time(),
-								'TotalExpa' 	=> $this->getBaseLevelExp($this->user->level),
-							)
-						);
-
-						$this->db->query("UPDATE `game_users` SET `side` = '0', `offer` = '" . $offerId . "' WHERE `id` = '" . $this->user->id . "'");
-					}
-				}
-			}
-		}
-
-		return $message;
-	}
-
-	public function getBaseLevelExp($level)
-	{
-		$level = $this->db->query("SELECT base FROM game_levels WHERE level = '" . intval($level) . "'")->fetch();
-
-		if (isset($level['base'])) {
-			return $level['base'];
-		} else {
-			return 0;
-		}
 	}
 }

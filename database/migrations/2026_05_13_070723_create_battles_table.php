@@ -11,9 +11,16 @@ return new class extends Migration {
 			$table->id();
 			$table->timestamp('started_at')->nullable();
 			$table->unsignedTinyInteger('type');
-			$table->unsignedTinyInteger('timeout');
-			$table->enum('status', ['request', 'battle', 'finished'])->default('request');
+			$table->smallInteger('round')->default(1);
+			$table->timestamp('round_at')->nullable();
+			$table->smallInteger('timeout')->default(60);
+			$table->boolean('use_weapons')->default(true);
+			$table->boolean('is_blood')->default(false);
+			$table->enum('status', ['waiting', 'active', 'finished', 'cancelled'])->default('waiting');
 			$table->string('comment')->nullable();
+			$table->smallInteger('capacity')->default(1);
+			$table->smallInteger('min_level')->nullable();
+			$table->smallInteger('max_level')->nullable();
 			$table->timestamps();
 		});
 	}
