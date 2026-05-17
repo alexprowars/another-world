@@ -16,7 +16,7 @@ Route::middleware([RedirectToGame::class])->group(function () {
 Route::middleware(['auth', 'game'])->group(function () {
 	Route::get('/avatar', [Controllers\AvatarController::class, 'index']);
 	Route::get('/person', [Controllers\PersonController::class, 'index'])->name('person.detail');
-	Route::get('/person/updates', [Controllers\PersonController::class, 'updates'])->name('person.updates');
+	Route::match(['get', 'post'], '/person/updates', [Controllers\PersonController::class, 'updates'])->name('person.updates');
 	Route::get('/person/inventory', [Controllers\PersonController::class, 'inventory'])->name('person.inventory');
 	Route::get('/chat/last', [Controllers\ChatController::class, 'last']);
 	Route::post('/chat/send', [Controllers\ChatController::class, 'send']);

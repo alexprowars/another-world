@@ -1,4 +1,5 @@
 <template>
+	<Head title="Персонаж"/>
 	<table class="table np mx-2 w-full">
 		<tr>
 			<td width="245" valign=top>
@@ -37,7 +38,7 @@
 </template>
 
 <script setup>
-	import { Link } from '@inertiajs/vue3';
+	import { Head, Link } from '@inertiajs/vue3';
 	import PersonView from '../components/PersonView.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';

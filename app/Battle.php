@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Exceptions\Exception;
 use App\Models\BattleLog;
 use App\Models\BattleMember;
 use App\Models\Level;
@@ -75,7 +76,11 @@ class Battle
 
 	public function show()
 	{
-		$json = [];
+		$json = [
+			'time' => now()->toAtomString(),
+			'action' => 'impactForm',
+			'result' => null,
+		];
 
 		// Основные боевые константы
 		/** @var array $priem_full */
@@ -84,7 +89,6 @@ class Battle
 		$this->user->calculate();
 		$this->calculateKickAndBlockCount();
 
-		$enemyId = request()->integer('opponent');
 		$logId = request()->integer('lastLogId');
 
 		if (request()->has('use_priem') && is_numeric(request()->get('use_priem'))) {
@@ -104,7 +108,6 @@ class Battle
 		// Вычисляем время таймаута
 		$timeout = $this->battle->timeout - $this->battle->round_at->diffInSeconds();
 
-		$action = [];
 		$endbattle = 0;
 		$victims = [];
 		$random = 0;
@@ -153,20 +156,29 @@ class Battle
 					});
 
 				if ($users_command->isEmpty() && $enemy_command->isEmpty()) {
-					$action = $this->battleResult(1); // Ничья
+					$this->battleResult(1); // Ничья
 					$endbattle = 1;
+
+					$json['action'] = 'finishBattle';
+					$json['result'] = 'draw';
 				} elseif ($users_command->isEmpty() && $enemy_command->isNotEmpty()) {
-					$action = $this->battleResult(2); // Проигрыш
+					$this->battleResult(2); // Проигрыш
 					$endbattle = 1;
+
+					$json['action'] = 'finishBattle';
+					$json['result'] = 'lose';
 				} elseif ($users_command->isNotEmpty() && $enemy_command->isEmpty()) {
-					$action = $this->battleResult(3); // Победа
+					$this->battleResult(3); // Победа
 					$endbattle = 1;
+
+					$json['action'] = 'finishBattle';
+					$json['result'] = 'win';
 				} elseif ($users_command->isNotEmpty() && $enemy_command->isNotEmpty()) {
-					$action = ['userDead', ''];
+					$json['action'] = 'userDead';
 				}
 			}
 		} else {
-			$json['smena'] = [];
+			$json['opponents'] = [];
 
 			$accept = 0;
 
@@ -188,7 +200,11 @@ class Battle
 						$accept = 1;
 					}
 
-					$json['smena'][] = ['id' => $opponent->id, 'n' => $opponent->user->name];
+					$json['opponents'][] = [
+						'id' => $opponent->id,
+						'name' => $opponent->user->name,
+						'level' => $opponent->user->level,
+					];
 
 					$n++;
 				}
@@ -197,9 +213,11 @@ class Battle
 				if ($this->BattleFighter->finished_at) {
 					// ----------------------------- # Выиграли по таймауту # -------------------------- //
 					if ($timeout <= 0 && !$endbattle) {
-						$action = $this->timeout();
+						$this->timeout();
+
+						$json['action'] = 'refresh';
 					} else {
-						$action = ['waitImpact', ''];
+						$json['action'] = 'waitImpact';
 					}
 				} else {
 					$random = 0; // rand(0, $n - 1);
@@ -210,7 +228,9 @@ class Battle
 
 					// ----------------------------- # Проигрыш по таймауту # -------------------------- //
 					if ($timeout <= 0 && !$endbattle) {
-						$action = $this->timeout();
+						$this->timeout();
+
+						$json['action'] = 'refresh';
 					}
 					// --------------------------------- # Конец # ------------------------------------- //
 
@@ -223,30 +243,23 @@ class Battle
 					}
 				}
 			} else {
-				$action = $this->battleResult(3);
+				$this->battleResult(3);
+
+				$json['action'] = 'finishBattle';
+				$json['result'] = 'win';
 			}
 		}
 
-		if (!count($action)) {
+		if (empty($json['action'])) {
 			if ($this->battle->type == 1 && $this->user->room == 2) {
-				$action = ['impactForm', ''];
+				$json['action'] = 'impactForm';
 			} else {
-				$action = ['mapForm', ''];
+				$json['action'] = 'mapForm';
 			}
 		}
 
-		$json['center'] = [
-			'action' => $action[0],
-			'is_win' => $action[1],
-			'impact' =>
-				[
-					'stat_kick' => $this->numKicks,
-					'stat_block' => $this->numBlocks,
-				],
-		];
-
-		$json['time'] = time();
-		$json['m'] = (isset($nms) ? $nms : '');
+		$json['kicks'] = $this->numKicks;
+		$json['blocks'] = $this->numBlocks;
 		$json['priems'] = [];
 
 		$p_block = 0 + $this->BattleFighter['block'];
@@ -300,23 +313,21 @@ class Battle
 			],
 		];
 
-		$json['left'] = [
-			'user' => [
-				'items' => $this->user->getSlotsInfo(),
-				'data' => [
-					'orden' => $this->user->rank,
-					'hp_all' => $this->user->hp_max,
-					'hp' => $this->user->hp_now,
-					'energy_all' => $this->user->energy_max,
-					'energy' => $this->user->energy_now,
-					'level' => $this->user->level,
-					'rang' => $this->user->tribe,
-					'login' => $this->user->name,
-					'user_id' => $this->user->id,
-					'obraz' => $this->user->getAvatar(),
-				],
-			],
+		$json['user'] = [
+			'id' => $this->user->id,
+			'rank' => $this->user->rank,
+			'hp' => (int) floor($this->user->hp_now),
+			'hp_max' => $this->user->hp_max,
+			'energy' => (int) floor($this->user->energy_now),
+			'energy_max' => $this->user->energy_max,
+			'level' => $this->user->level,
+			'tribe' => $this->user->tribe,
+			'name' => $this->user->name,
+			'avatar' => $this->user->getAvatar(),
+			'items' => $this->user->getSlotsInfo(),
 		];
+
+		$json['teams'] = ['left' => [], 'right' => []];
 
 		if (!$endbattle) {
 			$command = ['left' => [], 'right' => []];
@@ -333,101 +344,58 @@ class Battle
 				]);
 
 			foreach ($fighters as $fighter) {
-				$command[($fighter->side == 0 ? 'left' : 'right')][] = [
+				$command[$fighter->side == 0 ? 'left' : 'right'][] = [
 					'id' => $fighter->user->id,
-					'login' => $fighter->user->name,
-					'hp' => floor($fighter->user->hp_now),
+					'name' => $fighter->user->name,
+					'hp' => (int) floor($fighter->user->hp_now),
 					'level' => $fighter->user->level,
-					'sd' => $fighter->side,
-					'timeout' => $fighter->finished_at,
+					'side' => $fighter->side,
+					'finished' => $fighter->finished_at != null,
 				];
-
-				if ($fighter->user->rank == 60 && !$fighter->finished_at) {
-					$user_opp = null;
-
-					if ($fighter->side == 0 && count($command['right'])) {
-						$user_opp = $command['right'][random_int(0, count($command['right']) - 1)]['id'];
-					} elseif ($fighter->side == 1 && count($command['left'])) {
-						$user_opp = $command['left'][random_int(0, count($command['left']) - 1)]['id'];
-					}
-
-					if ($user_opp) {
-						$fighter->user->calculate();
-
-						$kick1 = random_int(1, 5);
-						$block1 = random_int(1, 5);
-						$block2 = random_int(1, 5);
-
-						while ($block1 == $block2) {
-							$block2 = random_int(1, 5);
-						}
-
-						// Помечаем окончание раунда
-						$fighter->finished_at = now();
-						$fighter->save();
-
-						$user = $this->battle->members
-							->where('user_id', $user_opp);
-
-						$log = $this->battle->logs()->make();
-						$log->round = $this->battle->round;
-						$log->hit = array_filter([$kick1]);
-						$log->block = array_filter([$block1, $block2]);
-						$log->member()->associate($fighter);
-						$log->enemy()->associate($user);
-						$log->save();
-					}
-				}
 			}
 
-			$json['action_users'] = ['team_my' => [], 'team' => []];
-
-			if (isset($command['left'])) {
-				$json['action_users']['team_my'] = $command['left'];
+			if (!empty($command['left'])) {
+				$json['teams']['left'] = $command['left'];
 			}
 
-			if (isset($command['right'])) {
-				$json['action_users']['team'] = $command['right'];
+			if (!empty($command['right'])) {
+				$json['teams']['right'] = $command['right'];
 			}
-
-			$json['in_battle'] = 'yes';
 		}
+
+		$json['oppenent_id'] = null;
 
 		if ($timeout > 0 && $this->user->hp_now > 0 && !$endbattle && isset($victims[$random])) {
 			/** @var BattleMember $enemy */
 			$enemy = $this->battle->members
-				->where('id', $victims[$random]);
+				->where('id', $victims[$random])
+				->first();
 
 			$enemy->user->calculate();
 
-			$json['right'] = [
-				'enemy' => [
-					'items' => $enemy->user->getSlotsInfo(),
-					'data' => [
-						'orden' => $enemy->user->rank,
-						'hp_all' => $enemy->user->hp_max,
-						'hp' => $enemy->user->hp_now,
-						'energy_all' => $enemy->user->energy_max,
-						'energy' => $enemy->user->energy_now,
-						'level' => $enemy->user->level,
-						'obraz' => $enemy->user->getAvatar(),
-						'rang' => $enemy->user->tribe_id,
-						'login' => $enemy->user->name,
-						'user_id' => $enemy->user->id,
-					],
-				],
-				'action' => 'getAllEnemy',
+			$json['opponent_id'] = $enemy->id;
+
+			$json['opponent'] = [
+				'id' => $enemy->user->id,
+				'rank' => $enemy->user->rank,
+				'hp' => (int) floor($enemy->user->hp_now),
+				'hp_max' => $enemy->user->hp_max,
+				'energy' => (int) floor($enemy->user->energy_now),
+				'energy_max' => $enemy->user->energy_max,
+				'level' => $enemy->user->level,
+				'tribe' => $enemy->user->tribe_id,
+				'name' => $enemy->user->name,
+				'avatar' => $enemy->user->getAvatar(),
+				'items' => $enemy->user->getSlotsInfo(),
 			];
 		} else {
-			$json['right'] = ['action' => 'getAdvertising'];
+			$json['opponent'] = null;
 		}
 
-		$json['info'] = [
-			'damage' => $this->BattleFighter->damage,
-			'battle_id' => $this->user->battle,
-			'timebattle' => max(0, $timeout),
-			'timeout' => ($this->battle->timeout / 60),
-		];
+		$json['damage'] = $this->BattleFighter->damage;
+		$json['id'] = $this->user->battle_id;
+		$json['timeout_left'] = (int) max(0, $timeout);
+		$json['timeout'] = $this->battle->timeout;
 
 		$json['logs'] = [];
 
@@ -438,39 +406,21 @@ class Battle
 			->where('id', '>', $logId)
 			->get();
 
-		if ($lastLogs->isNotEmpty()) {
-			$lg = 0;
-
-			$i = 0;
-
-			foreach ($lastLogs as $turn) {
-				if ($i == 0) {
-					$lg = $turn['HitStatus'];
-				}
-
-				$json['logs'][] = [
-					'uid' => $turn['HitID'],
-					'date' => date('H:i', $turn['HitTime']),
-					'id' => $turn['HitStatus'],
-					'a' => $turn['AttackerFighterName'],
-					'at' => $turn['AttackerTeam'],
-					'ah' => $turn['AttackerHitType'],
-					'ad' => $turn['AttackerDamage'],
-					'ab' => $turn['AttackerBlock'],
-					'd' => $turn['DefenderFighterName'],
-					'dh' => $turn['DefenderHitType'],
-					'dd' => $turn['DefenderDamage'],
-					'db' => $turn['DefenderBlock'],
-					'c' => $turn['RedComment'],
-					't' => '',
-					'my' => ($this->user->id == $turn['AttackerFighter'] || $this->user->id == $turn['DefenderFighter']) ? 'y' : 'n',
-					'hr' => ($lg < $turn['HitStatus']) ? 1 : 0,
-				];
-
-				$lg = $turn['HitStatus'];
-
-				$i++;
-			}
+		foreach ($lastLogs as $turn) {
+			$json['logs'][] = [
+				'id' => $turn->id,
+				'date' => $turn->date->toAtomString(),
+				'round' => $turn->round,
+				'user' => $turn->member->user->name ?? null,
+				'side' => $turn->member->side,
+				'hits' => $turn->hit,
+				'damage' => $turn->damage,
+				'blocks' => $turn->block,
+				'enemy' => $turn->enemy->user->name ?? null,
+				'enemy_blocks' => $turn->enemy_block,
+				'comment' => $turn->comment_id,
+				'my' => $this->user->is($turn->member->user) || $this->user->is($turn->enemy->user),
+			];
 		}
 
 		return $json;
@@ -486,11 +436,13 @@ class Battle
 
 		foreach ($logs as $user) {
 			foreach ($logs as $enemy) {
-				if ($user->member->is($enemy->member)) {
+				if ($user->member->is($enemy->enemy)) {
 					$user->member->user->calculate();
 					$enemy->member->user->calculate();
 
 					$damage = $this->kick($user, $enemy, $this->battle->round);
+
+					//dump($user->member_id, $damage);
 
 					if ($this->user->is($enemy->member->user)) {
 						$this->user->hp_now -= $damage;
@@ -499,8 +451,11 @@ class Battle
 			}
 		}
 
+		//dd($this->battle->members->toArray());
+
 		$this->battle->round++;
 		$this->battle->round_at = now();
+		$this->battle->save();
 
 		$this->battle->members->each(function (BattleMember $member) {
 			$member->finished_at = null;
@@ -743,16 +698,6 @@ class Battle
 
 		$this->user->battle()->associate(null);
 		$this->user->save();
-
-		if ($type == 1) {
-			return ['finishBattle', 'draw'];
-		} elseif ($type == 2) {
-			return ['finishBattle', 'no'];
-		} elseif ($type == 3) {
-			return ['finishBattle', 'yes'];
-		} else {
-			return [];
-		}
 	}
 
 	// ----- # Функция расчёта опыта # ----- //
@@ -891,8 +836,6 @@ class Battle
 				->member()->associate($enemy)
 				->save();
 		}
-
-		return ['refresh', ''];
 	}
 
 	private function calcMF($x, $y)
@@ -1077,7 +1020,7 @@ class Battle
 
 		// уворот
 		if ($pu > $a) {
-			$kickAction[1] = "uvorot";
+			$kickAction[1] = 'uvorot';
 		} elseif ($pi > $rb) {  // крит
 			$kickDamage[1] = random_int(1.5 * ($user->member->user->strength / 3 + $user->member->user->min), 2.5 * ($user->member->user->strength / 1.5 + $user->member->user->max));
 
@@ -1085,7 +1028,7 @@ class Battle
 				$kickDamage[1] = 0;
 			}
 
-			$kickAction[1] = "krit";
+			$kickAction[1] = 'krit';
 
 			$exp_x *= 1.2;
 		} else {
@@ -1101,12 +1044,12 @@ class Battle
 								$kickDamage[$i] = 0;
 							}
 
-							$kickAction[$i] = "prob" . $i;
+							$kickAction[$i] = 'prob' . $i;
 
 							$exp_x *= 1.2;
 						} else {
 							$kickDamage[$i] = 0;
-							$kickAction[$i] = "block" . $i;
+							$kickAction[$i] = 'block' . $i;
 						}
 					} else {
 						if ($pbr > $bpr) {
@@ -1124,7 +1067,7 @@ class Battle
 							$kickDamage[$i] = 0;
 						}
 
-						$kickAction[$i] = "udar";
+						$kickAction[$i] = 'udar';
 					}
 				}
 			}
@@ -1158,30 +1101,30 @@ class Battle
 
 		$comment = 0;
 
-		if ($kickAction[1] == "uvorot") {
+		if ($kickAction[1] == 'uvorot') {
 			$comment = random_int(31, 33);
 			$add_pr = 1;
-		} elseif ($kickAction[1] == "krit") {
+		} elseif ($kickAction[1] == 'krit') {
 			$comment = random_int(21, 23);
 			$add_pr = 2;
-		} elseif ($kickAction[1] == "prob1" && $kickAction[2] != "prob2") {
+		} elseif ($kickAction[1] == 'prob1' && $kickAction[2] != 'prob2') {
 			$comment = 41;
 			$add_pr = 3;
-		} elseif ($kickAction[1] != "prob1" && $kickAction[2] == "prob2") {
+		} elseif ($kickAction[1] != 'prob1' && $kickAction[2] == 'prob2') {
 			$comment = 42;
 			$add_pr = 3;
-		} elseif ($kickAction[1] == "prob1" && $kickAction[2] == "prob2") {
+		} elseif ($kickAction[1] == 'prob1' && $kickAction[2] == 'prob2') {
 			$comment = 43;
 			$add_pr = 3;
-		} elseif ($kickAction[1] == "block1" && $kickAction[2] != "udar") {
+		} elseif ($kickAction[1] == 'block1' && $kickAction[2] != 'udar') {
 			$comment = random_int(11, 20);
 			$add_pr = 4;
-		} elseif ($kickAction[1] == "udar" && $kickAction[2] != "block2") {
+		} elseif ($kickAction[1] == "udar" && $kickAction[2] != 'block2') {
 			$comment = random_int(1, 4);
-		} elseif ($kickAction[1] == "udar" && $kickAction[2] == "block2") {
+		} elseif ($kickAction[1] == 'udar' && $kickAction[2] == 'block2') {
 			$comment = random_int(5, 7);
 			$add_pr = 4;
-		} elseif ($kickAction[1] == "block1" && $kickAction[2] == "udar") {
+		} elseif ($kickAction[1] == 'block1' && $kickAction[2] == 'udar') {
 			$comment = random_int(8, 10);
 			$add_pr = 4;
 		}
@@ -1229,6 +1172,7 @@ class Battle
 		$enemy->member->user->save();
 
 		$user->damage = $damage;
+		$user->enemy_block = $enemyBlock;
 		$user->comment_id = $comment;
 		$user->save();
 
@@ -1266,32 +1210,32 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 		$block3 = 0;
 
 		// Вычисляем цифровые значения ударов и блоков по зонам удара
-		if (request()->has('headImpact') && request()->get('headImpact') == "yes") {
+		if (request()->has('headImpact') && request()->boolean('headImpact')) {
 			$kick1 = 1;
 		}
 
-		if (request()->has('caseImpact') && request()->get('caseImpact') == "yes") {
+		if (request()->has('caseImpact') && request()->boolean('caseImpact')) {
 			if ($kick1 > 0 && $this->numKicks == 2 && $kick2 == 0) {
 				$kick2 = 2;
 			} else {
 				$kick1 = 2;
 			}
 		}
-		if (request()->has('stomachImpact') && request()->get('stomachImpact') == "yes") {
+		if (request()->has('stomachImpact') && request()->boolean('stomachImpact')) {
 			if ($kick1 > 0 && $this->numKicks == 2 && $kick2 == 0) {
 				$kick2 = 3;
 			} else {
 				$kick1 = 3;
 			}
 		}
-		if (request()->has('beltImpact') && request()->get('beltImpact') == "yes") {
+		if (request()->has('beltImpact') && request()->boolean('beltImpact')) {
 			if ($kick1 > 0 && $this->numKicks == 2 && $kick2 == 0) {
 				$kick2 = 4;
 			} else {
 				$kick1 = 4;
 			}
 		}
-		if (request()->has('legsImpact') && request()->get('legsImpact') == "yes") {
+		if (request()->has('legsImpact') && request()->boolean('legsImpact')) {
 			if ($kick1 > 0 && $this->numKicks == 2 && $kick2 == 0) {
 				$kick2 = 5;
 			} else {
@@ -1299,11 +1243,11 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 			}
 		}
 
-		if (request()->has('headBlock') && request()->get('headBlock') == "yes") {
+		if (request()->has('headBlock') && request()->boolean('headBlock')) {
 			$block1 = 1;
 		}
 
-		if (request()->has('caseBlock') && request()->get('caseBlock') == "yes") {
+		if (request()->has('caseBlock') && request()->boolean('caseBlock')) {
 			if ($block1 > 0 && $block2 == 0) {
 				$block2 = 2;
 			} else {
@@ -1311,7 +1255,7 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 			}
 		}
 
-		if (request()->has('stomachBlock') && request()->get('stomachBlock') == "yes") {
+		if (request()->has('stomachBlock') && request()->boolean('stomachBlock')) {
 			if ($block1 > 0 && $block2 == 0) {
 				$block2 = 3;
 			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
@@ -1321,7 +1265,7 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 			}
 		}
 
-		if (request()->has('beltBlock') && request()->get('beltBlock') == "yes") {
+		if (request()->has('beltBlock') && request()->boolean('beltBlock')) {
 			if ($block1 > 0 && $block2 == 0) {
 				$block2 = 4;
 			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
@@ -1331,7 +1275,7 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 			}
 		}
 
-		if (request()->has('legsBlock') && request()->get('legsBlock') == "yes") {
+		if (request()->has('legsBlock') && request()->boolean('legsBlock')) {
 			if ($block1 > 0 && $block2 == 0) {
 				$block2 = 5;
 			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
@@ -1340,6 +1284,8 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 				$block1 = 5;
 			}
 		}
+
+		$enemyId = request()->integer('opponent');
 
 		// ----- # Узнаем, в какой команде, и общие сведения о состоянии боя # ----- //
 		// Team - команды в бою (0 - левые и 1 - правые)
@@ -1357,14 +1303,18 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 		if ($this->user->hp_now > 0 && !$this->BattleFighter->finished_at && !$this->BattleFighter->died_at) {
 			// Если стоит хоть один удар, блок и есть противник
 			if ($kick1 > 0 && $block1 > 0 && $enemyId > 0) {
-				$enemy = $this->battle->members->where('id', $enemyId);
+				$enemy = $this->battle->members->where('id', $enemyId)->first();
+
+				if (!$enemy) {
+					throw new Exception('Противник не найден');
+				}
 
 				// Если противник убит, то он не может быть ударен
 				if ($enemy->user->hp_now <= 0) {
 					$enemyId = 0;
 				}
 
-				if ($enemyId > 0) {
+				if ($enemyId) {
 					// Помечаем окончание раунда
 					$this->BattleFighter->finished_at = now();
 					$this->BattleFighter->save();
@@ -1396,15 +1346,64 @@ AND bf2.BattleID = bf.BattleID AND bf2.FighterID = p.id AND p2.id = '" . $user['
 
 			// Если все сходили, то заканчиваем раунд
 			if ($members->isEmpty()) {
+				$this->botsHit();
+
 				$this->endRound();
 
-				$this->battle->refresh();
 				$this->BattleFighter = $this->battle->members->where('user_id', $this->user->id)->first();
 			}
 
 			//if ($this->BattleFighter['wait'] > 0) {
 			//	$this->BattleFighter['wait'] -= 1;
 			//}
+		}
+	}
+
+	protected function botsHit()
+	{
+		$members = $this->battle->members
+			->whereNull('finished_at')
+			->whereNull('died_at')
+			->filter(function (BattleMember $member) {
+				return $member->user->rank == 60 && $member->user->hp_now > 0;
+			});
+
+		foreach ($members as $member) {
+			$opponents = $this->battle->members
+				->whereNull('died_at')
+				->where('side', $member->side == 0 ? 1 : 0);
+
+			if ($opponents->isEmpty()) {
+				continue;
+			}
+
+			$opponent = $opponents->random();
+
+			if (!$opponent) {
+				continue;
+			}
+
+			$member->user->calculate();
+
+			$kick1  = random_int(1, 5);
+			$block1 = random_int(1, 5);
+			$block2 = random_int(1, 5);
+
+			while ($block1 == $block2) {
+				$block2 = random_int(1, 5);
+			}
+
+			// Помечаем окончание раунда
+			$member->finished_at = now();
+			$member->save();
+
+			$log = $this->battle->logs()->make();
+			$log->round = $this->battle->round;
+			$log->hit = array_filter([$kick1]);
+			$log->block = array_filter([$block1, $block2]);
+			$log->member()->associate($member);
+			$log->enemy()->associate($opponent);
+			$log->save();
 		}
 	}
 

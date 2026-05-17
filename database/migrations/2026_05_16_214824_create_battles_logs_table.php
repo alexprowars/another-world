@@ -11,13 +11,14 @@ return new class extends Migration {
 			$table->id();
 			$table->foreignId('battle_id')->constrained('battles');
 			$table->foreignId('member_id')->constrained('battles_members');
-			$table->smallInteger('round')->nullable();
+			$table->smallInteger('round')->default(0);
 			$table->timestamp('date')->useCurrent();
 			$table->foreignId('enemy_id')->nullable()->constrained('battles_members');
-			$table->enum('hit', ['1','2','3','4','5'])->nullable();
-			$table->enum('block', ['1','2','3','4','5'])->nullable();
+			$table->json('hit')->nullable();
+			$table->json('block')->nullable();
+			$table->json('enemy_block')->nullable();
 			$table->smallInteger('damage')->nullable();
-			$table->smallInteger('comment_id');
+			$table->smallInteger('comment_id')->nullable();
 		});
 	}
 

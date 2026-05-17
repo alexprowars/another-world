@@ -13,11 +13,11 @@
 
 		<a href="" @click.prevent="toPlayer" title="Послать сообщение">{{ user['name'] }}</a>
 		<b>[{{ user['level'] }}]</b>
-		<Link :href="'/info/' + user['id']" target="main" title="Посмотреть инфу" class="chat">
+		<Link :href="'/info/' + user['id']" target="_blank" title="Посмотреть инфу" class="chat">
 			<img src="/assets/images/images/inf.gif" title="Посмотреть инфу" align="absmiddle">
 		</Link>
 
-		<div class="pull-xs-right">
+		<div class="float-right">
 			<img v-if="user['profession']" :src="'/assets/images/guild/' + user['profession'] + '.gif'" :title="$t('proffession.' + user['profession'])">
 			<img v-if="user['silence']" src="/assets/images/chat/molch.gif" :title="'Молчанка до ' + $formatDate(user['silence'], 'DD MMM HH:mm:ss')" width="15" height="12">
 			<Link v-if="user['battle']" :href="'/view_logs.php?log=' + user['battle']" target="main">

@@ -71,7 +71,7 @@ class UserService
 		$result = 0;
 
 		if (!$user->battle_id && $user->r_type != 2 && ($user->hp_now < $user->hp_max) && $user->hp_max != 0 && $user->online) {
-			$result = round($user->hp_max * (((int) $user->online->diffInSeconds()) / 600), 4);
+			$result = round($user->hp_max * (((int) $user->online->diffInSeconds()) / 100), 4); // 600
 
 			if (($user->hp_now + $result) > $user->hp_max) {
 				$result = $user->hp_max - $user->hp_now;

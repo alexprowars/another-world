@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Battle;
 use App\Http\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class BattleController extends Controller
@@ -22,10 +23,14 @@ class BattleController extends Controller
 
 		if ($this->user->battle) {
 			if ($request->expectsJson()) {
-				$battle = new Battle($this->user->battle, $request->user());
-				$battle->init();
+				$result = DB::transaction(function () use ($request) {
+					$battle = new Battle($this->user->battle, $request->user());
+					$battle->init();
 
-				return response()->json($battle->show());
+					return $battle->show();
+				});
+
+				return response()->json($result);
 			} else {
 				return Inertia::render('Battle', [
 					'id' => $this->user->battle->id,

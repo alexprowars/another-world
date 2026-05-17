@@ -11,11 +11,11 @@
 					</div>
 	
 					<ul class="mapHints">
-						<li><a href='?room=103'>Торговая площадь</a></li>
-						<li><a href='?room=10'>Башня магов</a></li>
-						<li><a href='?room=16'>Центр занятости</a></li>
-						<li><a href='?room=13'>Сувениры</a></li>
-						<li><a href='?room=105'>Промышленная зона</a></li>
+						<li><Link href='?room=103'>Торговая площадь</Link></li>
+						<li><Link href='?room=10'>Башня магов</Link></li>
+						<li><Link href='?room=16'>Центр занятости</Link></li>
+						<li><Link href='?room=13'>Сувениры</Link></li>
+						<li><Link href='?room=105'>Промышленная зона</Link></li>
 					</ul>
 				</td>
 				<td>
@@ -26,25 +26,25 @@
 							<img :src="'/assets/images/world/city/' + page.city + '/2_LV.gif'" v-tooltip="'Игорный дом'" class="tooltip text">
 						</div>
 						<div style="position:absolute; left:246px; top:174px; width:91px; height:69px;">
-							<a href="?room=16"><img :src="'/assets/images/world/city/' + page.city + '/2_Gift.gif'" v-tooltip="'Центр занятости'" class="tooltip text aFilter"></a>
+							<Link href="?room=16"><img :src="'/assets/images/world/city/' + page.city + '/2_Gift.gif'" v-tooltip="'Центр занятости'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:348px; top:204px; width:71px; height:49px;">
-							<a href='?room=13'><img :src="'/assets/images/world/city/' + page.city + '/2_Loto.gif'" v-tooltip="'Сувениры'" class="tooltip text aFilter"></a>
+							<Link href='?room=13'><img :src="'/assets/images/world/city/' + page.city + '/2_Loto.gif'" v-tooltip="'Сувениры'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:28px; top:197px; width:96px; height:100px;">
 							<img :src="'/assets/images/world/city/' + page.city + '/2_Tavern.gif'" v-tooltip="'Таверна'" class="tooltip text">
 						</div>
 						<div style="position:absolute; left:7px; top:230px; width:25px; height:24px;">
-							<a href="?room=103"><img :src="'/assets/images/world/city/' + page.city + '/2_Left.gif'" v-tooltip="'Торговая площадь'" class="tooltip text aFilter"></a>
+							<Link href="?room=103"><img :src="'/assets/images/world/city/' + page.city + '/2_Left.gif'" v-tooltip="'Торговая площадь'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:502px; top:265px; width:29px; height:26px;">
-							<a href="?room=105"><img :src="'/assets/images/world/city/' + page.city + '/2_Right.gif'" v-tooltip="'Промышленная зона'" class="tooltip text aFilter"></a>
+							<Link href="?room=105"><img :src="'/assets/images/world/city/' + page.city + '/2_Right.gif'" v-tooltip="'Промышленная зона'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:118px; top:273px; width:19px; height:20px;">
 							<img :src="'/assets/images/world/city/' + page.city + '/2_Bottom.gif'" v-tooltip="'Проход закрыт'" class="tooltip text aFilter">
 						</div>
 						<div style="position:absolute; left:283px; top:20px; width:32px; height:101px;">
-							<a href="?room=10"><img :src="'/assets/images/world/city/' + page.city + '/2_Mage.gif'" v-tooltip="'Башня Магов'" class="tooltip text aFilter"></a>
+							<Link href="?room=10"><img :src="'/assets/images/world/city/' + page.city + '/2_Mage.gif'" v-tooltip="'Башня Магов'" class="tooltip text aFilter"></Link>
 						</div>
 					</div>
 				</td>
@@ -55,6 +55,7 @@
 
 <script setup>
 	import CityHeader from '~/components/CityHeader.vue';
+	import { Link } from '@inertiajs/vue3';
 
 	defineProps({
 		page: Object,

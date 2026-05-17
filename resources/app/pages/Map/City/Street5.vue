@@ -12,9 +12,9 @@
 					</div>
 
 					<ul class="mapHints">
-						<li><a href='?room=104'>Парк</a></li>
-						<li><a href='?room=200'>Шахта</a></li>
-						<li><a href='?room=666'>Тюрьма</a></li>
+						<li><Link href='?room=104'>Парк</Link></li>
+						<li><Link href='?room=200'>Шахта</Link></li>
+						<li><Link href='?room=666'>Тюрьма</Link></li>
 					</ul>
 				</td>
 				<td>
@@ -22,10 +22,10 @@
 						<img :src="'/assets/images/world/city/' + page.city + '/3_bg.jpg'" alt="" width="550" height="300"/>
 
 						<div style="position:absolute; left:340px; top:108px; width:130px; height:105px;">
-							<a href="?room=666"><img :src="'/assets/images/world/city/' + page.city + '/3_Prison.gif'" v-tooltip="'Тюрьма'" class="tooltip text aFilter"></a>
+							<Link href="?room=666"><img :src="'/assets/images/world/city/' + page.city + '/3_Prison.gif'" v-tooltip="'Тюрьма'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:72px; top:191px; width:24px; height:23px;">
-							<a href="?room=104"><img :src="'/assets/images/world/city/' + page.city + '/3_Left.gif'" v-tooltip="'Парк'" class="tooltip text aFilter"></a>
+							<Link href="?room=104"><img :src="'/assets/images/world/city/' + page.city + '/3_Left.gif'" v-tooltip="'Парк'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:14px; top:134px; width:54px; height:74px;">
 							<img :src="'/assets/images/world/city/' + page.city + '/3_Tower.gif'" v-tooltip="'Проход закрыт'" class="tooltip text">
@@ -37,7 +37,7 @@
 							<img :src="'/assets/images/world/city/' + page.city + '/3_Right.gif'" v-tooltip="'Проход закрыт'" class="tooltip text">
 						</div>
 						<div style="position:absolute; left:247px; top:135px; width:30px; height:26px;">
-							<a href="?room=200"><img :src="'/assets/images/world/city/' + page.city + '/3_Mine.gif'" v-tooltip="'Шахта'" class="tooltip text aFilter"></a>
+							<Link href="?room=200"><img :src="'/assets/images/world/city/' + page.city + '/3_Mine.gif'" v-tooltip="'Шахта'" class="tooltip text aFilter"></Link>
 						</div>
 					</div>
 				</td>
@@ -48,6 +48,7 @@
 
 <script setup>
 	import CityHeader from '~/components/CityHeader.vue';
+	import { Link } from '@inertiajs/vue3';
 
 	defineProps({
 		page: Object,

@@ -76,7 +76,7 @@ class PersonController extends Controller
 	{
 		$msg = '';
 
-		$update = $request->input('update');
+		$update = $request->post('update');
 
 		if (!empty($update)) {
 			if ($this->user->updates > 0) {

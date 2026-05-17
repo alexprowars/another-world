@@ -6,6 +6,7 @@
 @import "./styles/main.css";
 @import "./styles/shop.css";
 @import "./styles/info.css";
+@import "./styles/battle.css";
 @import "./styles/modal.css";
 
 @import 'vue-final-modal/style.css';

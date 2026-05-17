@@ -33,7 +33,7 @@ class GameMiddleware
 
 		$dispatch = null;
 
-		if ($user->battle_id) {
+		if ($user->battle_id && !str_contains($request->route()->uri(), 'chat/')) {
 			$dispatch = BattleController::class;
 		} elseif ($user->r_date && $user->r_type) {
 			switch ($user->r_type) {

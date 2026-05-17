@@ -74,7 +74,7 @@
 			[{ title: 'Нет' }, {
 				title: 'Да',
 				handler() {
-					router.get('', {
+					router.post('/person/updates', {
 						update: stat,
 					});
 				},

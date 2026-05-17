@@ -22,6 +22,7 @@ Thumbs.db
 /public/storage
 app/cache/*
 app/config/*.ini
+/public/build
 /public/assets/admin/*
 /public/assets/global/*
 /public/css/bootstap.css

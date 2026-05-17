@@ -33,19 +33,19 @@
 									</a>
 									<div style="height:20px;"></div>
 									<div class="text-xs-center flex justify-center gap-2">
-										<PersonViewSlot :position="17"/>
-										<PersonViewSlot :position="18"/>
+										<PersonViewSlot :position="17" :item="person.slots.slot_17 || null"/>
+										<PersonViewSlot :position="18" :item="person.slots.slot_18 || null"/>
 									</div>
 								</td>
 								<td valign="top" class="right">
-									<PersonViewSlot :position="14"/>
-									<PersonViewSlot :position="15"/>
-									<PersonViewSlot :position="5"/>
-									<PersonViewSlot :position="10"/>
-									<PersonViewSlot :position="11"/>
-									<PersonViewSlot :position="12"/>
-									<PersonViewSlot :position="22"/>
-									<PersonViewSlot :position="13"/>
+									<PersonViewSlot :position="14" :item="person.slots.slot_14 || null"/>
+									<PersonViewSlot :position="15" :item="person.slots.slot_15 || null"/>
+									<PersonViewSlot :position="5" :item="person.slots.slot_5 || null"/>
+									<PersonViewSlot :position="10" :item="person.slots.slot_10 || null"/>
+									<PersonViewSlot :position="11" :item="person.slots.slot_11 || null"/>
+									<PersonViewSlot :position="12" :item="person.slots.slot_12 || null"/>
+									<PersonViewSlot :position="22" :item="person.slots.slot_22 || null"/>
+									<PersonViewSlot :position="13" :item="person.slots.slot_13 || null"/>
 								</td>
 							</tr>
 						</table>

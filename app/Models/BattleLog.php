@@ -16,6 +16,7 @@ class BattleLog extends Model
 			'date' => 'immutable_datetime',
 			'hit' => 'array',
 			'block' => 'array',
+			'enemy_block' => 'array',
 		];
 	}
 

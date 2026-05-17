@@ -278,6 +278,7 @@ a.fm:hover {
 
 .bdg {
     border: 1px solid #8C8470;
+	text-align: left;
 }
 
 .sblock {
@@ -835,7 +836,7 @@ form {
     margin: 10px 0;
 }
 
-#usersContent table td {
+#usersContent > div {
     padding: 5px;
     text-align: center;
     border: 1px #D8C792 solid;

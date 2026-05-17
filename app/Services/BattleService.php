@@ -21,7 +21,7 @@ class BattleService
 			throw new Exception('Персонаж <u>' . $enemy->name . '</u> не является ботом!');
 		}
 
-		if ($user->travma > time() && $user->t_level > 2) {
+		if ($user->injury > time() && $user->injury_type > 2) {
 			throw new Exception('С тяжелой травмой в бой нельзя!');
 		}
 
@@ -41,24 +41,33 @@ class BattleService
 			throw new Exception('Бот <u>' . $enemy->name . '</u> еще не восстановил свой уровень жизни!');
 		}
 
-		/*if ($enemy->rank == 60 && $enemy->battle && $enemy->battle != $enemy->last_battle) {
-			$kol_arr = $this->db->query("SELECT id, onlinetime FROM game_users WHERE battle = " . $enemy->battle . " AND id != " . $enemy->id . "");
-			$nn = $kol_arr->numRows();
+		if ($enemy->rank == 60 && $enemy->battle_id) {
+			$skip = false;
 
-			if ($nn > 0) {
-				while ($kol_a = $kol_arr->fetch()) {
-					if ($kol_a['onlinetime'] < (time() - 180)) {
-						$this->db->query("DELETE FROM game_battle_users WHERE BattleID = " . $enemy->battle . " AND FighterID = " . $kol_a['id'] . "");
-						$this->db->query("UPDATE game_users SET losses=losses+1, battle=0 WHERE id = '" . $kol_a['id'] . "'");
+			$players = User::query()
+				->where('battle_id', $enemy->battle_id)
+				->whereKeyNot($enemy)
+				->get();
 
-						$nn--;
-					}
+			foreach ($players as $player) {
+				if ($player->online->diffInMinutes() > 10) {
+					BattleMember::query()
+						->where('battle_id', $enemy->battle_id)
+						->whereBelongsTo($player)
+						->delete();
+
+					$player->losses -= 1;
+					$player->battle()->associate(null);
+					$player->save();
+				} else {
+					$skip = true;
 				}
 			}
 
-			if ($nn == 0)
-				$enemy->battle = 0;
-		}*/
+			if (!$skip) {
+				$enemy->battle()->associate(null);
+			}
+		}
 
 		if ($enemy->rank == 60 && !$enemy->battle_id) {
 			$enemy->calculate();
@@ -112,7 +121,7 @@ class BattleService
 
 			$battle->members()->create([
 				'user_id' => $enemy->id,
-				'side' => 0,
+				'side' => 1,
 				'exp' => self::getBaseLevelExp($enemy->level),
 			]);
 

@@ -15,6 +15,7 @@ import GameLayout from '~/layouts/Game.vue';
 import { createState, StateSymbol } from '~/composables/useState.js';
 import FloatingVue from 'floating-vue';
 import toastPlugin from './plugins/toast';
+import { time } from '~/utils/format.js';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -53,6 +54,8 @@ createInertiaApp({
 		app.config.globalProperties.$formatDate = (value, format) => {
 			return dayjs(value).tz().format(format)
 		};
+
+		app.config.globalProperties.$formatTime = time;
 
 		app.use(toastPlugin);
 
