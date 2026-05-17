@@ -51,6 +51,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 	public $immun;
 	public $t_level;
 
+	protected $calculated = false;
 	public $hp = 0;
 	public $energy = 0;
 
@@ -138,6 +139,12 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 		return $this->hasMany(Effect::class, 'user_id');
 	}
 
+	/** @return HasMany<UserAbility, $this> */
+	public function abilities(): HasMany
+	{
+		return $this->hasMany(UserAbility::class, 'user_id');
+	}
+
 	/** @return HasMany<UserAuthentication, $this> */
 	public function authentications(): HasMany
 	{
@@ -183,8 +190,14 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 
 	public function calculate()
 	{
+		if ($this->calculated) {
+			return;
+		}
+
 		UserService::calculateWearsStats($this);
 		UserService::calculateStats($this);
+
+		$this->calculated = true;
 	}
 
 	public function getSlot()
@@ -287,8 +300,8 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 
 	public function getAvatar(): string
 	{
-		if ($this->obraz) {
-			return '/assets/images/avatar/obraz/' . $this->obraz . '.png';
+		if ($this->image) {
+			return '/assets/images/avatar/' . $this->image;
 		}
 
 		return '/assets/images/avatar/1/' . ($this->gender === 'F' ? '2' : '1') . '.png';

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Engine\Battle\BattleStatus;
+use App\Engine\Battle\BattleType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -15,6 +17,8 @@ class Battle extends Model
 		'round_at' => 'immutable_datetime',
 		'use_weapons' => 'boolean',
 		'is_blood' => 'boolean',
+		'type' => BattleType::class,
+		'status' => BattleStatus::class,
 	];
 
 	/** @return HasMany<BattleMember, $this> */

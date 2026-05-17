@@ -22,6 +22,7 @@ return [
 		'horizon*',
 		'_boost/browser-logs',
 		'broadcasting*',
+		'chat/*',
 	],
 
 	/*

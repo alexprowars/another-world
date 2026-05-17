@@ -36,7 +36,7 @@ return new class extends Migration {
 			$table->smallInteger('s_vitality')->default(3);
 			$table->smallInteger('s_power')->default(1);
 			$table->smallInteger('s_intelligence')->default(0);
-			$table->unsignedSmallInteger('image')->nullable();
+			$table->string('image', 50)->nullable();
 			$table->unsignedSmallInteger('profession')->nullable();
 			$table->decimal('hp_now', 12, 4)->default(15);
 			$table->unsignedInteger('hp_max')->default(15);

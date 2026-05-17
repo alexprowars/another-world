@@ -1,5 +1,5 @@
 <template>
-	<div class="textblock text-center">
+	<div class="textblock text-center text-sm">
 		<br><b><span color=black>Со Сводом Законов игры можно ознакомиться </span> <a href="/person?type=law" target="_blank">здесь</a></b><br/><br/>
 
 		<template v-if="user.level < 3">

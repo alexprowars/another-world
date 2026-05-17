@@ -1079,10 +1079,6 @@ p.message {
 	margin-left: -70px;
 }
 
-.table.vertical td {
-	vertical-align: middle;
-}
-
 .btn {
 	padding: 5px 12px;
 	font-size: 12px;

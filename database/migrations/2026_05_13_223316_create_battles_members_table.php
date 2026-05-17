@@ -15,7 +15,16 @@ return new class extends Migration {
 			$table->timestamp('finished_at')->nullable();
 			$table->timestamp('died_at')->nullable();
 			$table->unsignedInteger('damage')->default(0);
-			$table->smallInteger('exp');
+			$table->smallInteger('exp')->default(0);
+			$table->smallInteger('wait')->default(0);
+			$table->smallInteger('blocks')->default(0);
+			$table->smallInteger('hits')->default(0);
+			$table->smallInteger('hp')->default(0);
+			$table->smallInteger('crits')->default(0);
+			$table->smallInteger('parry')->default(0);
+			$table->smallInteger('spirit')->default(0);
+			$table->smallInteger('ability')->nullable();
+			$table->smallInteger('time')->default(0);
 			$table->timestamps();
 		});
 	}

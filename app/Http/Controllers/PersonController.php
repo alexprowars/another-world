@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Facades\Vars;
+use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
-use App\Models\Level;
 use App\Services\InventoryService;
-use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PersonController extends Controller
@@ -17,8 +14,6 @@ class PersonController extends Controller
 	public function index()
 	{
 		return Inertia::render('Person/Index');
-
-		//$this->tag->prependTitle('Персонаж');
 	}
 
 	public function inventory(Request $request)
@@ -252,64 +247,68 @@ class PersonController extends Controller
 		$this->view->setVar('anketa', $info);
 	}
 
-	public function priemAction()
+	public function abilities(Request $request)
 	{
 		$message = '';
 
-		/**
-		 * @var array $priem_full
-		 */
-		include(ROOT_PATH . '/app/library/Battle/vars.php');
+		/** @var array $priem_full */
+		include(resource_path('/data/battle.php'));
 
-		$onset_priem = $this->request->getQuery('onset_priem', 'int', 0);
-		$unset_priem = $this->request->getQuery('unset_priem', 'int', 0);
+		$priem_full = array_filter(
+			$priem_full,
+			fn(array $ab) => $ab['level'] <= $this->user->level
+		);
 
-		$active = $this->db->query("SELECT * FROM game_users_priems WHERE user_id = " . $this->user->getId() . "")->fetch();
+		$active = $this->user->abilities()
+			->pluck('ability', 'slot');
 
-		if (!isset($active['id'])) {
-			$this->db->query("INSERT INTO game_users_priems SET user_id = " . $this->user->getId() . "");
-		}
-
-		if ($onset_priem > 0) {
-			if (!$priem_full[$onset_priem]) {
-				$message = "Такого приёма не существует";
+		if ($onset = $request->integer('onset')) {
+			if (!$priem_full[$onset]) {
+				throw new Exception('Такого приёма не существует');
 			}
-			if ($this->user->level < $priem_full[$onset_priem]['level']) {
-				$message = "Уровень слишком мал!";
-			} else {
-				$slot = 1;
 
-				for ($i = 1; $i <= 10; $i++) {
-					if (!$active[$i]) {
-						$slot = $i;
-						break;
-					}
+			if ($this->user->level < $priem_full[$onset]['level']) {
+				throw new Exception('Уровень слишком мал!');
+			}
+
+			$slot = 1;
+
+			for ($i = 1; $i <= 10; $i++) {
+				if (!isset($active[$i])) {
+					$slot = $i;
+					break;
 				}
-
-				$active[$slot] = $onset_priem;
-
-				$this->db->query("UPDATE game_users_priems SET `" . $slot . "` = '" . $onset_priem . "' WHERE user_id = " . $this->user->getId() . "");
 			}
+
+			$this->user->abilities()
+				->updateOrCreate(['slot' => $slot], [
+					'ability' => $onset,
+				]);
+
+			return back();
 		}
 
-		if ($unset_priem > 0) {
-			if ($unset_priem > 10) {
-				$message = "Неправильный ввод данных";
-			} else {
-				$this->db->query("UPDATE game_users_priems SET `" . $unset_priem . "` = '0' WHERE user_id = " . $this->user->getId() . "");
-				$active[$unset_priem] = 0;
+		if ($unset = $request->integer('unset')) {
+			if ($unset > 10) {
+				throw new Exception('Неправильный ввод данных');
 			}
+
+			$this->user->abilities()->where('slot', $unset)
+				->delete();
+
+			return back();
 		}
 
 		foreach ($priem_full as $k => $v) {
-			if (in_array($k, $active)) {
+			if ($active->contains($k)) {
 				$priem_full[$k]['onset'] = 'Y';
 			}
 		}
 
-		$this->view->setVar('message', $message);
-		$this->view->setVar('priems', $active);
-		$this->view->setVar('priem_full', $priem_full);
+		return Inertia::render('Person/Abilities', [
+			'items' => $priem_full,
+			'active' => $active,
+		]);
 	}
 
 	public function workAction()

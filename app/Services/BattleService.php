@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Engine\Battle\BattleStatus;
+use App\Engine\Battle\BattleType;
 use App\Exceptions\Exception;
 use App\Models\Battle;
 use App\Models\BattleMember;
@@ -98,8 +100,8 @@ class BattleService
 				->member()->associate($member)
 				->save();
 
-			$battle->type = 2;
-			$battle->status = 'active';
+			$battle->type = BattleType::GROUP;
+			$battle->status = BattleStatus::ACTIVE;
 			$battle->save();
 
 			$user->battle()->associate($battle);
@@ -108,9 +110,9 @@ class BattleService
 			$battle = new Battle();
 			$battle->started_at = now();
 			$battle->round_at = now();
-			$battle->type = 1;
+			$battle->type = BattleType::DUEL;
 			$battle->timeout = 180;
-			$battle->status = 'active';
+			$battle->status = BattleStatus::ACTIVE;
 			$battle->save();
 
 			$memberUser = $battle->members()->create([
@@ -165,7 +167,7 @@ class BattleService
 			throw new Exception('Вы слишком ослаблены для поединка, подлечитесь!');
 		}
 
-		if ($battle->type == 1) {
+		if ($battle->type == BattleType::DUEL) {
 			$battle->loadMissing(['members', 'members.user']);
 
 			switch ($battle->members->count()) {
@@ -196,7 +198,7 @@ class BattleService
 				default:
 					throw new Exception('Боец отозвал заявку или её не существует!');
 			}
-		} elseif ($battle->type == 2) {
+		} elseif ($battle->type == BattleType::GROUP) {
 			if ($user->level < 2) {
 				throw new Exception('Извините, групповые бои с 2-ого уровня');
 			}
@@ -243,7 +245,7 @@ class BattleService
 				'side' => $side,
 				'exp' => self::getBaseLevelExp($user->level),
 			]);
-		} elseif ($battle->type == 3) {
+		} elseif ($battle->type == BattleType::CHAOS) {
 			if ($user->level < 3) {
 				throw new Exception('Извините, хаотические бои с 3-ого уровня');
 			} else {

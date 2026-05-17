@@ -3,7 +3,7 @@
 		<img :src="image" :class="{ 'cursor-pointer': isEdit }" :width="width" :height="height" :alt="title" @click.prevent="unsetItem()">
 
 		<template #content>
-			<div class="w-[170px] text-xs">
+			<div class="max-w-40 text-xs">
 				<template v-if="item">
 					<div class="it text-center"><b>{{ item.title }}</b></div>
 					<div v-if="item.engraving" class="it">

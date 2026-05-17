@@ -1,11 +1,11 @@
 <template>
 	<div class="frame">
-		<div class="border left"></div>
+		<div class="frame-border left"></div>
 		<div class="content">
 			<div class="top">
 				<Header/>
 				<div class="mainFrame">
-					<div class="w-full max-w-400 pb-10 h-fit">
+					<div class="w-full max-w-400 pb-10 mt-2 mx-5 h-fit">
 						<slot/>
 					</div>
 				</div>
@@ -91,7 +91,7 @@
 			</div>
 			<div id="smiles" style="display:none"></div>
 		</div>
-		<div class="border right"></div>
+		<div class="frame-border right"></div>
 	</div>
 	<ModalsContainer />
 </template>
@@ -144,5 +144,38 @@
 			.listen('ChatPrivateMessage', ({ message }) => {
 				chat.addMessage(message);
 			})
+	}
+
+	var newbieCount = 0;
+	var newbieMessages = [];
+	newbieMessages[0] = 'Здравствуйте, вы попали в славный мир Another World. Я помогу вам освоиться здесь.';
+	newbieMessages[1] = 'Прежде всего вы должны распределить свободные параметры, такие как: сила, удача, ловкость и выносливость. Разум на нулевом уровне качать нет смысла. Чтобы увеличить параметры надо нажать на "Есть свободные статы!", и в появившемся окне, сделать выбор статов.';
+	newbieMessages[2] = 'Не спешите выбирать между энергией и выносливостью, т.к. этот выбор определит вашу будущую раскачку под мага или воина соответственно. Выбор можно сделать в любой момент.';
+	newbieMessages[3] = 'Теперь следует приобрести тренировочный нож за 2 золота, он значительно увеличит наносимый вами урон. Чтобы попасть в любое здание вначале надо нажать  кнопку "Город", расположенную в верхнем фрэйме, затем выбрать здание, в нашем случае "Магазин", он находится на "Торговой площади".';
+	newbieMessages[4] = 'Возращаемся на Арену и начинаем свой путь к первому уровню! Опыт игроки набирают в поединках, на нулевом уровне доступны физические поединки (1х1) и бои с вашим клоном в тренировочной комнате. В бою вы можете сделать 1 удар и поставить 1 блок (без щита).';
+	newbieMessages[5] = 'Удачи вам, на этом не лёгком пути к славе и победам.';
+
+	if (user.value.exp === 0) {
+		setTimeout(() => newbieSend(), 30000);
+	}
+
+	function newbieSend() {
+		if (typeof newbieMessages[newbieCount] != 'undefined') {
+
+			chat.addMessage({
+				date: new Date(),
+				user: 'Коментатор',
+				tou: [],
+				toi: [],
+				text: newbieMessages[newbieCount],
+				private: true,
+				me: true,
+				my: false,
+			});
+
+			setTimeout(newbieSend, 45000);
+
+			newbieCount++;
+		}
 	}
 </script>

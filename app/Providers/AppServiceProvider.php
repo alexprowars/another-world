@@ -2,19 +2,19 @@
 
 namespace App\Providers;
 
-use App\Facades\Vars;
-use App\Factories\PlanetServiceFactory;
 use App\Http\PageResponseFactory;
-use App\Services\GalaxyService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Inertia\ExceptionResponse;
+use Inertia\Inertia;
 use Inertia\ResponseFactory;
 
 class AppServiceProvider extends ServiceProvider
@@ -58,6 +58,34 @@ class AppServiceProvider extends ServiceProvider
 
 			DB::prohibitDestructiveCommands();
 		}
+
+		Inertia::disableSsr(function () {
+			$path = request()->path();
+
+			if ($path == '/' || str_starts_with($path, 'info/')) {
+				return false;
+			}
+
+			return true;
+		});
+
+		Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
+			if ($response->response instanceof JsonResponse) {
+				return $response;
+			}
+
+			if (in_array($response->statusCode(), [403, 404, 500, 503])) {
+				return $response->render(
+					'ErrorPage',
+					array_merge([
+						'status' => $response->statusCode(),
+						'message' => $response->exception->getMessage(),
+					], !app()->isProduction() ? ['trace' => $response->exception->getTraceAsString()] : [])
+				);
+			}
+
+			return $response;
+		});
 
 		/*\DB::listen(function ($query) {
 			dump($query);

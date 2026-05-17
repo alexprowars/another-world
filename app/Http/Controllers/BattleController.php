@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Battle;
+use App\Engine\Battle\Battle;
 use App\Http\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

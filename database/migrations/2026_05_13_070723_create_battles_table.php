@@ -15,6 +15,7 @@ return new class extends Migration {
 			$table->timestamp('round_at')->nullable();
 			$table->smallInteger('timeout')->default(60);
 			$table->boolean('use_weapons')->default(true);
+			$table->tinyInteger('result')->nullable();
 			$table->boolean('is_blood')->default(false);
 			$table->enum('status', ['waiting', 'active', 'finished', 'cancelled'])->default('waiting');
 			$table->string('comment')->nullable();

@@ -1,5 +1,5 @@
 <template>
-	<table class="parameters" width="100%" style="width:100%;border:solid #e1d0b0 1.5pt;" bgcolor=efdcb8>
+	<table class="parameters text-sm" width="100%" style="width:100%;border:solid #e1d0b0 1.5pt;" bgcolor=efdcb8>
 		<tbody>
 		<tr>
 			<td class="tc_b">Уровень:</td>
@@ -101,78 +101,76 @@
 		</tr>
 		<tr>
 			<td>Физ.урон</td>
-			<td align="right" class="text-nowrap">
-				<small>{{ player.damage_min }} - {{ player.damage_max }}</small>
+			<td align="right" class="text-nowrap text-xs font-bold">
+				{{ player.damage_min }} - {{ player.damage_max }}
 			</td>
 		</tr>
 		<tr>
 			<td>Маг.урон</td>
-			<td align="right" class="text-nowrap">
-				<small>{{ player.magic_min }} - {{ player.magic_max }}</small>
+			<td align="right" class="text-nowrap text-xs font-bold">
+				{{ player.magic_min }} - {{ player.magic_max }}
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center">Броня:</td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center" class="text-nowrap">
-				<small>
-					<b title="Броня головы">{{ player.armor1 }}</b>/<b title="Броня груди">{{ player.armor2 }}</b>/<b title="Броня живота">{{ player.armor3 }}</b>/<b title="Броня пояса">{{ player.armor4 }}</b>/<b title="Броня ног">{{ player.armor5 }}</b>
-				</small>
+			<td colspan="2" align="center" class="text-nowrap text-xs font-bold">
+				<span title="Броня головы">{{ player.armor1 }}</span>/<span title="Броня груди">{{ player.armor2 }}</span>/<span title="Броня живота">{{ player.armor3 }}</span>/<span title="Броня пояса">{{ player.armor4 }}</span>/<span title="Броня ног">{{ player.armor5 }}</span>
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Крит:</td>
-			<td align="right">
-				<small><b>{{ player.krit }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.krit }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Мощн.крита:</td>
-			<td align="right">
-				<small><b>{{ player.mkrit }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.mkrit }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Антикрит:</td>
-			<td align="right">
-				<small><b>{{ player.unkrit }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.unkrit }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Уворот:</td>
-			<td align="right">
-				<small><b>{{ player.uv }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.uv }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Антиуворот:</td>
-			<td align="right">
-				<small><b>{{ player.unuv }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.unuv }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Проб.блока:</td>
-			<td align="right">
-				<small><b>{{ player.pblock }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.pblock }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Мощн.блока:</td>
-			<td align="right">
-				<small><b>{{ player.mblock }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.mblock }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Проб.брони:</td>
-			<td align="right">
-				<small><b>{{ player.pbr }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.pbr }}
 			</td>
 		</tr>
 		<tr>
 			<td width="40">Крепк.брони:</td>
-			<td align="right">
-				<small><b>{{ player.kbr }}</b></small>
+			<td align="right" class="text-xs font-bold">
+				{{ player.kbr }}
 			</td>
 		</tr>
 		</tbody>

@@ -2,44 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Game\Controller;
+use App\Exceptions\Exception;
+use App\Http\Controller;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Throwable;
 
-/**
- * @RoutePrefix("/avatar")
- * @Route("/")
- * @Route("/{action}/")
- * @Route("/{action}{params:(/.*)*}")
- * @Private
- */
 class AvatarController extends Controller
 {
-	public function initialize ()
+	public function index(Request $request)
 	{
-		$this->tag->setTitle('Установка образа');
+		if ($request->has('image')) {
+			try {
+				if ($this->user->image) {
+					throw new Exception('Вы не можете установить образ!');
+				}
 
-		parent::initialize();
-	}
+				$image = $request->integer('image');
 
-    public function index()
-    {
-		$message = '';
-
-		if ($this->request->hasQuery('setimg'))
-		{
-			if ($this->user->level < 8 && $this->user->obraz == '0')
-			{
-				if (is_numeric($this->request->getQuery('setimg')) && (intval($_GET['setimg']) > 0 && $this->request->getQuery('setimg', 'int') < 6))
-				{
-					$this->user->obraz = "obraz/".$this->user->sex."/".$this->request->getQuery('setimg', 'int');
+				if ($image && $image < 6) {
+					$this->user->image = 'images/' . ($this->user->gender == 'F' ? 2 : 1) . '/' . $image . '.png';
 					$this->user->update();
 
-					$message = "Образ установлен!";
+					throw new Exception('Образ установлен!');
 				}
+			} catch (Throwable $e) {
+				Inertia::flash(['message' => $e->getMessage()]);
+
+				return back();
 			}
-			else
-				$message = "Вы не можете установить образ!";
 		}
 
-		$this->view->setVar('message', $message);
+		return Inertia::render('Person/Avatar', [
+			'images' => [1, 2, 3, 4, 5],
+		]);
 	}
 }

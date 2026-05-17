@@ -13,7 +13,7 @@
 							{{ message }}
 						</div>
 
-						<div class="flex flex-col items-center gap-5 m-4">
+						<div class="flex flex-col items-center gap-2 m-4 mt-2">
 							<div v-if="data.action === 'finishBattle'" class="text-red-600 font-bold">
 								<div>
 									Ваш бой окончен.
@@ -33,14 +33,13 @@
 							</div>
 
 							<template v-if="data.action === 'impactForm' && !isFinished">
-								<BattleImpactForm
-									ref="impactForm"
+								<BattleImpactForm ref="impactForm"
 									v-model:auto="autoGo"
 									:blocks-count="data.blocks"
 									:impacts-count="data.kicks"
 									@complete="gofight"
 								/>
-								<BattlePriems :priems="data.priems || []" @use="usePriem"/>
+								<BattleAbilities :abilities="data.abilities || null" @use="useAbility"/>
 							</template>
 						</div>
 
@@ -48,15 +47,20 @@
 							<img src="/assets/images/refresh.gif" alt="">
 						</div>
 
+						<div v-show="!isFinished" class="text-center mt-4">
+							До тайм-аута: <b>{{ timeoutText }}</b>
+							<hr color="e2e0e0">
+						</div>
+
 						<div v-if="!isFinished" class="flex justify-center gap-4">
 							<div class="text-center">
 								<input type="button" value="Ударить" class="standbut" @click="gofight">
 							</div>
-							<div class="text-center battle-change">
+							<div v-if="data.opponents.length > 1" class="text-center battle-change">
 								<input type="button" value="Сменить" class="standbut" @click="toggleEnemyList">
 								<div v-if="showEnemyList" id="oMen" class="battle-change__menu">
 									<div class="battle-change__title">Выберите противника:</div>
-									<div v-for="opponent in data.opponents" :key="enemy.id" class="battle-change__item">
+									<div v-for="opponent in data.opponents" :key="opponent.id" class="battle-change__item">
 										<a class="menuItem" href="" @click.prevent="selectEnemy(opponent.id)">{{ opponent.name }}</a>
 									</div>
 								</div>
@@ -76,9 +80,6 @@
 				</div>
 
 				<div v-show="!isFinished" class="text-center mt-4">
-					До тайм-аута:
-					<b>{{ timeoutText }}</b>
-					<hr color="e2e0e0">
 					<b>Полный лог боя <a :href="'/logs/' + page.id" target="_blank"> тут</a></b>
 					<hr color="e2e0e0">
 				</div>
@@ -104,7 +105,7 @@
 	import BattleFighter from '~/components/Battle/BattleFighter.vue';
 	import BattleImpactForm from '~/components/Battle/BattleImpactForm.vue';
 	import BattleLogs from '~/components/Battle/BattleLogs.vue';
-	import BattlePriems from '~/components/Battle/BattlePriems.vue';
+	import BattleAbilities from '~/components/Battle/BattleAbilities.vue';
 	import BattleUsers from '~/components/Battle/BattleUsers.vue';
 
 	defineProps({
@@ -164,7 +165,7 @@
 		try {
 			const result = await useHttp({
 				lastLogId: lastLogId.value || 0,
-				smena: selectedEnemy.value || 0,
+				opponent: selectedEnemy.value || 0,
 				...extra,
 			}).get('/battle');
 
@@ -175,8 +176,8 @@
 		}
 	}
 
-	async function usePriem(id) {
-		await refresh({ use_priem: id });
+	async function useAbility(id) {
+		await refresh({ ability: id });
 		clearTimeout(refreshTimer);
 		refreshTimer = setTimeout(loaderRefresh, 45000);
 	}

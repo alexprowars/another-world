@@ -1,5 +1,6 @@
 <?php
 
+use App\Engine\Battle\BattleStatus;
 use App\Models\Battle;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +12,7 @@ $room = request()->integer('room');
 
 if ($room == 23 || $room == 2 || $room == 8) {
 	$existBattleRequest = Battle::query()
-		->where('type', 'request')
+		->where('status', BattleStatus::WAITING)
 		->whereHas('members', function (Builder $query) {
 			$query->whereBelongsTo($this->user);
 		})

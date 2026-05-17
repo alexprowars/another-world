@@ -6,11 +6,13 @@ use App\Exceptions\Exception;
 use App\Facades\Vars;
 use App\Locale;
 use App\Models\Effect;
+use App\Models\Referal;
 use App\Models\User;
 use App\Notifications\UserRegistrationNotification;
 use App\Settings;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -33,6 +35,18 @@ class UserService
 
 		if (!$user->id) {
 			throw new Exception('create user error');
+		}
+
+		if (Session::has('ref')) {
+			$refer = User::query()->whereKeyNot($user)
+				->findOne((int) Session::get('ref'));
+
+			if ($refer) {
+				Referal::insert([
+					'referal_id' => $user->id,
+					'user_id' => $refer->id,
+				]);
+			}
 		}
 
 		$settings = app(Settings::class);
@@ -63,7 +77,7 @@ class UserService
 		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->battery + $user->power - 14;
 		$b = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
 
-		return round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
+		return (int) round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
 	}
 
 	public static function getCuredHealth(User $user): float

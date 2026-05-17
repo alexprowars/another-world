@@ -524,3 +524,9 @@ a.fm_n:hover {
 	margin: 5px 0;
 	border: 1px solid #d8ad83;
 }
+
+.v-popper__popper.v-popper--theme-tooltip .v-popper__inner {
+	font-size: 14px;
+	padding: 4px 8px 4px;
+	border-radius: 4px;
+}
