@@ -22,6 +22,8 @@ class InventoryItemResource extends JsonResource
 			'wearout' => $this->wearout,
 			'wearout_max' => $this->wearout_max,
 			'price' => $this->price,
+			'price_type' => $this->price_type,
+			'price_sell' => $this->getSellPrice(),
 			'about' => $this->about,
 			'strength' => $this->strength,
 			'dexterity' => $this->dexterity,

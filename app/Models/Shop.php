@@ -11,9 +11,9 @@ class Shop extends Model
 	protected $guarded = [];
 	public $timestamps = false;
 
-	/** @return HasMany<ShopItems, $this> */
+	/** @return HasMany<ShopItem, $this> */
 	public function items(): HasMany
 	{
-		return $this->hasMany(ShopItems::class, 'shop_id');
+		return $this->hasMany(ShopItem::class, 'shop_id');
 	}
 }

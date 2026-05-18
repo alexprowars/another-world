@@ -17,12 +17,10 @@ class UserSeed extends Seeder
 				'password' 	=> 'password',
 			]);
 
-			$user->moneys = 500;
+			$user->gold = 500;
 			$user->credits = 200;
-			$user->rank = 99;
+			$user->rank = 100;
 			$user->save();
-
-			$user->assignRole('admin');
 		}
 	}
 }

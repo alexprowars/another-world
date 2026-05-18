@@ -4,7 +4,7 @@
 		<div class="whitespace-nowrap bg-repeat-x flex items-center text-white text-sm" style="background-image: url('/assets/images/main/cp.jpg')">
 			<div>
 				У вас с собой денег:
-				<span class="text-[#ede2be]">{{ user.moneys }} зол.</span>
+				<span class="text-[#ede2be]">{{ user.gold }} зол.</span>
 				|
 				<span class="text-[#ede2be]">{{ user.credits }} пл.</span>
 			</div>

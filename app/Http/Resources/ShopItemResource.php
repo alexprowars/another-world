@@ -22,7 +22,7 @@ class ShopItemResource extends JsonResource
 
 		return [
 			'id' => $this->resource->id,
-			'count' => $this->resource->count,
+			'stock' => $this->resource->stock,
 			'delivery' => $this->resource->delivery,
 			'item' => [
 				'id' => $item->id,

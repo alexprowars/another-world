@@ -13,6 +13,7 @@ return new class extends Migration {
 			$table->string('code', 50);
 			$table->string('title', 150);
 			$table->decimal('price', 12)->default(0);
+			$table->tinyInteger('price_type')->default(0);
 			$table->boolean('artifact')->default(false);
 			$table->boolean('second')->default(false);
 			$table->unsignedSmallInteger('wearout')->default(0);

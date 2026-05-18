@@ -129,7 +129,7 @@ class Item extends Model
 
 	public function formatStat($value)
 	{
-		return ($value > 0 ? '+' . $value : '');
+		return $value > 0 ? '+' . $value : '';
 	}
 
 	public function isSecondHand()
@@ -142,7 +142,7 @@ class Item extends Model
 		if ($this->credits > 0) {
 			return round($this->credits * 0.67, 2);
 		} else {
-			return round($this->price * 0.85, 2);
+			return round($this->gold * 0.85, 2);
 		}
 	}
 }

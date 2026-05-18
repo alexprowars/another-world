@@ -1,9 +1,7 @@
 <template>
-	<CityHeader title="Бесплатные образы"/>
+	<CityHeader :title="title"/>
 	<div class="textblock">
-		<div v-if="page.flash.message" class="p-4 mb-4 bg-red-100 text-red-600 text-center">
-			{{ page.flash.message }}
-		</div>
+		<div v-if="page.flash.message" class="p-4 mb-4 bg-red-100 text-red-600 text-center" v-html="page.flash.message"></div>
 
 		<slot/>
 	</div>

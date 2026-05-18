@@ -167,28 +167,4 @@ class Controller extends PhalconController
 
 		return true;
     }
-
-	public function message ($text, $title = '', $redirect = '', $timeout = 5)
-	{
-		$this->view->pick('shared/message');
-		$this->view->setVar('text', $text);
-		$this->view->setVar('title', $title);
-
-		if ($redirect != '')
-			$this->view->setVar('destination', $this->url->getBaseUri().ltrim($redirect, '/'));
-		else
-			$this->view->setVar('destination', '');
-
-		$this->view->setVar('time', $timeout);
-
-		$this->tag->setTitle(($title ? strip_tags($title) : 'Сообщение'));
-
-		$this->view->start();
-		$this->view->render('error', 'index');
-		$this->view->finish();
-
-		echo $this->view->getContent();
-
-		die();
-	}
 }

@@ -29,21 +29,6 @@ class Game extends Component
 	private $data = [];
 	public $tutorial = [];
 
-	public function addToLog ($userId, $action = '', $item = '', $place = '')
-	{
-		$this->db->insertAsDict(
-			"game_log_items",
-			array
-			(
-				'user_id'	=> $userId,
-				'action'	=> $action,
-				'item'		=> $item,
-				'time'		=> time(),
-				'place'		=> $place,
-			)
-		);
-	}
-
 	public function useMagic ($objectId, $user)
 	{
 		$message = '';

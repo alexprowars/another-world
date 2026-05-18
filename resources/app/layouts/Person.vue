@@ -9,8 +9,8 @@
 				<Parameters :player="user"/>
 			</td>
 			<td valign="top">
-				<div v-if="page.message" class="text-center">
-					<span style="color:red"><b v-html="page.message"></b></span>
+				<div v-if="page.flash.message" class="p-4 mb-4 bg-red-100 text-red-600 text-center">
+					{{ page.flash.message }}
 				</div>
 				<div class="personMenu">
 					<table>
@@ -38,16 +38,13 @@
 </template>
 
 <script setup>
-	import { Head, Link } from '@inertiajs/vue3';
+	import { Head, Link, usePage } from '@inertiajs/vue3';
 	import PersonView from '../components/PersonView.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import Parameters from '~/components/Person/Parameters.vue';
 
-	defineProps({
-		page: Object,
-	});
-
+	const page = usePage();
 	const state = useState();
 	const user = computed(() => state.user);
 </script>

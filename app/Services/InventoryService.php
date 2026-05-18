@@ -19,7 +19,8 @@ class InventoryService
 		$object->fill([
 			'code' => $item->code,
 			'title' => $item->title,
-			'price' => $item->price,
+			'price' => $item->credits > 0 ? $item->credits : $item->gold,
+			'price_type' => $item->credits > 0 ? 1 : 0,
 			'artifact' => $item->artifact,
 			'wearout' => 0,
 			'wearout_max' => $item->wearout,

@@ -8,6 +8,7 @@ use App\Http\Resources\InventoryItemResource;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Throwable;
 
 class PersonController extends Controller
 {
@@ -69,13 +70,11 @@ class PersonController extends Controller
 
 	public function updates(Request $request)
 	{
-		$msg = '';
-
 		$update = $request->post('update');
 
 		if (!empty($update)) {
 			if ($this->user->updates > 0) {
-				$st_name = '';
+				$st_name = null;
 
 				switch ($update) {
 					case 'strength':
@@ -104,21 +103,19 @@ class PersonController extends Controller
 						break;
 				}
 
-				if ($st_name != '') {
+				if ($st_name) {
 					$this->user->updates--;
 					$this->user->{'s_' . $st_name}++;
 					$this->user->update();
 
-					$msg = 'Удачно увеличили физический параметр "' . __('stats. ' . $st_name) . '"!';
+					flash('Удачно увеличили физический параметр "' . __('stats.' . $st_name) . '"!');
 				}
 			} else {
-				$msg = 'У Вас нет свободных увеличений!';
+				flash('У Вас нет свободных увеличений!');
 			}
 		}
 
-		return Inertia::render('Person/Updates', [
-			'message' => $msg,
-		]);
+		return Inertia::render('Person/Updates');
 	}
 
 	public function friendsAction()
@@ -262,41 +259,45 @@ class PersonController extends Controller
 		$active = $this->user->abilities()
 			->pluck('ability', 'slot');
 
-		if ($onset = $request->integer('onset')) {
-			if (!$priem_full[$onset]) {
-				throw new Exception('Такого приёма не существует');
-			}
-
-			if ($this->user->level < $priem_full[$onset]['level']) {
-				throw new Exception('Уровень слишком мал!');
-			}
-
-			$slot = 1;
-
-			for ($i = 1; $i <= 10; $i++) {
-				if (!isset($active[$i])) {
-					$slot = $i;
-					break;
+		try {
+			if ($onset = $request->integer('onset')) {
+				if (!$priem_full[$onset]) {
+					throw new Exception('Такого приёма не существует');
 				}
+
+				if ($this->user->level < $priem_full[$onset]['level']) {
+					throw new Exception('Уровень слишком мал!');
+				}
+
+				$slot = 1;
+
+				for ($i = 1; $i <= 10; $i++) {
+					if (!isset($active[$i])) {
+						$slot = $i;
+						break;
+					}
+				}
+
+				$this->user->abilities()
+					->updateOrCreate(['slot' => $slot], [
+						'ability' => $onset,
+					]);
+
+				return back();
 			}
 
-			$this->user->abilities()
-				->updateOrCreate(['slot' => $slot], [
-					'ability' => $onset,
-				]);
+			if ($unset = $request->integer('unset')) {
+				if ($unset > 10) {
+					throw new Exception('Неправильный ввод данных');
+				}
 
-			return back();
-		}
+				$this->user->abilities()->where('slot', $unset)
+					->delete();
 
-		if ($unset = $request->integer('unset')) {
-			if ($unset > 10) {
-				throw new Exception('Неправильный ввод данных');
+				return back();
 			}
-
-			$this->user->abilities()->where('slot', $unset)
-				->delete();
-
-			return back();
+		} catch (Throwable $e) {
+			flash($e->getMessage());
 		}
 
 		foreach ($priem_full as $k => $v) {

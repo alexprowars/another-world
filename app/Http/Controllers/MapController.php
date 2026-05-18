@@ -2,35 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Map;
 use App\Exceptions\Exception;
 use App\Http\Controller;
-use App\Http\Controllers\Map\City\StreetController;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
 {
 	public function index(Request $request)
 	{
-		$user = $request->user();
-
-		if ($request->has('refer')) {
-			if ($user->r_date || $user->r_type) {
-				throw new Exception('Нельзя перемещаться по городу пока занят работой');
-			}
-
-			$refer = $request->integer('refer');
-
-			if ($refer != $user->room) {
-				throw new Exception('Типа читанул?');
-			}
-
-			$this->setRoom($refer);
-		}
-
-		return $this->checkRoom($user->room);
+		return $this->checkRoom($request->user()->room);
 	}
 
-	private function setRoom($oldRoom)
+	public function change(int $roomId)
+	{
+		$user = auth()->user();
+
+		if ($user->r_date || $user->r_type) {
+			throw new Exception('Нельзя перемещаться по городу пока занят работой');
+		}
+
+		if ($roomId != $user->room) {
+			throw new Exception('Типа читанул?');
+		}
+
+		$this->setRoom($roomId);
+
+		return back();
+	}
+
+	protected function setRoom($oldRoom)
 	{
 		$new_room = 0;
 
@@ -99,18 +100,15 @@ class MapController extends Controller
 		}
 	}
 
-	public function checkRoom($roomId)
+	protected function checkRoom($roomId)
 	{
 		switch ($roomId) {
 			case 1:
-				return include(app_path('/includes/city/city.php'));
-				break; // Арена
+				return new Map\Arena\City()();
 			case 2:
-				return to_route('map.arena.training');
-				return include(app_path('/includes/city/city_1/trening.php'));
-				break; // Тренировочная
+				return new Map\Arena\Training()();
 			case 7:
-				return to_route('map.city.shop');
+				return new Map\Shop()();
 			case 8:
 				return include(app_path('/includes/city/city_1/ambulance.php'));
 				break; // Больница
@@ -166,20 +164,16 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/prison.php'));
 				break; // Тюрьма
 			case 101:
-				return to_route('map.city.street', [1]);
 			case 103:
-				return to_route('map.city.street', [2]);
 			case 104:
-				return to_route('map.city.street', [3]);
-			case 23:
-				return to_route('map.city.street', [4]);
 			case 105:
-				return to_route('map.city.street', [5]);
+			case 23:
+				return new Map\Street()();
 			default:
 				if ($this->user->room >= 200 && $this->user->room <= 370) {
 					return include(app_path('/includes/city/city_1/vault.php'));
 				} else {
-					return include(app_path('/includes/city/city.php'));
+					return new Map\Arena\City()();
 				}
 		}
 	}

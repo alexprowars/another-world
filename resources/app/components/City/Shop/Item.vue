@@ -10,17 +10,17 @@
 						<a href="" @click.prevent="buyItem"><b>Купить</b></a>
 					</template>
 					<template v-if="type === 2">
-						<a href='javascript:;' onclick="present({{ object.shop.id }});">Выгравировать надпись за 150 зол.</a><br><br>
+						<a href='javascript:;' onclick="present(object.shop.id)">Выгравировать надпись за 150 зол.</a><br><br>
 
-						<a v-if="user.profession === 2" href="{{ url('map/') }}?otdel={{ otdel }}&act=upgrade&id={{ object.shop.id }}">Увеличить урон предмета за 50 пл.<br>(мин +1 и мах +1)<br>(<i>Максимальная долговечноть -20</i>)</a>
+						<a v-if="user.profession === 2" href="/map/?otdel={ otdel }&act=upgrade&id={ object.shop.id }">Увеличить урон предмета за 50 пл.<br>(мин +1 и мах +1)<br>(<i>Максимальная долговечноть -20</i>)</a>
 						<font v-else color=red><b>Перековать может только Кузнец</b></font>
 					</template>
 					<template v-if="type === 3">
-						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Починить этот предмет за {{ t_price }} зол.?', 'load(\'/map/?otdel={{ otdel }}&iznos={{ object.shop.id }}\')')"><b>Починить весь предмет</b></a><br>
-						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Починить за {{vip }} зол.?', 'load(\'/map/?otdel={{ otdel }}&iznos1={{ object.shop.id }}\')')"><b>Починить 1 ед.</b></a>
+						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Починить этот предмет за { t_price } зол.?', 'load(\'/map/?otdel={ otdel }&iznos={ object.shop.id }\')')"><b>Починить весь предмет</b></a><br>
+						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Починить за {vip } зол.?', 'load(\'/map/?otdel={ otdel }&iznos1={ object.shop.id }\')')"><b>Починить 1 ед.</b></a>
 					</template>
 					<template v-if="type === 4">
-						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Вы действительно хотите огранить &quot;{{ object.item.title }}&quot; ?', 'load(\'/map/?otdel={{ otdel }}&ogran={{ object.shop.id }}\')')"><b>Огранить</b></a><br>
+						<a href="#" onclick="confirmDialog('Подтвердите действие', 'Вы действительно хотите огранить &quot;{ object.item.title }&quot; ?', 'load(\'/map/?otdel={ otdel }&ogran={ object.shop.id }\')')"><b>Огранить</b></a><br>
 					</template>
 				</td>
 				<td>
@@ -47,7 +47,7 @@
 							Затраты маны: <i>{{ item.item.mana }}</i>
 						</div>
 						<div>
-							Остаток на складе: <b>{{ item.count }}</b>
+							Остаток на складе: <b>{{ item.stock }}</b>
 						</div>
 						<div v-if="item.delivery">
 							Завоз: <b>{{ item.delivery }}</b>.

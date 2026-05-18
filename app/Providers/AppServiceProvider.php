@@ -94,10 +94,6 @@ class AppServiceProvider extends ServiceProvider
 
 	public function register()
 	{
-		if (!str_starts_with(request()->path(), 'api') || isset($_SERVER['LARAVEL_OCTANE'])) {
-			$this->app->register(AdminPanelProvider::class);
-		}
-
 		$this->app->singleton(ResponseFactory::class, PageResponseFactory::class);
 	}
 }

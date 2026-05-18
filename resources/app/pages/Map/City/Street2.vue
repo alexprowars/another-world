@@ -1,6 +1,5 @@
 <template>
-	<CityHeader title="Торговая Площадь"/>
-	<div class="textblock">
+	<ContentBlock title="Торговая Площадь">
 		<table class='ltable'>
 			<tr>
 				<td style="vertical-align: top">
@@ -53,12 +52,12 @@
 				</td>
 			</tr>
 		</table>
-	</div>
+	</ContentBlock>
 </template>
 
 <script setup>
-	import CityHeader from '~/components/CityHeader.vue';
 	import { Link } from '@inertiajs/vue3';
+	import ContentBlock from '~/components/ContentBlock.vue';
 
 	defineProps({
 		page: Object,

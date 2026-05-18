@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Map\City;
+namespace App\Engine\Map\Arena;
 
 use App\Exceptions\Exception;
-use App\Http\Controller;
 use App\Models\User;
 use App\Services\BattleService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class TrainingController extends Controller
+class Training
 {
-	public function index(Request $request)
+	public function __invoke()
 	{
+		$request = request();
+
 		if ($request->has('fight')) {
 			$enemy = User::findOne($request->integer('fight'));
 

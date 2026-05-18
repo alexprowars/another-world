@@ -11,7 +11,7 @@ return new class extends Migration {
 			$table->id();
 			$table->string('code', 50);
 			$table->string('title', 150);
-			$table->decimal('price', 12)->default(0);
+			$table->decimal('gold', 12)->default(0);
 			$table->decimal('credits', 12)->default(0);
 			$table->unsignedTinyInteger('type')->index();
 			$table->unsignedSmallInteger('slot1')->nullable();

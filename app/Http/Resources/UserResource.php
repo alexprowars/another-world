@@ -18,9 +18,9 @@ class UserResource extends JsonResource
 {
 	public function toArray($request): array
 	{
-		$photo = Cache::remember('media::user_' . $this->resource->id, 3600, function () {
-			return $this->resource->getFirstMediaUrl(conversionName: 'thumb');
-		});
+		//$photo = Cache::remember('media::user_' . $this->resource->id, 3600, function () {
+		//	return $this->resource->getFirstMediaUrl(conversionName: 'thumb');
+		//});
 
 		$user = $this->resource;
 
@@ -49,7 +49,7 @@ class UserResource extends JsonResource
 			'slots' => $user->getSlotsInfo(),
 			'exp' => $user->exp,
 			'profession' => $user->profession,
-			'moneys' => $user->moneys,
+			'gold' => $user->gold,
 			'credits' => $user->credits,
 			'updates' => $user->updates,
 			'tribe' => null,

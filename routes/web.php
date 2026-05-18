@@ -24,10 +24,7 @@ Route::middleware(['auth', 'game'])->group(function () {
 	Route::get('/chat/last', [Controllers\ChatController::class, 'last']);
 	Route::post('/chat/send', [Controllers\ChatController::class, 'send']);
 	Route::get('/chat/online', [Controllers\ChatController::class, 'online']);
-	Route::get('/map', [Controllers\MapController::class, 'index'])->name('map');
+	Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');
+	Route::get('/map/change/{room}', [Controllers\MapController::class, 'change']);
 	Route::get('/battle', [Controllers\BattleController::class, 'index'])->name('battle');
-
-	Route::get('/map/city/street/{id}', [Controllers\Map\City\StreetController::class, 'index'])->name('map.city.street');
-	Route::get('/map/city/shop', [Controllers\Map\City\ShopController::class, 'index'])->name('map.city.shop');
-	Route::match(['get', 'post'], '/map/arena/training', [Controllers\Map\City\TrainingController::class, 'index'])->name('map.arena.training');
 });

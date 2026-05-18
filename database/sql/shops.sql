@@ -4,7 +4,7 @@ INSERT INTO `shops` (`id`, `title`) VALUES
 (3, ''),
 (4, 'Магазин подарков');
 
-INSERT INTO `shops_items` (`id`, `shop_id`, `section_id`, `item_id`, `count`, `delivery`) VALUES
+INSERT INTO `shops_items` (`id`, `shop_id`, `section_id`, `item_id`, `stock`, `delivery`) VALUES
 (18, 1, 3, 7, 999, 0),
 (23, 1, 3, 5, 999, 0),
 (25, 1, 3, 2, 999, 0),

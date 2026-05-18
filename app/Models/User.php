@@ -5,9 +5,6 @@ namespace App\Models;
 use App\Facades\Vars;
 use App\Http\Resources\UserSlotItemResource;
 use App\Services\UserService;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasName;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,39 +14,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasName, HasMedia
+class User extends Authenticatable implements HasMedia
 {
-	use HasRoles;
 	use Notifiable;
 	use SoftDeletes;
 	use InteractsWithMedia;
 
 	private $auraInfo = array();
 	public $effects = 0;
-
-	private $isEdit = false;
-
-	public $tutorial;
-	public $sign;
-	public $obraz;
-	public $provin;
-	public $item_type;
-	public $b_tribe;
-	public $tribe_rank;
-
-	public $active;
-
-	public $invisible;
-	public $travma;
-	public $ma_time;
-	public $m_time;
-	public $ch_time;
-	public $f_time;
-	public $t_time;
-	public $immun;
-	public $t_level;
 
 	protected $calculated = false;
 	public $hp = 0;
@@ -170,12 +143,12 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 
 	public function isAdmin(): bool
 	{
-		return $this->hasRole('admin');
+		return $this->rank === 100;
 	}
 
 	public function isFree(): bool
 	{
-		return !$this->r_time;
+		return !$this->r_date;
 	}
 
 	public function isOnline(): bool
@@ -305,15 +278,5 @@ class User extends Authenticatable implements FilamentUser, HasName, HasMedia
 		}
 
 		return '/assets/images/avatar/1/' . ($this->gender === 'F' ? '2' : '1') . '.png';
-	}
-
-	public function canAccessPanel(Panel $panel): bool
-	{
-		return $this->id === 1 || $this->can('panel');
-	}
-
-	public function getFilamentName(): string
-	{
-		return $this->nickname;
 	}
 }

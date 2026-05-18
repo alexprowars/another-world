@@ -36,7 +36,7 @@
 		</tr>
 		<tr>
 			<td class="tc_r">Золото:</td>
-			<td class="tc_r" align="right">{{ player.moneys }}</td>
+			<td class="tc_r" align="right">{{ player.gold }}</td>
 		</tr>
 		<tr>
 			<td class="tc_r">Платина:</td>

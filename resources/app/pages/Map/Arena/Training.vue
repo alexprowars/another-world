@@ -1,8 +1,5 @@
 <template>
-	<CityHeader title="Тренировочный зал для новичков"/>
-	<div class="textblock">
-		<p v-if="page.message" class="message mb-4 bg-red-100 text-red-700">{{ page.message }}</p>
-
+	<ContentBlock title="Тренировочный зал для новичков">
 		<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 			<div class="flex max-w-150 flex-col gap-2 sm:flex-row sm:items-center">
 				<div class="shrink-0 sm:py-1 sm:pr-1">
@@ -16,7 +13,7 @@
 				<a href="/map" title="Обновить">
 					<img src="/assets/images/images/refresh.gif" alt="Обновить">
 				</a>
-				<a v-if="user.room === 2" href="/map?refer=2" title="Вернуться">
+				<a v-if="user.room === 2" href="/map/change/2" title="Вернуться">
 					<img src="/assets/images/images/back.gif" alt="Вернуться">
 				</a>
 			</div>
@@ -58,16 +55,16 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</ContentBlock>
 </template>
 
 <script setup>
-	import CityHeader from '~/components/CityHeader.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import Name from '~/components/Person/Name.vue';
 	import HpLine from '~/components/Person/HpLine.vue';
 	import { router } from '@inertiajs/vue3';
+	import ContentBlock from '~/components/ContentBlock.vue';
 
 	defineProps({
 		page: Object,

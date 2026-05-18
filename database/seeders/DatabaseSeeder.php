@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Item;
-use App\Models\Items;
 use App\Models\Level;
 use App\Models\Shop;
 use Illuminate\Database\Seeder;
@@ -50,8 +49,6 @@ class DatabaseSeeder extends Seeder
 			}
 		}
 
-		$this->call(PermissionSeed::class);
-		$this->call(RoleSeed::class);
 		$this->call(UserSeed::class);
 		$this->call(BotsSeed::class);
 	}

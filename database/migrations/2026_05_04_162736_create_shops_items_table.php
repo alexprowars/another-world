@@ -12,8 +12,8 @@ return new class extends Migration {
 			$table->foreignId('shop_id')->constrained('shops')->cascadeOnDelete();
 			$table->unsignedSmallInteger('section_id')->nullable()->index();
 			$table->foreignId('item_id')->constrained('items')->cascadeOnDelete();
-			$table->unsignedSmallInteger('count');
-			$table->unsignedSmallInteger('delivery');
+			$table->unsignedSmallInteger('stock')->default(0);
+			$table->unsignedSmallInteger('delivery')->default(0);
 			$table->timestamps();
 		});
 	}
