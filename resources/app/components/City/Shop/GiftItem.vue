@@ -4,14 +4,16 @@
 			<tr>
 				<td width="30%" align="center">
 					<div><img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title"></div>
-					<a href="" @click.prevent="sellItem" class="text-xs">
-						<b>Продать за {{ item.price_sell }} {{ item.price_type === 1 ? 'плт.' : 'зол.' }}</b>
+					<a href="" @click.prevent="giftItem">
+						<b>Подарить</b>
 					</a>
 				</td>
 				<td width="70%" valign="top" class="text-xs">
 					<div class="font-bold">{{ item.title }}</div>
 					<div>Гос. цена: <b>{{ item.price }}</b> зол.</div>
-					<div>Долговечность предмета: <b>{{ item.wearout }}</b>/<b>{{ item.wearout_max }}</b></div>
+					<div v-if="item.wearout">
+						Долговечность предмета: <b>{{ item.wearout }}</b>/<b>{{ item.wearout_max }}</b>
+					</div>
 
 					<div v-if="Object.keys(item['requirements']).length > 0" class="mt-2">
 						<div class="font-bold">Минимальные требования:</div>
@@ -45,7 +47,8 @@
 <script setup>
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
-	import { openConfirmModal } from '~/composables/useModals.js';
+	import { openPopupModal } from '~/composables/useModals.js';
+	import Form from '~/components/City/Gift/Form.vue';
 
 	const props = defineProps({
 		item: Object,
@@ -53,21 +56,11 @@
 
 	const state = useState();
 	const user = computed(() => state.user);
-	const emit = defineEmits(['sell']);
 
-	function sellItem() {
-		openConfirmModal(
-			'Подтвердите действие',
-			'Продать предмет &quot;' + props.item.price_sell + '&quot; за &quot;item.price&quot; ' + (props.item.price_type === 1 ? 'плт.' : 'зол.') + '?',
-			[{
-				title: 'Нет',
-			}, {
-				title: 'Да',
-				handler() {
-					emit('sell');
-				}
-			}]
-		);
+	function giftItem() {
+		openPopupModal(Form, {
+			item: props.item,
+		});
 	}
 
 	const bonuses = computed(() => [

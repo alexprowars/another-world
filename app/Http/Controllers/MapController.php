@@ -28,7 +28,7 @@ class MapController extends Controller
 
 		$this->setRoom($roomId);
 
-		return back();
+		return to_route('map');
 	}
 
 	protected function setRoom($oldRoom)
@@ -110,8 +110,7 @@ class MapController extends Controller
 			case 7:
 				return new Map\Shop()();
 			case 8:
-				return include(app_path('/includes/city/city_1/ambulance.php'));
-				break; // Больница
+				return new Map\Hospital()();
 			case 9:
 				return include(app_path('/includes/city/city_1/academy.php'));
 				break; // Академия
@@ -125,8 +124,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/gamblinghouse.php'));
 				break; // Игорный дом
 			case 13:
-				return include(app_path('/includes/city/city_1/gshop.php'));
-				break; // Сувениры
+				return new Map\GiftShop()();
 			case 14:
 				return include(app_path('/includes/city/city_1/administ.php'));
 				break; // Админка
@@ -155,8 +153,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/sclad.php'));
 				break; // Склад
 			case 29:
-				return include(app_path('/includes/city/city_1/butik.php'));
-				break; // Бутик
+				return new Map\Boutique()();
 			case 35:
 				return include(app_path('/includes/city/city_1/kwest.php'));
 				break; // Таверна

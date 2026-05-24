@@ -78,6 +78,9 @@ class UserResource extends JsonResource
 			'magic_min' => $user->intelligence / 1.5,
 			'magic_max' => 1 + $user->intelligence,
 			'poison' => $user->poison,
+			'injury' => $user->injury?->toAtomString(),
+			'r_date' => $user->r_date?->toAtomString(),
+			'r_type' => $user->r_type,
 		];
 
 		if ($user->tribe) {

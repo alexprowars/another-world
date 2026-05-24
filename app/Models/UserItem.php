@@ -14,6 +14,7 @@ class UserItem extends Model
 		'bank' => 'boolean',
 		'komis' => 'boolean',
 		'sclad' => 'boolean',
+		'present' => 'boolean',
 	];
 
 	/** @return BelongsTo<User, $this> */

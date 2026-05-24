@@ -6,7 +6,6 @@ use App\Engine\ShopService;
 use App\Exceptions\Exception;
 use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\ShopItemResource;
-use App\Http\Resources\ShopSaleResource;
 use App\Models\ShopItem;
 use App\Models\UserItem;
 use App\Services\InventoryService;
@@ -17,6 +16,7 @@ use Throwable;
 class Shop
 {
 	protected $shopId = 1;
+	protected $templateId = 'Shop';
 
 	public function __invoke()
 	{
@@ -51,7 +51,7 @@ class Shop
 				->where('shop_id', $this->shopId)
 				->where('count', '>', 0)
 				->joinRelationship('item', function (PowerJoinClause $join) use ($user) {
-					$join->as('item')->where('req_level', $user->level);
+					$join->as('item')->where('req_level', '<=', $user->level);
 				})
 				->orderByDesc('section_id')
 				->get();
@@ -61,7 +61,7 @@ class Shop
 				->where('count', '>', 0)
 				->where('section_id', $section)
 				->joinRelationship('item', function (PowerJoinClause $join) use ($user) {
-					$join->as('item')->where('req_level', $user->level);
+					$join->as('item')->where('req_level', '<=', $user->level);
 				})
 				->orderBy('item.req_level')
 				->get();
@@ -77,13 +77,13 @@ class Shop
 					return true;
 				});
 
-			return Inertia::render('Map/Shop', [
+			return Inertia::render('Map/' . $this->templateId, [
 				'section' => $section,
 				'items' => InventoryItemResource::collection($objects),
 			]);
 		}
 
-		return Inertia::render('Map/Shop', [
+		return Inertia::render('Map/' . $this->templateId, [
 			'section' => $section,
 			'items' => ShopItemResource::collection($objects),
 		]);

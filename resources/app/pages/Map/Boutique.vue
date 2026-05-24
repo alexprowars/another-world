@@ -1,5 +1,5 @@
 <template>
-	<ContentBlock title="Государственный Магазин">
+	<ContentBlock title="Бутик">
 		<div class="flex flex-wrap">
 			<div class="w-9/12 flex-none xl:w-10/12 pr-4">
 				<p v-if="page.message" class="message bg-red-100 text-red-700 mb-4" v-html="page.message"></p>
@@ -29,7 +29,7 @@
 				<div class="shopnav">
 					<Link href="/map?section=100"><img src="/assets/images/images/shop_sale.gif" alt="Продать предметы"></Link>
 					<Link href="/map"><img src="/assets/images/images/refresh.gif" alt="Обновить"></Link>
-					<Link href="/map/change/7"><img src="/assets/images/images/back.gif" alt="Вернуться"></Link>
+					<Link href="/map/change/29"><img src="/assets/images/images/back.gif" alt="Вернуться"></Link>
 				</div>
 				<div align="center" class="shopotdels">
 					<table>
@@ -93,11 +93,11 @@
 				<div align="center" class="shopotdels">
 					<table>
 						<tr>
-							<td width="100%" colspan="4" align="center"><b>Работа</b></td>
+							<td colspan="2" align="center"><b>Магические предметы</b></td>
 						</tr>
 						<tr>
-							<td width="50%" align="center" colspan="2"><Link href="?section=20">Инструменты</Link></td>
-							<td width="50%" align="center" colspan="2"><Link href="?section=32">Документы</Link></td>
+							<td width="50%" align="center"><Link href="?section=18">Свитки</Link></td>
+							<td width="50%" align="center"><Link href="?section=19">Зелья</Link></td>
 						</tr>
 					</table>
 				</div>

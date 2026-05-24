@@ -250,7 +250,7 @@ class InventoryService
 		return true;
 	}
 
-	public static function getInventoryObjects(User $user, int $type = 1)
+	public static function getInventoryObjects(User $user, int $type = 1, ?\Illuminate\Database\Query\Builder $query = null)
 	{
 		$result = $user->items()
 			->where('bank', false)
@@ -295,6 +295,10 @@ class InventoryService
 
 		if (!empty($items)) {
 			$result->whereNotIn('id', $items);
+		}
+
+		if ($query) {
+			$result->addNestedWhereQuery($query);
 		}
 
 		return $result->get();

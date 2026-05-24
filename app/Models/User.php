@@ -118,6 +118,12 @@ class User extends Authenticatable implements HasMedia
 		return $this->hasMany(UserAbility::class, 'user_id');
 	}
 
+	/** @return HasMany<UserGift, $this> */
+	public function gifts(): HasMany
+	{
+		return $this->hasMany(UserGift::class, 'user_id');
+	}
+
 	/** @return HasMany<UserAuthentication, $this> */
 	public function authentications(): HasMany
 	{

@@ -2,13 +2,13 @@
 	<div class="textblock">
 		<table width=100%>
 			<tr>
-				<td colspan="2">
-					<center><u>Для поединка зайдите внутрь арены</u></center><br>
+				<td colspan="2" class="text-center">
+					<u>Для поединка зайдите внутрь арены</u><br><br>
 				</td>
 			</tr>
 			<tr>
 				<td valign=center colspan=2 align=center>
-					<a href="/map?room=23" class="standbut">Уйти с арены</a>
+					<Link href="/map?room=23" class="standbut">Уйти с арены</Link>
 				</td>
 			</tr>
 			<tr>
@@ -23,7 +23,7 @@
 						Пустует
 					</template>
 					<br>
-					<a href="/map?room=1" class="standbut">Вход</a>
+					<Link href="/map?room=1" class="standbut">Вход</Link>
 				</td>
 				<td align=center>
 					<b>Тренировочный зал</b><br>
@@ -36,7 +36,7 @@
 						Пустует
 					</template>
 					<br>
-					<a href="/map?room=2" class="standbut">Вход</a>
+					<Link href="/map?room=2" class="standbut">Вход</Link>
 				</td>
 			</tr>
 			<tr>
@@ -44,7 +44,7 @@
 					<b>Больница</b><br>
 					<small>[портал в больницу]</small>
 					<br>
-					<a href="/map?room=8" class="standbut">Вход</a>
+					<Link href="/map?room=8" class="standbut">Вход</Link>
 				</td>
 			</tr>
 		</table>
@@ -54,6 +54,7 @@
 <script setup>
 	import GameLayout from '~/layouts/Game.vue';
 	import PersonLayout from '~/layouts/Person.vue';
+	import { Link } from '@inertiajs/vue3';
 
 	defineOptions({
 		layout: [GameLayout, PersonLayout]
