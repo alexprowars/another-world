@@ -69,7 +69,7 @@
 				</div>
 			</template>
 		</div>
-		<div v-if="item.item['bonuses']" class="text-xs mt-2">
+		<div v-if="item.item['bonuses'].length" class="text-xs mt-2">
 			<div class="font-bold">Действие предмета:</div>
 
 			<div v-for="(value, stat) in item.item['bonuses']">
@@ -83,7 +83,7 @@
 			</div>
 			<div v-if="item.item.about">
 				<div class="font-bold">Дополнительная информация:</div>
-				{{ item.item.about }}
+				<div v-html="item.item.about"></div>
 			</div>
 		</div>
 	</div>

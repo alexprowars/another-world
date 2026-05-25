@@ -49,7 +49,7 @@ class Shop
 		if ($section == 0) {
 			$objects = ShopItem::query()
 				->where('shop_id', $this->shopId)
-				->where('count', '>', 0)
+				->where('stock', '>', 0)
 				->joinRelationship('item', function (PowerJoinClause $join) use ($user) {
 					$join->as('item')->where('req_level', '<=', $user->level);
 				})
@@ -58,7 +58,7 @@ class Shop
 		} elseif ($section < 40) {
 			$objects = ShopItem::query()
 				->where('shop_id', $this->shopId)
-				->where('count', '>', 0)
+				->where('stock', '>', 0)
 				->where('section_id', $section)
 				->joinRelationship('item', function (PowerJoinClause $join) use ($user) {
 					$join->as('item')->where('req_level', '<=', $user->level);

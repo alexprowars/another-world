@@ -121,8 +121,7 @@ class MapController extends Controller
 			case 9:
 				return new Map\Academy()();
 			case 10:
-				return include(app_path('/includes/city/city_1/mshop.php'));
-				break; // Лавка мага
+				return new Map\MagicShop()();
 			case 11:
 				return include(app_path('/includes/city/city_1/repair.php'));
 				break; // Кузница

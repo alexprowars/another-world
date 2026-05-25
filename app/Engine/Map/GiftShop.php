@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Kirschbaum\PowerJoins\PowerJoinClause;
 use Throwable;
 
 class GiftShop
@@ -47,11 +48,14 @@ class GiftShop
 		if ($section < 4) {
 			$objects = ShopItem::query()
 				->where('shop_id', 4)
-				->where('count', '>', 0)
+				->where('stock', '>', 0)
 				->when(
 					$section,
 					fn(Builder $query) => $query->where('section_id', $section)
 				)
+				->joinRelationship('item', function (PowerJoinClause $join) {
+					$join->as('item');
+				})
 				->orderBy('item.req_level')
 				->get();
 		} else {
