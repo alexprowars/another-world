@@ -20,7 +20,7 @@
 		<tr v-if="player.profession">
 			<td class="tc_b">Профессия:</td>
 			<td class="tc_b" align="right">
-				<b>{{ player.profession }}</b>
+				<b>{{ $t('profession.' + player.profession) }}</b>
 			</td>
 		</tr>
 		<tr v-if="player.tribe">

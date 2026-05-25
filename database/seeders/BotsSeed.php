@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Locale;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 
 class BotsSeed extends Seeder

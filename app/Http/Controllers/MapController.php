@@ -6,6 +6,7 @@ use App\Engine\Map;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use Illuminate\Http\Request;
+use Throwable;
 
 class MapController extends Controller
 {
@@ -18,12 +19,18 @@ class MapController extends Controller
 	{
 		$user = auth()->user();
 
-		if ($user->r_date || $user->r_type) {
-			throw new Exception('Нельзя перемещаться по городу пока занят работой');
-		}
+		try {
+			if ($user->r_date || $user->r_type) {
+				throw new Exception('Нельзя перемещаться по городу пока занят работой');
+			}
 
-		if ($roomId != $user->room) {
-			throw new Exception('Типа читанул?');
+			if ($roomId != $user->room) {
+				throw new Exception('Типа читанул?');
+			}
+		} catch (Throwable $e) {
+			flash($e->getMessage());
+
+			return back();
 		}
 
 		$this->setRoom($roomId);
@@ -112,8 +119,7 @@ class MapController extends Controller
 			case 8:
 				return new Map\Hospital()();
 			case 9:
-				return include(app_path('/includes/city/city_1/academy.php'));
-				break; // Академия
+				return new Map\Academy()();
 			case 10:
 				return include(app_path('/includes/city/city_1/mshop.php'));
 				break; // Лавка мага

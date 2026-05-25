@@ -51,5 +51,6 @@ class DatabaseSeeder extends Seeder
 
 		$this->call(UserSeed::class);
 		$this->call(BotsSeed::class);
+		$this->call(AcademySeed::class);
 	}
 }

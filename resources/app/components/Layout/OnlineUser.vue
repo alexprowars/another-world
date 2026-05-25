@@ -18,7 +18,7 @@
 		</Link>
 
 		<div class="float-right">
-			<img v-if="user['profession']" :src="'/assets/images/guild/' + user['profession'] + '.gif'" :title="$t('proffession.' + user['profession'])">
+			<img v-if="user['profession']" :src="'/assets/images/guild/' + user['profession'] + '.gif'" :title="$t('profession.' + user['profession'])">
 			<img v-if="user['silence']" src="/assets/images/chat/molch.gif" :title="'Молчанка до ' + $formatDate(user['silence'], 'DD MMM HH:mm:ss')" width="15" height="12">
 			<Link v-if="user['battle']" :href="'/view_logs.php?log=' + user['battle']" target="main">
 				<img src="/assets/images/chat/noweapon.gif" alt="В бою" height="12" width="15">
