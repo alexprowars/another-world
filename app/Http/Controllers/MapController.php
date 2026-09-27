@@ -49,7 +49,6 @@ class MapController extends Controller
 		switch ($oldRoom) {
 			case 2:
 			case 9:
-			case 28:
 				$new_room = 23;
 				break;
 			case 40:
@@ -90,6 +89,7 @@ class MapController extends Controller
 				$new_room = 104;
 				break;
 			case 19:
+			case 28:
 			case 36:
 			case 200:
 			case 666:
@@ -127,8 +127,7 @@ class MapController extends Controller
 			case 10:
 				return new Map\MagicShop()();
 			case 11:
-				return include(app_path('/includes/city/city_1/repair.php'));
-				break; // Кузница
+				return new Map\Smithy()();
 			case 12:
 				return include(app_path('/includes/city/city_1/gamblinghouse.php'));
 				break; // Игорный дом
@@ -156,8 +155,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/znahar.php'));
 				break; // Знахарка
 			case 28:
-				return include(app_path('/includes/city/city_1/sclad.php'));
-				break; // Склад
+				return new Map\PawnShop()();
 			case 29:
 				return new Map\Boutique()();
 			case 35:

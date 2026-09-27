@@ -25,6 +25,7 @@ class InventoryItemResource extends JsonResource
 			'price_type' => $this->price_type,
 			'price_sell' => $this->getSellPrice(),
 			'about' => $this->about,
+			'engraving' => $this->engraving,
 			'strength' => $this->strength,
 			'dexterity' => $this->dexterity,
 			'agility' => $this->agility,

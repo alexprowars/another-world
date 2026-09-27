@@ -16,7 +16,7 @@ class MarketService
 {
 	public static function canSell(UserItem $item): bool
 	{
-		return !$item->present && !$item->onset && !$item->bank && !$item->sclad && !$item->market
+		return !$item->present && !$item->onset && !$item->bank && !$item->pawnshop && !$item->market
 			&& $item->price_type != 1 && !in_array($item->type, [12, 13, 15, 16, 17, 21, 22]);
 	}
 
@@ -89,7 +89,7 @@ class MarketService
 
 			$item = $listing->item()->lockForUpdate()->first();
 
-			if (!$item || !$item->market || $item->user_id != $listing->user_id || $item->onset || $item->present || $item->bank || $item->sclad) {
+			if (!$item || !$item->market || $item->user_id != $listing->user_id || $item->onset || $item->present || $item->bank || $item->pawnshop) {
 				throw new Exception('Предмет недоступен для покупки!');
 			}
 

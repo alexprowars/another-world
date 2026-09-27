@@ -13,7 +13,8 @@
 				<td width="70%" valign="top" class="text-xs">
 					<div class="font-bold">{{ item.title }}</div>
 					<slot name="details"/>
-					<div>Гос. цена: <b>{{ item.price }}</b> зол.</div>
+					<div v-if="item.engraving">Гравировка: <b>{{ item.engraving }}</b></div>
+					<div>Гос. цена: <b>{{ item.price }}</b> {{ item.price_type === 1 ? 'пл.' : 'зол.' }}</div>
 					<div>Долговечность предмета: <b>{{ item.wearout }}</b>/<b>{{ item.wearout_max }}</b></div>
 
 					<div v-if="Object.keys(item.requirements || {}).length > 0" class="mt-2">

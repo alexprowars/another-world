@@ -30,7 +30,7 @@
 							<img :src="'/assets/images/world/city/' + page.city + '/3_Tower.gif'" v-tooltip="'Проход закрыт'" class="tooltip text">
 						</div>
 						<div style="position:absolute; left:195px; top:206px; width:102px; height:79px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/3_Storage.gif'" v-tooltip="'Склад'" class="tooltip text">
+							<Link href="?room=28"><img :src="'/assets/images/world/city/' + page.city + '/3_Storage.gif'" v-tooltip="'Ломбард'" class="tooltip text aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:504px; top:219px; width:26px; height:25px;">
 							<img :src="'/assets/images/world/city/' + page.city + '/3_Right.gif'" v-tooltip="'Проход закрыт'" class="tooltip text">

@@ -51,7 +51,7 @@ return new class extends Migration {
 			$table->string('engraving')->nullable();
 			$table->unsignedTinyInteger('mf_type')->nullable();
 			$table->boolean('market')->default(false);
-			$table->boolean('sclad')->default(false);
+			$table->boolean('pawnshop')->default(false);
 			$table->unsignedTinyInteger('class')->nullable();
 			$table->unsignedSmallInteger('mz_1')->nullable();
 			$table->unsignedSmallInteger('mz_2')->nullable();

@@ -23,7 +23,7 @@
 							<Link href="?room=9"><img src=/assets/images/world/0.gif width="70" height="165" v-tooltip="'Академия'" class="aFilter"></Link>
 						</div>
 						<div style="position:absolute; left:610px; top:80px;">
-							<img src=/assets/images/world/0.gif width="70" height="165" alt='Склад' class="aFilter">
+							<img src=/assets/images/world/0.gif width="70" height="165" alt='Ломбард' class="aFilter">
 						</div>
 					</div>
 				</td>

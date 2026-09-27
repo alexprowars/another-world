@@ -51,9 +51,9 @@
 											<div v-html="item.magic"></div>
 										</div>
 
-										<div v-if="item.grav" class="w-full my-1 p-1 border border-[#d8ad83]">
+										<div v-if="item.engraving" class="w-full my-1 p-1 border border-[#d8ad83]">
 											<b>Выгравирована надпись:</b>
-											<div v-html="item.grav"></div>
+											<div>{{ item.engraving }}</div>
 										</div>
 
 										<div v-if="item.about" class="w-full my-1 p-1 border border-[#d8ad83]">

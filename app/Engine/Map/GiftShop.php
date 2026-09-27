@@ -125,6 +125,10 @@ class GiftShop
 				throw new Exception('Сначала снимите предмет с продажи на рынке!');
 			}
 
+			if ($object->pawnshop) {
+				throw new Exception('Сначала выкупите предмет из ломбарда!');
+			}
+
 			$exist = UserGift::query()
 				->whereBelongsTo($object, 'item')
 				->exists();

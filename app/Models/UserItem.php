@@ -13,7 +13,7 @@ class UserItem extends Model
 		'requirements' => 'json:unicode',
 		'bank' => 'boolean',
 		'market' => 'boolean',
-		'sclad' => 'boolean',
+		'pawnshop' => 'boolean',
 		'present' => 'boolean',
 	];
 

@@ -33,7 +33,7 @@ class UserSet extends Model
 					->whereKey($items['i' . $i])
 					->whereNull('bank')
 					->whereNull('market')
-					->whereNull('sclad')
+					->whereNull('pawnshop')
 					->first();
 
 				if (!$object) {

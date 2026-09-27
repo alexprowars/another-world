@@ -221,7 +221,7 @@ class InventoryService
 
 	public static function isAllowOnset(UserItem $item, User $user): bool
 	{
-		if ($item->market) {
+		if ($item->market || $item->pawnshop) {
 			return false;
 		}
 
@@ -259,7 +259,7 @@ class InventoryService
 		$result = $user->items()
 			->where('bank', false)
 			->where('market', false)
-			->where('sclad', false)
+			->where('pawnshop', false)
 			->orderByDesc('created_at');
 
 		switch ($type) {
