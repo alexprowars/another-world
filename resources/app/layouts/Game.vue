@@ -56,10 +56,10 @@
 								</Link>
 							</div>
 						</template>
-						<template v-if="user.level >= 6 || user.isAdmin">
+						<template v-if="user.level >= 6 || user.admin">
 							<div><img src="/assets/images/frames/lbd3.jpg" class="h-full" alt=""></div>
 							<div>
-								<Link href="/transfer" v-tooltip="'Передача предметов / кредитов'">
+								<Link href="/transfers" v-tooltip="'Передача предметов и золота'">
 									<img src="/assets/images/menu/b_m5.jpg" class="h-full" alt="">
 								</Link>
 							</div>

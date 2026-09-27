@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\UserItem;
+use App\Services\InventoryService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -18,6 +19,7 @@ class InventoryItemResource extends JsonResource
 			'code' => $this->code,
 			'title' => $this->title,
 			'type' => $this->type,
+			'can_drop' => InventoryService::canDrop($this->resource),
 			'requirements' => $this->requirements,
 			'wearout' => $this->wearout,
 			'wearout_max' => $this->wearout_max,

@@ -9,6 +9,7 @@ return new class extends Migration {
 	{
 		Schema::create('users_items', function (Blueprint $table) {
 			$table->id();
+			$table->foreignId('tribe_id')->nullable()->constrained('tribes')->restrictOnDelete();
 			$table->foreignId('user_id')->index()->constrained('users')->cascadeOnDelete();
 			$table->string('code', 50);
 			$table->string('title', 150);

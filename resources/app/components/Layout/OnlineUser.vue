@@ -6,7 +6,7 @@
 		</a>
 
 		<a v-if="user['tribe']" href="" @click.prevent="toTribe">
-			<img :src="'/assets/images/tribe/' + pl['tribe'] + '.gif'" width="24" height="15" :title="'Клан ' + user['tribe']">
+			<img :src="'/assets/images/tribe/' + user.tribe.id + '.gif'" width="24" height="15" :title="'Клан ' + user.tribe.name" :alt="'Клан ' + user.tribe.name">
 		</a>
 
 		<img v-if="user['rank']" :src="'/assets/images/rank/' + user['rank'] + '.gif'" :title="$t('rank.' + user['rank'])" width="12" height="15">

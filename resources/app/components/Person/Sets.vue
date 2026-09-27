@@ -1,98 +1,55 @@
 <template>
-	<table>
-		<tr>
-			<td>
-				<table width="100%">
-					<tr>
-						<td style="width:50%">
-							<div align="right" class="hline"><img src="/assets/images/main/lhrline.png" width="34" height="1" alt="" style="vertical-align: top"></div>
-						</td>
-						<td style="padding: 0 10px">
-							<table>
-								<tr>
-									<td><img src="/assets/images/main/lfl.gif" width="17" height="16" alt=""></td>
-									<td valign="top" style="white-space: nowrap;" class="hitem">Комплекты</td>
-									<td><img src="/assets/images/main/rfl.gif" width="17" height="16" alt=""></td>
-								</tr>
-							</table>
-						</td>
-						<td style="width:50%">
-							<div class="hline"><img src="/assets/images/main/rhrline.png" width="34" height="1" alt="" style="vertical-align: top"></div>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td style="text-align:center;">
-				<form method="POST" action="/person/inventory?do=compl">
-					<table style="margin: 0 auto">
-						<tr>
-							<td>
-								<table>
-									<tr>
-										<td><img src="/assets/images/main/in_l.gif" width="20" height="35" alt=""></td>
-										<td class="in_f">
-											<input type="text" value="" placeholder="имя комплекта" class="tint" style="width:205px;" name="name">
-										</td>
-										<td><img src="/assets/images/main/in_r.gif" width="20" height="35" alt=""></td>
-									</tr>
-								</table>
-							</td>
-							<td>
-								<table>
-									<tr>
-										<td><img src="/assets/images/main/btn_l.gif" width="19" height="26" alt=""></td>
-										<td class="btn_f"><input type="submit" style="width:80px;" value="сохранить" class="int"></td>
-										<td><img src="/assets/images/main/btn_r.gif" width="19" height="26" alt=""></td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-					</table>
-				</form>
-			</td>
-		</tr>
-		<tr>
-			<td style="text-align:center;padding-top:5px;">
-				<table border="0" cellspacing="1" cellpadding="1">
-					? foreach ($inventory as $c): ?
-					<!-- готовый комплект начало -->
-					<tr>
-						<td style="white-space: nowrap;padding-right: 20px"><b>?= $c->name ?</b></td>
-						<td style="width: 100%; white-space: nowrap;">
-							<div align="right" class="hline"><img src="/assets/images/main/lhrline.png" width="34" height="1" style="vertical-align: top" alt=""/></div>
-						</td>
-						<td>
-							<table border="0">
-								<tr>
-									<td><img src="/assets/images/main/btn_l.gif" width="19" height="26" alt="" border="0"/></td>
-									<td class="btn_f">
-										<input type="button" style="width:70px;" value="надеть" class="int" onclick="/person/inventory?do=wear&id=">
-									</td>
-									<td><img src="/assets/images/main/btn_r.gif" width="19" height="26" alt="" border="0"/></td>
-								</tr>
-							</table>
-						</td>
-						<td>
-							<table border="0">
-								<tr>
-									<td><img src="/assets/images/main/btn_l.gif" width="19" height="26" alt="" border="0"/></td>
-									<td class="btn_f">
-										<input type="button" style="width:70px;" value="удалить" class="int" onclick="load('/person/inventory?do=wear&a=del&id=?=$c->id ?')">
-									</td>
-									<td><img src="/assets/images/main/btn_r.gif" width="19" height="26" alt="" border="0"/></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					? endforeach; ?
-				</table>
-			</td>
-		</tr>
-	</table>
+	<section class="space-y-4">
+		<h2 class="hitem text-center">Комплекты</h2>
+		<p>Сохраните надетые вещи, чтобы затем надеть весь комплект одним действием.</p>
+		<form class="flex flex-wrap items-end gap-3" @submit.prevent="save">
+			<label class="block">
+				Название комплекта
+				<input v-model.trim="saveForm.name" type="text" maxlength="255" required class="block w-full" placeholder="Имя комплекта">
+			</label>
+			<button type="submit" class="button" :disabled="busy">Сохранить</button>
+		</form>
+		<div v-if="Object.keys(saveForm.errors).length" class="text-red-700" role="alert">
+			<p v-for="(error, field) in saveForm.errors" :key="field">{{ error }}</p>
+		</div>
+		<div v-if="Object.keys(actionForm.errors).length" class="text-red-700" role="alert">
+			<p v-for="(error, field) in actionForm.errors" :key="field">{{ error }}</p>
+		</div>
+		<ul v-if="sets.length" class="space-y-2">
+			<li v-for="set in sets" :key="set.id" class="flex flex-wrap items-center gap-3 border-b border-slate-300 py-2">
+				<b class="min-w-0 flex-1 break-words">{{ set.name }}</b>
+				<button type="button" class="button" :disabled="busy" @click="act('wear', set.id)">Надеть</button>
+				<button type="button" class="button" :disabled="busy" @click="act('delete', set.id)">Удалить</button>
+			</li>
+		</ul>
+		<p v-else>У вас пока нет сохранённых комплектов.</p>
+	</section>
 </template>
 
 <script setup>
+	import { computed } from 'vue';
+	import { useForm } from '@inertiajs/vue3';
 
+	defineProps({ sets: Array });
+
+	const saveForm = useForm({ action: 'save', name: '' });
+	const actionForm = useForm({ action: '', id: null });
+	const busy = computed(() => saveForm.processing || actionForm.processing);
+
+	function save() {
+		if (busy.value) return;
+		actionForm.clearErrors();
+		saveForm.post('/person/inventory/sets', {
+			preserveScroll: true,
+			onSuccess: () => saveForm.reset('name'),
+		});
+	}
+
+	function act(action, id) {
+		if (busy.value) return;
+		saveForm.clearErrors();
+		actionForm.action = action;
+		actionForm.id = id;
+		actionForm.post('/person/inventory/sets', { preserveScroll: true });
+	}
 </script>

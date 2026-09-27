@@ -28,7 +28,7 @@ return new class extends Migration {
 			$table->unsignedTinyInteger('level')->default(0);
 			$table->unsignedTinyInteger('up')->default(0);
 			$table->unsignedTinyInteger('updates')->default(3);
-			$table->float('gold', 2)->default(0);
+			$table->decimal('gold', 12, 2)->default(0);
 			$table->float('credits', 2)->default(0);
 			$table->unsignedSmallInteger('wins')->default(0);
 			$table->unsignedSmallInteger('losses')->default(0);
@@ -51,6 +51,8 @@ return new class extends Migration {
 			$table->unsignedInteger('stamina_max')->default(0);
 			$table->unsignedInteger('rating')->default(0);
 			$table->foreignId('tribe_id')->nullable()->constrained('tribes')->nullOnDelete();
+			$table->unsignedTinyInteger('tribe_rank')->default(0);
+			$table->timestamp('inquisitor_check_until')->nullable();
 			$table->foreignId('battle_id')->nullable()->constrained('battles')->nullOnDelete();
 			$table->integer('r_type')->nullable();
 			$table->timestamp('r_date')->nullable();

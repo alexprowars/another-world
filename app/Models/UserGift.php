@@ -13,18 +13,22 @@ class UserGift extends Model
 
 	protected $casts = [
 		'date' => 'immutable_datetime',
+		'from' => 'integer',
 	];
 
+	/** @return BelongsTo<User, $this> */
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class, 'user_id');
 	}
 
+	/** @return BelongsTo<Item, $this> */
 	public function item(): BelongsTo
 	{
 		return $this->belongsTo(Item::class);
 	}
 
+	/** @return MorphTo<Model, $this> */
 	public function sender(): MorphTo
 	{
 		return $this->morphTo();

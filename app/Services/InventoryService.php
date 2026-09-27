@@ -2,15 +2,46 @@
 
 namespace App\Services;
 
+use App\Engine\LogsService;
 use App\Exceptions\Exception;
 use App\Facades\Vars;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\UserItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class InventoryService
 {
+	public static function canDrop(UserItem $item): bool
+	{
+		return in_array($item->type, [15, 16], true)
+			&& !$item->onset && !$item->bank && !$item->market && !$item->pawnshop;
+	}
+
+	public static function drop(User $user, int $itemId): void
+	{
+		DB::transaction(function () use ($user, $itemId) {
+			$item = $user->items()->lockForUpdate()->find($itemId);
+
+			if (!$item) {
+				throw new Exception('Предмет не найден в Вашем рюкзаке!');
+			}
+
+			if (!in_array($item->type, [15, 16], true)) {
+				throw new Exception('Выбросить можно только открытки и подарки.');
+			}
+
+			if (!self::canDrop($item) || in_array($item->id, $user->getSlot()->getItemsId())) {
+				throw new Exception('Этот предмет сейчас нельзя выбросить.');
+			}
+
+			$item->delete();
+
+			LogsService::addItemLog($user, 'выбросил', $item->title . ' (ID: ' . $item->id . ')', 'рюкзак');
+		}, 3);
+	}
+
 	public static function addInInventory(User $user, Item $item): UserItem
 	{
 		$object = new UserItem();
@@ -22,6 +53,7 @@ class InventoryService
 			'price' => $item->credits > 0 ? $item->credits : $item->gold,
 			'price_type' => $item->credits > 0 ? 1 : 0,
 			'artifact' => $item->artifact,
+			'tribe_id' => $item->tribe_id,
 			'wearout' => 0,
 			'wearout_max' => $item->wearout,
 			'second' => $item->isSecondHand(),
@@ -129,83 +161,20 @@ class InventoryService
 
 		$slots = $user->getSlot();
 
-		$slot = null;
+		$availableSlots = self::itemSlots($object);
+		$slot = $availableSlots[0] ?? null;
 
-		switch ($object->type) {
-			case 1:
-			case 17:
-				if ($slots->i3 && $object->second) {
-					$slot = 5;
-				} else {
-					$slot = 3;
-				}
-				break;
-			case 2:
-				$slot = 4;
-				break;
-			case 3:
-				if (!$slots->i6) {
-					$slot = 6;
-				} elseif (!$slots->i7) {
-					$slot = 7;
-				} elseif (!$slots->i8) {
-					$slot = 8;
-				} elseif (!$slots->i10) {
-					$slot = 10;
-				} elseif (!$slots->i11) {
-					$slot = 11;
-				} elseif (!$slots->i12) {
-					$slot = 12;
-				} else {
-					$slot = 6;
-				}
-				break;
-			case 4:
-				$slot = 2;
-				break;
-			case 5:
+		if (in_array($object->type, [1, 17])) {
+			if ($slots->i3 && $object->second) {
 				$slot = 5;
-				break;
-			case 6:
-				$slot = 13;
-				break;
-			case 7:
-				$slot = 9;
-				break;
-			case 8:
-				$slot = 1;
-				break;
-			case 9:
-				$slot = 15;
-				break;
-			case 10:
-				$slot = 14;
-				break;
-			case 11:
-				$slot = 16;
-				break;
-			case 12:
-			case 14:
-				if (!$slots->i17) {
-					$slot = 17;
-				} elseif (!$slots->i18) {
-					$slot = 18;
-				} else {
-					$slot = 17;
+			}
+		} else {
+			foreach ($availableSlots as $availableSlot) {
+				if (!$slots->{'i' . $availableSlot}) {
+					$slot = $availableSlot;
+					break;
 				}
-				break;
-			case 18:
-				$slot = 3;
-				break;
-			case 24:
-				$slot = 21;
-				break;
-			case 25:
-				$slot = 22;
-				break;
-			case 26:
-				$slot = 20;
-				break;
+			}
 		}
 
 		if ($slot) {
@@ -219,9 +188,33 @@ class InventoryService
 		$slots->clearCache();
 	}
 
+	/** @return list<int> */
+	public static function itemSlots(UserItem $item): array
+	{
+		return match ($item->type) {
+			1, 17 => $item->second ? [3, 5] : [3],
+			2 => [4],
+			3 => [6, 7, 8, 10, 11, 12],
+			4 => [2],
+			5 => [5],
+			6 => [13],
+			7 => [9],
+			8 => [1],
+			9 => [15],
+			10 => [14],
+			11 => [16],
+			12, 14 => [17, 18],
+			18 => [3],
+			24 => [21],
+			25 => [22],
+			26 => [20],
+			default => [],
+		};
+	}
+
 	public static function isAllowOnset(UserItem $item, User $user): bool
 	{
-		if ($item->market || $item->pawnshop) {
+		if ($item->bank || $item->market || $item->pawnshop) {
 			return false;
 		}
 

@@ -5,7 +5,7 @@
 			<div class="w-4/12 text-center">
 				<img :src="'/assets/images/items/' + item.item.type + '/' + item.item.code + '.gif'" :alt="item.item.title"><br>
 
-				<template v-if="type === 1">
+				<template v-if="type === 1 && !readOnly">
 					<a href="" @click.prevent="buyItem"><b>Купить</b></a>
 				</template>
 				<template v-if="type === 2">
@@ -32,7 +32,7 @@
 				<div v-if="item.item.price">
 					Гос. цена: <b>{{ item.item.price }}</b> зол.
 				</div>
-				<div v-if="item.item.price_vip && type == 1 && user.vip">
+				<div v-if="item.item.price_vip && type == 1 && user.vip && !readOnly">
 					VIP. цена: <b>{{ item.item.price_vip }}</b> пл.
 				</div>
 				<div v-if="item.item.wearout">
@@ -47,10 +47,10 @@
 				<div v-if="item.item.mana">
 					Затраты маны: <i>{{ item.item.mana }}</i>
 				</div>
-				<div>
+				<div v-if="!readOnly">
 					Остаток на складе: <b>{{ item.stock }}</b>
 				</div>
-				<div v-if="item.delivery">
+				<div v-if="item.delivery && !readOnly">
 					Завоз: <b>{{ item.delivery }}</b>
 				</div>
 			</div>
@@ -69,7 +69,7 @@
 				</div>
 			</template>
 		</div>
-		<div v-if="item.item['bonuses'].length" class="text-xs mt-2">
+		<div v-if="Object.keys(item.item['bonuses']).length" class="text-xs mt-2">
 			<div class="font-bold">Действие предмета:</div>
 
 			<div v-for="(value, stat) in item.item['bonuses']">
@@ -98,6 +98,7 @@
 
 	const props = defineProps({
 		item: Object,
+		readOnly: Boolean,
 	});
 
 	const state = useState();

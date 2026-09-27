@@ -2,29 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Game\Controller;
+use App\Http\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 
-/**
- * @RoutePrefix("/pay")
- * @Route("/")
- * @Route("/{action}/")
- * @Route("/{action}{params:(/.*)*}")
- * @Private
- */
 class PayController extends Controller
 {
-	public function initialize ()
+	public function index(): Response
 	{
-		$this->tag->setTitle('Покупка платины');
-
-		parent::initialize();
-	}
-
-    public function indexAction()
-    {
-		$message = '';
-
-		$this->view->setVar('userId', $this->user->getId());
-		$this->view->setVar('message', $message);
+		return Inertia::render('Pay');
 	}
 }

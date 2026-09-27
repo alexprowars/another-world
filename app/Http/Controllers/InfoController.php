@@ -2,110 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controller;
+use App\Http\Resources\ProfileResource;
+use App\Http\Resources\UserGiftResource;
+use App\Models\Blocked;
+use App\Models\LogsIp;
 use App\Models\User;
-use Game\Controller;
+use App\Models\UserFriend;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class InfoController extends Controller
 {
-	public function initialize ()
+	public function index(Request $request, ?int $id = null): Response
 	{
-		parent::initialize();
+		$data = $request->validate([
+			'login' => ['nullable', 'string', 'max:100'],
+			'id' => ['nullable', 'integer', 'min:1'],
+		]);
 
-		$this->assets->addJs('js/inf.js');
+		$query = User::query()->with(['tribe', 'slots']);
+
+		if ($id !== null) {
+			$query->whereKey($id);
+		} elseif (!empty($data['login'])) {
+			$query->where('name', $data['login']);
+		} elseif (!empty($data['id'])) {
+			$query->whereKey($data['id']);
+		} else {
+			abort(404, 'Персонаж с таким логином или ID не найден!');
+		}
+
+		$user = $query->first();
+
+		abort_unless($user !== null, 404, 'Персонаж с таким логином или ID не найден!');
+
+		$user->calculate(false);
+
+		$showAllGifts = $request->has('prizes');
+		$gifts = $user->gifts()->with(['item', 'sender'])->orderByDesc('id');
+
+		if (!$showAllGifts) {
+			$gifts->limit(18);
+		}
+
+		$gifts = $gifts->get();
+		$hasMoreGifts = !$showAllGifts && $gifts->count() > 17;
+		$viewer = $request->user();
+		$canViewPrivate = $viewer && (($viewer->rank >= 11 && $viewer->rank <= 14) || $viewer->rank === 36 || $viewer->rank >= 98);
+
+		return Inertia::render('Info', [
+			'person' => ProfileResource::make($user),
+			'gifts' => UserGiftResource::collection($showAllGifts ? $gifts : $gifts->take(17)),
+			'has_more_gifts' => $hasMoreGifts,
+			'friends' => $this->friends($user),
+			'friend_of' => $this->friends($user, true),
+			'block_reason' => $user->blocked_at
+				? Blocked::query()->whereBelongsTo($user)->latest('id')->value('reason')
+				: null,
+			'private_info' => $canViewPrivate ? [
+				...$user->only(['email', 'ip', 'exp', 'gold', 'credits', 'updates']),
+				'shared_ip_users' => $this->sharedIpUsers($user),
+			] : null,
+		]);
 	}
 
-    public function indexAction()
-    {
-		$where = '';
+	/** @return Collection<int, User> */
+	private function friends(User $user, bool $incoming = false): Collection
+	{
+		$friends = UserFriend::query()
+			->where($incoming ? 'friend_id' : 'user_id', $user->id)
+			->where('is_ignored', false)
+			->select($incoming ? 'user_id' : 'friend_id');
 
-		if ($this->request->hasQuery('login') && $this->request->getQuery('login') != '')
-		{
-			$where = " u.username ='" . addslashes(htmlspecialchars($this->request->getQuery('login'))) . "'";
-		}
-		elseif ($this->request->hasQuery('id') && $this->request->getQuery('id') != '')
-		{
-			$where = " u.id = " . intval($this->request->getQuery('id')) . "";
-		}
-		elseif (is_numeric($_SERVER['QUERY_STRING']))
-		{
-			$where = " u.id = " . intval($_SERVER['QUERY_STRING']) . "";
-		}
-		else
-			$this->message('Персонаж с таким логином или ID не найден!', 'Ошибка');
+		return User::query()->whereIn('id', $friends)->orderBy('name')->get(['id', 'name']);
+	}
 
-		$parse = $this->db->query("SELECT u.*, i.* FROM game_users u, game_users_info i WHERE ".$where."  AND i.id = u.id")->fetch();
+	/** @return Collection<int, User> */
+	private function sharedIpUsers(User $user): Collection
+	{
+		$addresses = LogsIp::query()->whereBelongsTo($user)->where('ip', '>', 0)->select('ip');
+		$users = LogsIp::query()->whereIn('ip', $addresses)->select('user_id');
 
-		$this->tag->prependTitle('Информация о персонаже - '.$parse['username']);
-
-		$info = new User();
-		$info->onConstruct();
-		$info->assign($parse);
-
-		foreach ($parse as $key => $value)
-			$parse['~'.$key] = $value;
-
-		$parse += $info->getSlotsInfo();
-		$info->calculate();
-
-		$t = $info->toArray();
-
-		foreach ($t as $k => $v)
-		{
-			$parse[$k] = $v;
-		}
-
-		if (!$info->obraz)
-			$parse['obraz'] = "1/" . $info->sex;
-
-		$parse['hp_max'] 		= $info->hp_max;
-		$parse['energy_max'] 	= $info->energy_max;
-
-		$parse['hp_now'] 		= round($info->hp_now);
-		$parse['energy_now'] 	= round($info->energy_now);
-
-		$parse['w_h'] = $info->getPercent($info->hp_now, $info->hp_max);
-		$parse['w_e'] = $info->getPercent($info->energy_now, $info->energy_max);
-		$parse['w_u'] = $info->getPercent($info->stamina_now, $info->stamina_max);
-
-		if ($info->tribe > 0)
-			$tribe = $this->db->query("SELECT * FROM game_tribes WHERE id = '".$info->tribe."'")->fetch();
-
-		$parse['prizes'] = array();
-
-		$prizes = $this->db->query("SELECT o.inf, u.username AS sender, p.text, p.who, p.tribe_id FROM game_objects o, game_users_prizes p LEFT JOIN game_users u ON u.id = p.sender_id WHERE p.user_id = '".$info->id."' AND o.id = p.object_id ORDER BY p.id DESC ".(!$this->request->hasQuery('prizes') ? 'LIMIT 17' : '')."");
-
-		while ($prize = $prizes->fetch())
-		{
-			$prize['inf'] = explode("|", $prize['inf']);
-
-			switch ($prize['who'])
-			{
-				case 'user':
-					$poster = $prize['sender'];
-					$who = $prize['sender'];
-					break;
-				case 'tribe':
-					$poster = '</b>Клан <IMG SRC="/images/tribe/' . $prize['tribe_id'] . '.gif" WIDTH="24" HEIGHT="1"><B>' . $prize['tribe'] . '</B><B>';
-					$who = $prize['tribe'];
-					break;
-				default:
-					$poster = "<i>Аноним</i>";
-					$who = "";
-			}
-
-			$parse['prizes'][] = array
-			(
-				'name' 	=> $prize['inf'][0],
-				'title' => $prize['inf'][1],
-				'text'	=> $prize['text'],
-				'sender'=> $poster,
-				'who'	=> $who
-			);
-		}
-
-		$this->view->setVar('info', $parse);
-
-		if (!$this->request->hasQuery('frame'))
-			$this->view->setMainView('info');
+		return User::query()->whereIn('id', $users)->where('id', '!=', $user->id)->orderBy('name')->get(['id', 'name']);
 	}
 }

@@ -263,7 +263,7 @@ class ChatController extends Controller
 				'id' => $user->id,
 				'name' => $user->name,
 				'rank' => $user->rank,
-				'tribe' => $user->tribe?->name,
+				'tribe' => $user->tribe?->only(['id', 'name']),
 				'level' => $user->level,
 				'battle' => $user->battle,
 				'profession' => $user->profession,
@@ -275,7 +275,7 @@ class ChatController extends Controller
 			if ($user->invisible?->isFuture()) {
 				$pl['name'] = 'Тень';
 				$pl['rank'] = 0;
-				$pl['tribe'] = '';
+				$pl['tribe'] = null;
 				$pl['level'] = '??';
 				$pl['id'] = 1699638901;
 				$pl['travma'] = null;

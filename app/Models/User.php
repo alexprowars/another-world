@@ -61,6 +61,8 @@ class User extends Authenticatable implements HasMedia
 
 	protected $casts = [
 		'options' => 'array',
+		'tribe_rank' => 'integer',
+		'inquisitor_check_until' => 'immutable_datetime',
 		'hp_now' => 'float',
 		'blocked_at' => 'immutable_datetime',
 		'injury' => 'immutable_datetime',
@@ -69,6 +71,7 @@ class User extends Authenticatable implements HasMedia
 		'r_date' => 'immutable_datetime',
 		'silence' => 'immutable_datetime',
 		'invisible' => 'immutable_datetime',
+		'vip' => 'immutable_datetime',
 	];
 
 	protected static function booted(): void
@@ -93,7 +96,7 @@ class User extends Authenticatable implements HasMedia
 	/** @return BelongsTo<Tribe, $this> */
 	public function tribe(): BelongsTo
 	{
-		return $this->belongsTo(Tribe::class, 'user_id');
+		return $this->belongsTo(Tribe::class);
 	}
 
 	/** @return BelongsTo<Battle, $this> */
@@ -181,14 +184,14 @@ class User extends Authenticatable implements HasMedia
 		return $this->rank == 60;
 	}
 
-	public function calculate()
+	public function calculate(bool $persist = true): void
 	{
 		if ($this->calculated) {
 			return;
 		}
 
-		UserService::calculateWearsStats($this);
-		UserService::calculateStats($this);
+		UserService::calculateWearsStats($this, $persist);
+		UserService::calculateStats($this, $persist);
 
 		$this->calculated = true;
 	}

@@ -156,7 +156,7 @@ class UserService
 		return $result;
 	}
 
-	public static function calculateStats(User $user)
+	public static function calculateStats(User $user, bool $persist = true): void
 	{
 		//$user['hp'] = 0;
 		//$user['energy'] = 0;
@@ -210,10 +210,12 @@ class UserService
 		$user->stamina_max = $user->vitality * 20;
 		$user->stamina_now = min($user->stamina_now, $user->stamina_max);
 
-		$user->save();
+		if ($persist) {
+			$user->save();
+		}
 	}
 
-	public static function calculateWearsStats(User $user)
+	public static function calculateWearsStats(User $user, bool $persist = true): void
 	{
 		$slot = $user->getSlot();
 
@@ -221,7 +223,9 @@ class UserService
 
 		foreach ($wears as $object) {
 			if ($object->life?->isPast()) {
-				InventoryService::unsetObject($user, $object->onset);
+				if ($persist) {
+					InventoryService::unsetObject($user, $object->onset);
+				}
 
 				continue;
 			}

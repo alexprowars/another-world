@@ -11,6 +11,7 @@ class UserItem extends Model
 
 	protected $casts = [
 		'requirements' => 'json:unicode',
+		'life' => 'immutable_datetime',
 		'bank' => 'boolean',
 		'market' => 'boolean',
 		'pawnshop' => 'boolean',

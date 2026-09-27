@@ -6,6 +6,8 @@ use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\UserFriendResource;
+use App\Models\UserSet;
+use App\Services\EquipmentSetService;
 use App\Services\FriendService;
 use App\Services\InventoryService;
 use App\Services\UserService;
@@ -27,6 +29,7 @@ class PersonController extends Controller
 	public function inventory(Request $request)
 	{
 		$type = $request->integer('item_type', 1);
+		$type = $type >= 1 && $type <= 9 ? $type : 1;
 
 		if ($request->integer('onset')) {
 			InventoryService::onsetObject($this->user, $request->integer('onset'));
@@ -34,7 +37,7 @@ class PersonController extends Controller
 			return to_route('person.inventory');
 		}
 
-		if ($request->integer('unset') == 'all') {
+		if ($request->input('unset') === 'all') {
 			InventoryService::unsetAllObject($this->user);
 
 			return to_route('person.inventory');
@@ -46,11 +49,65 @@ class PersonController extends Controller
 			return to_route('person.inventory');
 		}
 
-		$items = InventoryService::getInventoryObjects($this->user, $type);
+		$items = $type === 9 ? collect() : InventoryService::getInventoryObjects($this->user, $type);
 
 		return Inertia::render('Person/Inventory', [
+			'item_type' => $type,
 			'items' => InventoryItemResource::collection($items),
+			'sets' => $type === 9 ? UserSet::query()->whereBelongsTo($this->user)->orderByDesc('id')->get(['id', 'name']) : [],
 		]);
+	}
+
+	public function drop(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+			'item_type' => ['required', 'integer', 'between:1,8'],
+		]);
+
+		try {
+			InventoryService::drop($request->user(), (int) $data['id']);
+
+			flash('Предмет выброшен.');
+		} catch (Exception $e) {
+			return to_route('person.inventory', ['item_type' => $data['item_type']])->withErrors(['drop' => $e->getMessage()]);
+		}
+
+		return to_route('person.inventory', ['item_type' => $data['item_type']]);
+	}
+
+	public function sets(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'action' => ['required', 'in:save,wear,delete'],
+			'name' => ['exclude_unless:action,save', 'required', 'string', 'max:255', 'regex:/^[А-Яа-яЁёa-zA-Z0-9_!~.@ \-]+$/u'],
+			'id' => ['exclude_if:action,save', 'required', 'integer', 'min:1'],
+		], [
+			'name.required' => 'Введите название комплекта.',
+			'name.max' => 'Название должно содержать не более 255 символов.',
+			'name.regex' => 'В названии допустимы русские и латинские буквы, цифры, пробелы и символы _-!~.@.',
+		]);
+
+		try {
+			switch ($data['action']) {
+				case 'save':
+					EquipmentSetService::save($request->user(), $data['name']);
+					flash('Комплект сохранён.');
+					break;
+				case 'wear':
+					$skipped = EquipmentSetService::wear($request->user(), (int) $data['id']);
+					flash($skipped > 0 ? 'Комплект надет частично. Недоступных вещей: ' . $skipped . '.' : 'Комплект надет.');
+					break;
+				case 'delete':
+					EquipmentSetService::delete($request->user(), (int) $data['id']);
+					flash('Комплект удалён.');
+					break;
+			}
+		} catch (Exception $e) {
+			return to_route('person.inventory', ['item_type' => 9])->withErrors(['set' => $e->getMessage()]);
+		}
+
+		return to_route('person.inventory', ['item_type' => 9]);
 	}
 
 	public function settings(Request $request): Response|RedirectResponse

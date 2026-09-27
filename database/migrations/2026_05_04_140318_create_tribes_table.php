@@ -15,7 +15,7 @@ return new class extends Migration {
 			$table->unsignedTinyInteger('sclon');
 			$table->string('short');
 			$table->unsignedInteger('points');
-			$table->float('moneys', 2)->unsigned();
+			$table->decimal('moneys', 12, 2)->unsigned()->default(0);
 			$table->text('laws')->nullable();
 			$table->string('logo')->nullable();
 			$table->timestamps();

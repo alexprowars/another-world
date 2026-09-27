@@ -134,8 +134,7 @@ class MapController extends Controller
 			case 13:
 				return new Map\GiftShop()();
 			case 14:
-				return include(app_path('/includes/city/city_1/administ.php'));
-				break; // Админка
+				return new Map\Administration()();
 			case 16:
 				return new Map\Works()();
 			case 17:

@@ -11,7 +11,7 @@
 									<img src="/assets/images/main/sm.jpg" width="8" height="29"  style="vertical-align: middle" alt="">
 								</td>
 								<td>
-									<Link :href="'/person/inventory?item_type=' + id" :class="{ disabled: false }" class="smenu">{{ title }}</Link>
+									<Link :href="'/person/inventory?item_type=' + id" :class="{ disabled: Number(id) === page.item_type }" class="smenu">{{ title }}</Link>
 								</td>
 							</template>
 						</tr>
@@ -27,8 +27,8 @@
 					<div align="right" class="hline"></div>
 				</td>
 				<td nowrap>
-					<div class="button"><a href="/person/inventory?item_type=9" class="tm">комплекты</a></div>
-					<div class="button"><a href="/person/inventory?unset=all" class="tm">снять все</a></div>
+					<div class="button"><Link href="/person/inventory?item_type=9" class="tm">комплекты</Link></div>
+					<div class="button"><Link href="/person/inventory?unset=all" class="tm">снять все</Link></div>
 				</td>
 				<td style="width:50%">
 					<div class="hline"></div>
@@ -43,8 +43,12 @@
 			</tr>
 		</table>
 
-		<div v-if="page.items.length" class="flex flex-col gap-2">
-			<InventoryItem v-for="item in page.items" :key="item.id" :item="item" :player="user" @wear="wearItem"/>
+		<div v-if="Object.keys(dropForm.errors).length" class="mb-4 text-red-700" role="alert">
+			<p v-for="(error, field) in dropForm.errors" :key="field">{{ error }}</p>
+		</div>
+		<Sets v-if="page.item_type === 9" :sets="page.sets"/>
+		<div v-else-if="page.items.length" class="flex flex-col gap-2">
+			<InventoryItem v-for="item in page.items" :key="item.id" :item="item" :player="user" :dropping="dropForm.processing" @wear="wearItem" @drop="dropItem"/>
 		</div>
 		<div v-else class="text-xs-center">
 			<div class="alert alert-info" role="alert">Отдел рюкзака пуст.</div>
@@ -55,8 +59,9 @@
 <script setup>
 	import GameLayout from '~/layouts/Game.vue';
 	import PersonLayout from '~/layouts/Person.vue';
-	import { Link, router } from '@inertiajs/vue3';
+	import { Link, router, useForm } from '@inertiajs/vue3';
 	import InventoryItem from '~/components/Person/InventoryItem.vue';
+	import Sets from '~/components/Person/Sets.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 
@@ -64,12 +69,27 @@
 		layout: [GameLayout, PersonLayout]
 	});
 
-	defineProps({
+	const props = defineProps({
 		page: Object,
 	});
 
 	const state = useState();
 	const user = computed(() => state.user);
+
+	const dropForm = useForm({
+		id: null,
+		item_type: null
+	});
+
+	function dropItem(item) {
+		if (dropForm.processing) {
+			return;
+		}
+
+		dropForm.id = item.id;
+		dropForm.item_type = props.page.item_type;
+		dropForm.post('/person/inventory/drop', { preserveScroll: true });
+	}
 
 	function wearItem(item) {
 		router.get('', {

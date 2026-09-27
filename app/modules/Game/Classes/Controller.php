@@ -153,12 +153,6 @@ class Controller extends PhalconController
 				return $this->response->redirect($this->url->getBasePath().$dispatch.'/');
 			}
 
-			if ($this->user->tutorial < 100)
-			{
-				$tutorial = new Tutorial();
-				$this->game->tutorial = $tutorial->getArray();
-			}
-
 			$controller = $this->dispatcher->getControllerName();
 
 			if ($controller == 'index')

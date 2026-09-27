@@ -5,13 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserSet extends Model
+class TribeRequest extends Model
 {
-	protected $table = 'users_sets';
-	protected $guarded = [];
-
 	protected $casts = [
-		'items' => 'json:unicode',
+		'status' => 'integer',
 	];
 
 	/** @return BelongsTo<User, $this> */

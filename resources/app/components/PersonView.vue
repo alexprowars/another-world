@@ -28,9 +28,10 @@
 									<PersonViewSlot :position="8" :item="person.slots.slot_8 || null"/>-->
 								</td>
 								<td width="120" valign="top">
-									<Link href="/avatar">
+									<Link v-if="!readonly" href="/avatar">
 										<img :src="person.avatar" width="120" height="220" :alt="person.name" v-tooltip="person.name">
 									</Link>
+									<img v-else :src="person.avatar" width="120" height="220" :alt="person.name">
 									<div style="height:20px;"></div>
 									<div class="text-xs-center flex justify-center gap-2">
 										<PersonViewSlot :position="17" :item="person.slots.slot_17 || null"/>
@@ -63,6 +64,10 @@
 	import { Link } from '@inertiajs/vue3';
 
 	const props = defineProps({
+		readonly: {
+			type: Boolean,
+			default: false,
+		},
 		person: {
 			type: Object,
 		}

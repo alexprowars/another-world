@@ -93,7 +93,7 @@
 							</td>
 							<td colspan="2" align="center" title="Требуемый уровень" nowrap>
 								<img src="/assets/images/images/tbl-shp_level-icon.gif" width="11" height="10" align="absmiddle" alt="">
-								Уровень <b class="red">{{ item.requirements.level || 0 }}</b>
+								Уровень <b class="red">{{ item.requirements?.level || 0 }}</b>
 							</td>
 						</tr>
 						<tr>
@@ -111,8 +111,8 @@
 									<img src="/assets/images/images/m_game3.gif" border="0" width="11" height="11" align="absmiddle" alt="">
 								</span>&nbsp;{{ item.price }}
 							</td>
-							<td align="center">
-								<a href="" class="butt2" @click.prevent="confirmDrop">выбросить</a>
+							<td v-if="item.can_drop" align="center">
+								<button type="button" class="butt2" :disabled="dropping" @click="confirmDrop">выбросить</button>
 							</td>
 						</tr>
 					</table>
@@ -137,6 +137,7 @@
 			type: Object,
 			default: () => ({}),
 		},
+		dropping: Boolean,
 	});
 
 	const { t } = useI18n();
@@ -181,7 +182,7 @@
 	].filter(Boolean));
 
 	function requirement(key, label, format = null) {
-		const required = props.item.requirements[key];
+		const required = props.item.requirements?.[key];
 
 		if (!required) {
 			return null;
@@ -246,9 +247,11 @@
 	}
 
 	function confirmDrop() {
+		if (props.dropping || !props.item.can_drop) return;
+
 		openConfirmModal(
 			'Рюкзак',
-			`Вы действительно хотите выбросить ${props.item.title}?`,
+			'Вы действительно хотите выбросить этот предмет? Восстановить его будет нельзя.',
 			[{ title: 'Нет' }, {
 				title: 'Да',
 				handler() {
