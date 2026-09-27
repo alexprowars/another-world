@@ -12,7 +12,7 @@ class UserItem extends Model
 	protected $casts = [
 		'requirements' => 'json:unicode',
 		'bank' => 'boolean',
-		'komis' => 'boolean',
+		'market' => 'boolean',
 		'sclad' => 'boolean',
 		'present' => 'boolean',
 	];

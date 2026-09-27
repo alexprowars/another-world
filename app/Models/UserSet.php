@@ -32,7 +32,7 @@ class UserSet extends Model
 					->whereBelongsTo($user)
 					->whereKey($items['i' . $i])
 					->whereNull('bank')
-					->whereNull('komis')
+					->whereNull('market')
 					->whereNull('sclad')
 					->first();
 

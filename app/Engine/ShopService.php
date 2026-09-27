@@ -74,7 +74,7 @@ class ShopService
 	{
 		$user = auth()->user();
 
-		if ($item->type == 12 || $item->user_id != $user->id) {
+		if ($item->type == 12 || $item->market || $item->user_id != $user->id) {
 			throw new Exception('Предмет <u>' . $item->title . '</u> не подледжит продаже!');
 		}
 

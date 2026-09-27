@@ -60,6 +60,7 @@ class User extends Authenticatable implements HasMedia
 	public $mkrit	= 0;
 
 	protected $casts = [
+		'options' => 'array',
 		'hp_now' => 'float',
 		'blocked_at' => 'immutable_datetime',
 		'injury' => 'immutable_datetime',
@@ -129,6 +130,12 @@ class User extends Authenticatable implements HasMedia
 	public function gifts(): HasMany
 	{
 		return $this->hasMany(UserGift::class, 'user_id');
+	}
+
+	/** @return HasMany<UserFriend, $this> */
+	public function friends(): HasMany
+	{
+		return $this->hasMany(UserFriend::class, 'user_id');
 	}
 
 	/** @return HasMany<UserAuthentication, $this> */

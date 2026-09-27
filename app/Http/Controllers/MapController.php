@@ -140,14 +140,12 @@ class MapController extends Controller
 			case 16:
 				return new Map\Works()();
 			case 17:
-				return include(app_path('/includes/city/city_1/bank.php'));
-				break; // Банк
+				return new Map\Bank()();
 			case 19:
 				return include(app_path('/includes/city/city_1/ambar.php'));
 				break; // Приём ресоф
 			case 20:
-				return include(app_path('/includes/city/city_1/komis.php'));
-				break; // Рынок
+				return new Map\Market()();
 			case 22:
 				return include(app_path('/includes/city/city_1/brak.php'));
 				break; // Церковь

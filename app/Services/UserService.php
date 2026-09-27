@@ -10,6 +10,7 @@ use App\Models\Referal;
 use App\Models\User;
 use App\Notifications\UserRegistrationNotification;
 use App\Settings;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
@@ -61,6 +62,66 @@ class UserService
 		}
 
 		return $user;
+	}
+
+	public static function upgradeStat(User $user, string $stat): void
+	{
+		if (!in_array($stat, Vars::getStats(), true)) {
+			throw new Exception('Неизвестная характеристика');
+		}
+
+		DB::transaction(function () use ($user, $stat) {
+			$user->refreshForUpdate();
+
+			if ($user->updates <= 0) {
+				throw new Exception('У Вас нет свободных увеличений!');
+			}
+
+			$user->updates--;
+			$user->{'s_' . $stat}++;
+			$user->save();
+		});
+	}
+
+	public static function activateAbility(User $user, int $abilityId): void
+	{
+		require resource_path('data/battle.php');
+
+		/** @var array<int, array{level: int}> $priem_full */
+		$ability = $priem_full[$abilityId] ?? null;
+
+		if ($ability === null) {
+			throw new Exception('Такого приёма не существует');
+		}
+
+		if ($user->level < $ability['level']) {
+			throw new Exception('Уровень слишком мал!');
+		}
+
+		$active = $user->abilities()
+			->pluck('ability', 'slot');
+
+		$slot = 1;
+
+		for ($i = 1; $i <= 10; $i++) {
+			if (!isset($active[$i])) {
+				$slot = $i;
+				break;
+			}
+		}
+
+		$user->abilities()->updateOrCreate(['slot' => $slot], [
+			'ability' => $abilityId,
+		]);
+	}
+
+	public static function deactivateAbility(User $user, int $slot): void
+	{
+		if ($slot > 10) {
+			throw new Exception('Неправильный ввод данных');
+		}
+
+		$user->abilities()->where('slot', $slot)->delete();
 	}
 
 	public static function checkRoom(User $user, int $room)

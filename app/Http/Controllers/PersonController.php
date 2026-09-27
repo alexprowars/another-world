@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
+use App\Http\Resources\UserFriendResource;
+use App\Services\FriendService;
 use App\Services\InventoryService;
+use App\Services\UserService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Inertia\Response;
 use Throwable;
 
 class PersonController extends Controller
@@ -46,205 +53,161 @@ class PersonController extends Controller
 		]);
 	}
 
-	public function configAction()
+	public function settings(Request $request): Response|RedirectResponse
 	{
-		// Изменение конфига игрока
-		if ($this->request->hasPost('mystat')) {
-			if (is_numeric($this->request->getPost('update_status'))) {
-				$this->user->status = $this->request->getPost('update_status', 'int');
-				$this->user->update();
+		$user = $request->user();
 
-				$this->cookies->set('chat_showonline', $this->request->getPost('showonline', 'int'));
-				$this->cookies->set('chat_showstat', $this->request->getPost('showstat', 'int'));
-				$this->cookies->send();
+		if ($request->isMethod('post')) {
+			$data = $request->validate([
+				'action' => ['required', 'in:options,profile,password,email'],
+			]);
+
+			switch ($data['action']) {
+				case 'options':
+					$request->validate([
+						'presence_status' => ['required', 'integer', 'between:0,4'],
+					], [
+						'presence_status.*' => 'Выберите статус из списка.',
+					]);
+
+					$user->update([
+						'options' => array_merge($user->options ?? [], [
+							'presence_status' => $request->integer('presence_status'),
+						]),
+					]);
+
+					flash('Настройки сохранены');
+
+					break;
+				case 'profile':
+					$data = $request->validate([
+						'city' => ['present', 'nullable', 'string', 'max:255'],
+						'about' => ['present', 'nullable', 'string', 'max:10000'],
+					], [
+						'city.*' => 'Город должен быть строкой длиной не более 255 символов.',
+						'about.*' => 'Рассказ о себе должен быть текстом длиной не более 10 000 символов.',
+					]);
+
+					$user->update($data);
+
+					flash('Анкета сохранена');
+
+					break;
+				case 'password':
+					$data = $request->validate([
+						'current_password' => ['required', 'string', 'current_password'],
+						'password' => ['required', 'string', 'min:6', 'max:72', 'confirmed'],
+					], [
+						'current_password.required' => 'Введите текущий пароль.',
+						'current_password.current_password' => 'Текущий пароль указан неверно.',
+						'password.required' => 'Введите новый пароль.',
+						'password.min' => 'Пароль не должен быть короче 6 символов.',
+						'password.max' => 'Пароль не должен быть длиннее 72 символов.',
+						'password.confirmed' => 'Введённые пароли не совпадают.',
+					]);
+
+					$user->update(['password' => Hash::make($data['password'])]);
+
+					flash('Пароль изменён');
+
+					break;
+				case 'email':
+					$data = $request->validate([
+						'current_email' => ['required', 'string', Rule::in([$user->email])],
+						'email' => ['required', 'email', 'max:50', Rule::unique('users', 'email')->ignore($user->id)],
+					], [
+						'current_email.required' => 'Введите текущий e-mail.',
+						'current_email.in' => 'Текущий e-mail указан неверно.',
+						'email.required' => 'Введите новый e-mail.',
+						'email.email' => 'Введите корректный e-mail.',
+						'email.max' => 'E-mail не должен быть длиннее 50 символов.',
+						'email.unique' => 'Этот e-mail уже используется.',
+					]);
+
+					if ($data['email'] !== $user->email) {
+						$user->update(['email' => $data['email'], 'email_verified_at' => null]);
+					}
+
+					flash('E-mail сохранён.');
+
+					break;
 			}
+
+			return to_route('person.settings');
 		}
 
-		if ($this->request->hasPost('mychat')) {
-			$this->cookies->set('translit', $this->request->getPost('translit'));
-			$this->cookies->set('sysmsg', $this->request->getPost('sysmsg'));
-			$this->cookies->set('sysmsg1', $this->request->getPost('sysmsg1'));
-			$this->cookies->send();
-		}
+		return Inertia::render('Person/Settings', [
+			'options' => ['presence_status' => $user->options['presence_status'] ?? 0],
+			'city' => $user->city,
+			'about' => $user->about,
+		]);
 	}
 
-	public function updates(Request $request)
+	public function updates(Request $request): Response|RedirectResponse
 	{
-		$update = $request->post('update');
+		if ($request->isMethod('post')) {
+			$data = $request->validate([
+				'update' => ['required', 'string'],
+			]);
 
-		if (!empty($update)) {
-			if ($this->user->updates > 0) {
-				$st_name = null;
+			try {
+				UserService::upgradeStat($request->user(), $data['update']);
 
-				switch ($update) {
-					case 'strength':
-						$st_name = "strength";
-						break;
-					case 'dexterity':
-						$st_name = "dexterity";
-						break;
-					case 'agility':
-						$st_name = "agility";
-						break;
-					case 'vitality':
-						$st_name = "vitality";
-						break;
-					case 'magic':
-						$st_name = "magic";
-						break;
-					case 'intelligence':
-						$st_name = "intelligence";
-						break;
-					case 'duh':
-						$st_name = "duh";
-						break;
-				}
-
-				if ($st_name) {
-					$this->user->updates--;
-					$this->user->{'s_' . $st_name}++;
-					$this->user->update();
-
-					flash('Удачно увеличили физический параметр "' . __('stats.' . $st_name) . '"!');
-				}
-			} else {
-				flash('У Вас нет свободных увеличений!');
+				flash('Удачно увеличили физический параметр "' . __('main.stats.' . $data['update']) . '"!');
+			} catch (Exception $e) {
+				flash($e->getMessage());
 			}
+
+			return to_route('person.updates');
 		}
 
 		return Inertia::render('Person/Updates');
 	}
 
-	public function friendsAction()
+	public function friends(Request $request): Response|RedirectResponse
 	{
-		$this->view->disableLevel(View::LEVEL_LAYOUT);
+		$user = $request->user();
 
-		$message = '';
+		if ($request->isMethod('post')) {
+			$data = $request->validate([
+				'action' => ['required', 'in:add,remove'],
+				'name' => ['required', 'string', 'max:100', 'regex:/\A[a-zA-Zа-яА-ЯёЁ0-9_.,!?* -]+\z/u'],
+				'is_ignored' => ['required_if:action,add', 'boolean'],
+			], [
+				'name.required' => 'Введите ник персонажа',
+				'name.regex' => 'Ник содержит запрещённые символы',
+				'name.max' => 'Ник не должен быть длиннее 100 символов',
+			]);
 
-		if ($this->request->getQuery('act', null, '') == "add") {
-			$username = addslashes(htmlspecialchars($this->request->getPost('name')));
-
-			if (!preg_match("/^[a-zA-Za-яA-Я0-9_\.\,\-\!\?\*\ ]+$/u", $username)) {
-				$message = "Ник имеет запрещенные символы";
-			} else {
-				$friend = $this->db->query("SELECT `id` FROM `game_users` WHERE `username` = '" . $username . "'")->fetch();
-
-				if (!isset($friend['id'])) {
-					$message = "Персонаж не существует";
-				} elseif ($friend['id'] == $this->user->id) {
-					$message = "Вы неможете добавить себя в свой список";
-				} elseif (!is_numeric($_POST['dr']) || $_POST['dr'] > '1') {
-					$message = "Ну ты и читерюга!!!";
+			try {
+				if ($data['action'] === 'add') {
+					FriendService::add($user, $data['name'], $request->boolean('is_ignored'));
+					flash('Персонаж добавлен в ваш список');
 				} else {
-					$check = $this->db->query("SELECT `id` FROM game_friends WHERE user_id = '" . $this->user->id . "' AND friend_id = '" . $friend['id'] . "'");
-
-					if ($check->numRows() > 0) {
-						$message = "Персонаж уже записан в ваш список";
-					} else {
-						$this->db->query("INSERT INTO `game_friends` (user_id, friend_id, ignor) VALUES ('" . $this->user->id . "','" . $friend['id'] . "','" . intval($_POST['dr']) . "')");
-
-						$message = "Персонаж добавлен в ваш список";
-					}
+					FriendService::remove($user, $data['name']);
+					flash('Персонаж удалён из вашего списка');
 				}
+			} catch (Exception $e) {
+				flash($e->getMessage());
 			}
-		} elseif ($this->request->getQuery('act', null, '') == "del") {
-			$username = addslashes(htmlspecialchars($this->request->getPost('name')));
 
-			if (!preg_match("/^[a-zA-Za-яA-Я0-9_\.\,\-\!\?\*\ ]+$/u", $username)) {
-				$message = "Ник имеет запрещенные символы";
-			} else {
-				$friend = $this->db->query("SELECT `id` FROM `game_users` WHERE `username` = '" . $username . "'")->fetch();
-
-				if (!isset($friend['id'])) {
-					$message = "Персонаж не существует";
-				} else {
-					$check = $this->db->query("SELECT * FROM game_friends WHERE user_id = '" . $this->user->id . "' AND friend_id = '" . $friend['id'] . "'");
-
-					if ($check->numRows() > 0) {
-						$this->db->query("DELETE FROM game_friends WHERE user_id = '" . $this->user->id . "' AND friend_id = '" . $friend['id'] . "'");
-
-						$message = "Персонаж " . $username . " удален из вашего списка";
-					} else {
-						$message = "Персонаж " . $username . " не удален из вашего списка";
-					}
-				}
-			}
+			return to_route('person.friends');
 		}
 
-		$this->view->setVar('message', $message);
+		$friends = $user->friends()
+			->with('friend.tribe')
+			->whereHas('friend')
+			->orderBy('is_ignored')
+			->orderBy('id')
+			->get();
 
-		$list = $this->db->query("SELECT `f`.*, u.username, u.tribe, `u`.level, `u`.rank, `u`.room, `u`.onlinetime FROM `game_friends` f, `game_users` u WHERE `f`.`user_id` = '" . $this->user->id . "' AND `u`.`id` = `f`.`friend_id`")->fetchAll();
-
-		$this->view->setVar('list', $list);
+		return Inertia::render('Person/Friends', [
+			'friends' => UserFriendResource::collection($friends),
+		]);
 	}
 
-	public function anketaAction()
+	public function abilities(Request $request): Response|RedirectResponse
 	{
-		$message = '';
-
-		$info = $this->db->query("SELECT * FROM game_users_info WHERE id = '" . $this->user->id . "'")->fetch();
-
-		if ($this->request->hasPost('changepass')) {
-			if ($this->request->getPost('old_pass') != '') {
-				if (md5($this->request->getPost('old_pass')) == $this->user->pass) {
-					if ($this->request->getPost('new_pass') == $this->request->getPost('conf_new_pass')) {
-						if (strlen($this->request->getPost('new_pass')) >= 6) {
-							$pass = md5($this->request->getPost('new_pass'));
-							$this->db->query("UPDATE game_users_info SET password = '" . $pass . "' WHERE id = '" . $this->user->id . "'");
-
-							$message = "Ваш пароль успешно изменён!";
-						} else {
-							$message = "Пароль не должен быть короче 6 символов!";
-						}
-					} else {
-						$message = "Введённые пароли не совпадают! Будте аккуратны!";
-					}
-				} else {
-					$message = "Вы ошиблись при написании пароля! Будте аккуратны!";
-				}
-			} else {
-				$message = "Введите старый пароль!";
-			}
-		}
-
-		if ($this->request->hasPost('changemail')) {
-			if ($this->request->getPost('old_email') != '') {
-				if ($this->request->getPost('old_email') == $info['email']) {
-					if (preg_match("/^[_\.0-9a-zA-Z-]{1,}@[_\.0-9a-zA-Z-]{1,}\.[_\.0-9a-zA-Z-]{2,}$/", $this->request->getPost('new_email'))) {
-						$this->db->query("UPDATE game_users_info SET email = '" . $this->request->getPost('new_email') . "' WHERE id = '" . $this->user->id . "'");
-
-						$message = "Ваш e-mail успешно изменён!";
-					} else {
-						$message = "Адрес электронной почты содержит запрещённые символы!";
-					}
-				} else {
-					$message = "Вы ошиблись при написании e-mail! Будте аккуратны!";
-				}
-			} else {
-				$message = "Введите старый email!";
-			}
-		}
-
-		if ($this->request->hasPost('changeinfo')) {
-			$realname 	= addslashes(htmlspecialchars($this->request->getPost('realname', null, '')));
-			$city 		= addslashes(htmlspecialchars($this->request->getPost('city', null, '')));
-			$about 		= addslashes(htmlspecialchars($this->request->getPost('about', null, '')));
-
-			$this->db->query("UPDATE game_users u, game_users_info ui SET ui.name = '" . $realname . "', ui.city = '" . $city . "', ui.about = '" . $about . "' WHERE u.id = '" . $this->user->id . "' and ui.id = '" . $this->user->id . "'");
-
-			$info['name'] 	= $realname;
-			$info['city'] 	= $city;
-			$info['about'] 	= $about;
-		};
-
-		$this->view->setVar('message', $message);
-		$this->view->setVar('anketa', $info);
-	}
-
-	public function abilities(Request $request)
-	{
-		$message = '';
-
 		/** @var array $priem_full */
 		include(resource_path('/data/battle.php'));
 
@@ -258,38 +221,13 @@ class PersonController extends Controller
 
 		try {
 			if ($onset = $request->integer('onset')) {
-				if (!$priem_full[$onset]) {
-					throw new Exception('Такого приёма не существует');
-				}
-
-				if ($this->user->level < $priem_full[$onset]['level']) {
-					throw new Exception('Уровень слишком мал!');
-				}
-
-				$slot = 1;
-
-				for ($i = 1; $i <= 10; $i++) {
-					if (!isset($active[$i])) {
-						$slot = $i;
-						break;
-					}
-				}
-
-				$this->user->abilities()
-					->updateOrCreate(['slot' => $slot], [
-						'ability' => $onset,
-					]);
+				UserService::activateAbility($this->user, $onset);
 
 				return back();
 			}
 
 			if ($unset = $request->integer('unset')) {
-				if ($unset > 10) {
-					throw new Exception('Неправильный ввод данных');
-				}
-
-				$this->user->abilities()->where('slot', $unset)
-					->delete();
+				UserService::deactivateAbility($this->user, $unset);
 
 				return back();
 			}

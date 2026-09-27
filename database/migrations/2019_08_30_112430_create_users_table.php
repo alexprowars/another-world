@@ -13,7 +13,6 @@ return new class extends Migration {
 			$table->string('email', 50)->unique();
 			$table->timestamp('email_verified_at')->nullable();
 			$table->string('password')->nullable();
-			$table->string('name', 100)->nullable();
 			$table->timestamp('blocked_at')->nullable();
 			$table->timestamp('prison_until')->nullable()->index();
 			$table->string('prison_reason', 255)->nullable();
@@ -21,6 +20,10 @@ return new class extends Migration {
 			$table->bigInteger('ip')->nullable();
 			$table->enum('gender', ['M', 'F'])->nullable();
 			$table->char('locale', 2)->default('ru');
+			$table->string('name', 100)->nullable();
+			$table->string('city')->nullable();
+			$table->text('about')->nullable();
+			$table->json('options')->nullable();
 			$table->unsignedInteger('exp')->default(0);
 			$table->unsignedTinyInteger('level')->default(0);
 			$table->unsignedTinyInteger('up')->default(0);
@@ -36,7 +39,7 @@ return new class extends Migration {
 			$table->smallInteger('s_dexterity')->default(3);
 			$table->smallInteger('s_agility')->default(3);
 			$table->smallInteger('s_vitality')->default(3);
-			$table->smallInteger('s_power')->default(1);
+			$table->smallInteger('s_magic')->default(1);
 			$table->smallInteger('s_intelligence')->default(0);
 			$table->string('image', 50)->nullable();
 			$table->unsignedSmallInteger('profession')->nullable();

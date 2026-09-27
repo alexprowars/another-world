@@ -34,7 +34,7 @@ if (!empty($_GET['sale']) && is_numeric($_GET['sale'])) {
 	// Продаем
 	$sale = addslashes($_GET['sale']);
 
-	$is_ex=mysql_fetch_array(mysql_query("SELECT objects.`id`,objects.`inf`,objects.`tip` FROM objects, slots WHERE objects.user='".$stat['user']."' AND objects.present=0 AND objects.bank=0 AND objects.sclad=0 AND objects.komis=0 && objects.id=".addslashes($sale)." AND slots.id=".$stat['id']." && objects.id NOT IN (slots.1,slots.2,slots.3,slots.4,slots.5,slots.6,slots.7,slots.8,slots.9,slots.10,slots.11,slots.12,slots.13,slots.14,slots.15,slots.16,slots.17,slots.18,slots.19,slots.20)"));
+	$is_ex=mysql_fetch_array(mysql_query("SELECT objects.`id`,objects.`inf`,objects.`tip` FROM objects, slots WHERE objects.user='".$stat['user']."' AND objects.present=0 AND objects.bank=0 AND objects.sclad=0 AND objects.market=0 && objects.id=".addslashes($sale)." AND slots.id=".$stat['id']." && objects.id NOT IN (slots.1,slots.2,slots.3,slots.4,slots.5,slots.6,slots.7,slots.8,slots.9,slots.10,slots.11,slots.12,slots.13,slots.14,slots.15,slots.16,slots.17,slots.18,slots.19,slots.20)"));
 	
 	$is_ex_inf=explode("|",$is_ex['inf']);
 	
@@ -63,7 +63,7 @@ switch ($id) {
 
         case 1:
 	echo"<table border=0 width=100%>";
-$it_sost=mysql_query("SELECT * FROM `objects` WHERE `user` = '".$stat['user']."' AND (`tip` >= 19 AND `tip` <= 20) AND present=0 AND bank=0 AND sclad=0 AND komis=0");
+$it_sost=mysql_query("SELECT * FROM `objects` WHERE `user` = '".$stat['user']."' AND (`tip` >= 19 AND `tip` <= 20) AND present=0 AND bank=0 AND sclad=0 AND market=0");
 
 if (mysql_num_rows($it_sost)) {
 	

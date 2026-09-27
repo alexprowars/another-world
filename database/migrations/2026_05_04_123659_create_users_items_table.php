@@ -50,7 +50,7 @@ return new class extends Migration {
 			$table->string('about')->nullable();
 			$table->string('engraving')->nullable();
 			$table->unsignedTinyInteger('mf_type')->nullable();
-			$table->boolean('komis')->default(false);
+			$table->boolean('market')->default(false);
 			$table->boolean('sclad')->default(false);
 			$table->unsignedTinyInteger('class')->nullable();
 			$table->unsignedSmallInteger('mz_1')->nullable();

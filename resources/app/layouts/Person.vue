@@ -18,15 +18,13 @@
 						<tr>
 							<td valign="top" class="tm_p"><Link href="/person/inventory" class="tm">Рюкзак</Link></td>
 							<td class="delem"></td>
-							<td valign="top" class="tm_p"><Link href="/person/settings" class="tm">Настройки</Link></td>
-							<td class="delem"></td>
 							<td valign="top" class="tm_p"><Link href="/person/updates" class="tm">Умения</Link></td>
 							<td class="delem"></td>
 							<td valign="top" class="tm_p"><Link href="/person/abilities" class="tm">Приёмы</Link></td>
 							<td class="delem"></td>
 							<td valign="top" class="tm_p"><Link href="/person/friends" class="tm">Друзья</Link></td>
 							<td class="delem"></td>
-							<td valign="top" class="tm_p"><Link href="/person/anketa" class="tm">Анкета</Link></td>
+							<td valign="top" class="tm_p"><Link href="/person/settings" class="tm">Настройки</Link></td>
 						</tr>
 						</tbody>
 					</table>

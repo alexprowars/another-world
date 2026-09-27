@@ -4,16 +4,19 @@
 			<tr>
 				<td width="30%" align="center">
 					<div><img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title"></div>
-					<a href="" @click.prevent="sellItem" class="text-xs">
-						<b>Продать за {{ item.price_sell }} {{ item.price_type === 1 ? 'плт.' : 'зол.' }}</b>
-					</a>
+					<slot name="actions">
+						<a href="" @click.prevent="sellItem" class="text-xs">
+							<b>Продать за {{ item.price_sell }} {{ item.price_type === 1 ? 'плт.' : 'зол.' }}</b>
+						</a>
+					</slot>
 				</td>
 				<td width="70%" valign="top" class="text-xs">
 					<div class="font-bold">{{ item.title }}</div>
+					<slot name="details"/>
 					<div>Гос. цена: <b>{{ item.price }}</b> зол.</div>
 					<div>Долговечность предмета: <b>{{ item.wearout }}</b>/<b>{{ item.wearout_max }}</b></div>
 
-					<div v-if="Object.keys(item['requirements']).length > 0" class="mt-2">
+					<div v-if="Object.keys(item.requirements || {}).length > 0" class="mt-2">
 						<div class="font-bold">Минимальные требования:</div>
 						<div v-if="item['requirements']['level']" :class="{ 'text-red-600': user.level < item['requirements']['level'] }">
 							Уровень: {{ item['requirements']['level'] }}
@@ -23,7 +26,7 @@
 						</div>
 						<template v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence']">
 							<div v-if="item['requirements'][stat]" :class="{ 'text-red-600': user[stat] !== item['requirements'][stat] }">
-								{{ $t('stats.' . stat) }}: {{ item['requirements'][stat] }}
+								{{ $t('stats.' + stat) }}: {{ item['requirements'][stat] }}
 							</div>
 						</template>
 					</div>

@@ -221,6 +221,10 @@ class InventoryService
 
 	public static function isAllowOnset(UserItem $item, User $user): bool
 	{
+		if ($item->market) {
+			return false;
+		}
+
 		$req = $item->requirements;
 
 		if ($item->wearout >= $item->wearout_max) {
@@ -254,7 +258,7 @@ class InventoryService
 	{
 		$result = $user->items()
 			->where('bank', false)
-			->where('komis', false)
+			->where('market', false)
 			->where('sclad', false)
 			->orderByDesc('created_at');
 

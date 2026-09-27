@@ -26,6 +26,8 @@ Route::middleware(['auth'])->group(function () {
 		Route::match(['get', 'post'], '/person/abilities', [Controllers\PersonController::class, 'abilities'])->name('person.abilities');
 		Route::match(['get', 'post'], '/person/avatar', [Controllers\AvatarController::class, 'index'])->name('person.avatar');
 		Route::get('/person/inventory', [Controllers\PersonController::class, 'inventory'])->name('person.inventory');
+		Route::match(['get', 'post'], '/person/friends', [Controllers\PersonController::class, 'friends'])->name('person.friends');
+		Route::match(['get', 'post'], '/person/settings', [Controllers\PersonController::class, 'settings'])->name('person.settings');
 		Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');
 		Route::get('/map/change/{room}', [Controllers\MapController::class, 'change']);
 		Route::match(['get', 'post'], '/battle', [Controllers\BattleController::class, 'index'])->name('battle');

@@ -121,6 +121,10 @@ class GiftShop
 			->first();
 
 		if ($object) {
+			if ($object->market) {
+				throw new Exception('Сначала снимите предмет с продажи на рынке!');
+			}
+
 			$exist = UserGift::query()
 				->whereBelongsTo($object, 'item')
 				->exists();

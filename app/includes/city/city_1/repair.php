@@ -318,7 +318,7 @@ switch ($otdel)
 		{
 			$items = $this->user->getSlot()->getItemsId();
 
-			$objects = Objects::query()->where('user_id = ' . $this->user->id . ' AND ((tip >= 1 AND tip <= 11) OR (tip >= 24 AND tip <= 25)) AND present=0 AND bank=0 AND sclad=0 AND komis=0 AND '.(count($items) ? 'id NOT IN ('.implode(',', $items).')' : '').'')->orderBy('time DESC')->execute();
+			$objects = Objects::query()->where('user_id = ' . $this->user->id . ' AND ((tip >= 1 AND tip <= 11) OR (tip >= 24 AND tip <= 25)) AND present=0 AND bank=0 AND sclad=0 AND market=0 AND '.(count($items) ? 'id NOT IN ('.implode(',', $items).')' : '').'')->orderBy('time DESC')->execute();
 
 			$this->view->setVar('objects', $objects);
 
@@ -353,7 +353,7 @@ switch ($otdel)
 
 		if (!$this->user->r_time)
 		{
-			$objects = Objects::query()->where('user_id = ' . $this->user->id . ' AND ((tip >= 1 AND tip <= 11) OR (tip >= 24 AND tip <= 25) OR tip = 18) AND present=0 AND bank=0 AND sclad=0 AND komis=0')->orderBy('time DESC')->execute();
+			$objects = Objects::query()->where('user_id = ' . $this->user->id . ' AND ((tip >= 1 AND tip <= 11) OR (tip >= 24 AND tip <= 25) OR tip = 18) AND present=0 AND bank=0 AND sclad=0 AND market=0')->orderBy('time DESC')->execute();
 
 			$this->view->setVar('objects', $objects);
 
