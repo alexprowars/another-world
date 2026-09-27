@@ -153,11 +153,163 @@ class BattleService
 			->first();
 	}
 
+	public static function createOffer(User $user, BattleType $battleType)
+	{
+		$userOffer = self::getCurrentUserRequest($user);
+
+		switch (request()->integer('timeout')) {
+			case 1:
+				$timeout = 90;
+				break;
+			case 3:
+				$timeout = 180;
+				break;
+			case 5:
+				$timeout = 300;
+				break;
+			case 10:
+				$timeout = 600;
+				break;
+			default:
+				$timeout = 180;
+				break;
+		}
+
+		$comment = htmlspecialchars(request()->post('comment', ''));
+
+		$message = '';
+
+		if ($userOffer) {
+			throw new Exception('Для начала с одной заявкой разберись...');
+		}
+
+		if ($user->hp_now < $user->hp_max / 3) {
+			throw new Exception('Вы слишком ослаблены для поединка! Восстановитесь...');
+		}
+
+		$battle = new Battle();
+		$battle->status = BattleStatus::WAITING;
+		$battle->timeout = $timeout;
+		$battle->comment = $comment;
+
+		switch ($battleType) {
+			case BattleType::DUEL:
+				$battle->started_at = now()->addSeconds(600);
+				$battle->type = BattleType::DUEL;
+				$battle->is_blood = request()->boolean('blood');
+				$battle->use_weapons = !request()->boolean('kulak');
+
+				break;
+
+			case 2:
+				if ($user->level < 2) {
+					throw new Exception('Извините, групповые бои с 2-ого уровня');
+				}
+
+				$time_battle_start = request()->integer('time_battle_start');
+
+				if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
+					$time_battle_start = 180;
+				}
+
+				switch (request()->integer('offer_level')) {
+					case 2:
+						$level_min = $user->level;
+						$level_max = $user->level;
+						break;
+					case 3:
+						$level_min = 0;
+						$level_max = $user->level;
+						break;
+					case 4:
+						$level_min = 0;
+						$level_max = $user->level - 1;
+						break;
+					default:
+						$level_min = 0;
+						$level_max = 12;
+				}
+
+				$capacity 	= request()->integer('capacity', 2);
+
+				// Размеры команд
+				if ($capacity < 2 || $capacity > 25) {
+					$capacity = 2;
+				}
+
+				$battle->started_at = now()->addSeconds($time_battle_start);
+				$battle->type = BattleType::GROUP;
+				$battle->capacity = $capacity;
+				$battle->min_level = $level_min;
+				$battle->max_level = $level_max;
+
+				break;
+
+			case 3:
+				if ($user->level < 3) {
+					throw new Exception('Извините, хаотические бои с 3-ого уровня');
+				}
+
+				$time_battle_start = request()->integer('time_battle_start');
+
+				$alg = request()->integer('alg', 1);
+				$alg = min(1, max(0, $alg));
+
+				$inv = request()->integer('inv', 1);
+				$inv = min(1, max(0, $inv));
+
+				// Время до начала поединка
+				if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
+					$time_battle_start = 180;
+				}
+
+				// Уровни
+				switch (request()->integer('offer_level')) {
+					case 2:
+						$level_min = $user->level;
+						$level_max = $user->level;
+						break;
+					case 3:
+						$level_min = 0;
+						$level_max = $user->level;
+						break;
+					case 4:
+						$level_min = 0;
+						$level_max = $user->level - 1;
+						break;
+					default:
+						$level_min = 0;
+						$level_max = 12;
+				}
+
+				$battle->started_at = now()->addSeconds($time_battle_start);
+				$battle->type = BattleType::CHAOS;
+				$battle->capacity = 50;
+				$battle->min_level = $level_min;
+				$battle->max_level = $level_max;
+				$battle->is_blood = request()->boolean('blood');
+
+				//						'alg'				=> $alg,
+				//						'inv'				=> $inv,
+
+				break;
+			default:
+				throw new Exception('unknown battle type');
+		}
+
+		$battle->save();
+		$battle->members()->create([
+			'user_id' => $user->id,
+			'side' => 0,
+			'exp' => self::getBaseLevelExp($user->level),
+		]);
+
+		return $message;
+	}
+
 	public static function takeOffer(Battle $battle, User $user)
 	{
 		$existOffer = self::getCurrentUserRequest($user);
-
-		$message = '';
 
 		if (isset($existOffer)) {
 			throw new Exception('Для начала с одной заявкой разберись...');
@@ -271,8 +423,6 @@ class BattleService
 
 		$user->battle()->associate($battle);
 		$user->save();
-
-		return $message;
 	}
 
 	public static function getBaseLevelExp(int $lvl): int

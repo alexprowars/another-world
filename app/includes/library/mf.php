@@ -1,4 +1,4 @@
-<?
+<?php
 
 include("config/html_header.php");
 echo"

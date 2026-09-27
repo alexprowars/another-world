@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
  * @var $this \App\Http\Controllers\MapController

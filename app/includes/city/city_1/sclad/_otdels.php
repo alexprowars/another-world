@@ -1,4 +1,4 @@
-<?
+<?php
 
 if (!empty($otdel))
 {

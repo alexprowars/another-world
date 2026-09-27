@@ -1,4 +1,4 @@
-<?
+<?php
 if (!empty($otdel)) {
 
         $shop=mysql_query("SELECT * FROM items WHERE craft=2 ORDER BY price");

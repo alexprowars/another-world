@@ -1,4 +1,4 @@
-<?
+<?php
 
 $act = $_GET['act'];
 
@@ -148,7 +148,7 @@ if ($act == "new") {
 </td></tr></table>
 </form>
 
-<?
+<?php
 if ($_GET['do'] == "3") {
 
 $text = HtmlSpecialChars($_POST['text']);

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined("INSIDE")){ die("attemp hacking");}
 if (isset($_GET['buy'])) {
 

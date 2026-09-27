@@ -13,7 +13,7 @@
 <br>
 Выигрыш складывается из Ваших ставок.
 </FIELDSET>
-<?
+<?php
 function new_game () {
         ?>
         <form action='/map/?gameroom=1&sets=game' method=post>
@@ -27,7 +27,7 @@ function new_game () {
         </td>
         </tr>
         </table>
-        <?
+        <?php
         }
 if (!$_GET[sets])
 {
@@ -59,7 +59,7 @@ if ($_GET[sets]==game) {
 Деньги: <b><?=$stat['credits']?> кр.</b>
 <br>
 Ставка: <b><?=$st?> кр.</b>
-<?
+<?php
 if ($_POST['play']==1) {
 ?>
 <br>
@@ -67,7 +67,7 @@ if ($_POST['play']==1) {
 <center>
 <img src='/images/images/bone/<?=$player_1?>.gif' alt='<?=$player_1?>'><p><img src='/images/images/bone/<?=$player_2?>.gif' alt='<?=$player_2?>'>
 </center>
-<?
+<?php
   }
 ?>
 </FIELDSET>
@@ -81,7 +81,7 @@ if ($_POST['play']==1) {
 Деньги: <b>??? кр.</b>
 <br>
 Ставка: <b><?=$st?> кр.</b>
-<?
+<?php
 if ($_POST['play']==1) {
 ?>
 <br>
@@ -89,7 +89,7 @@ if ($_POST['play']==1) {
 <center>
 <img src='/images/images/bone/<?=$comp_1?>.gif' alt='<?=$comp_1?>'><p><img src='/images/images/bone/<?=$comp_2?>.gif' alt='<?=$comp_2?>'>
 </center>
-<?
+<?php
   }
 ?>
 </FIELDSET>
@@ -101,7 +101,7 @@ if ($_POST['play']==1) {
 <input type="hidden" name="play" value="1">
 <FIELDSET><LEGEND>Действия</LEGEND>
 <center>
-<? if ($_POST['play'] == 1) {
+<?php if ($_POST['play'] == 1) {
         $summa_player = $player_1+$player_2;
         $summa_comp = $comp_1+$comp_2;
         if ($summa_player>$summa_comp) {
@@ -131,7 +131,7 @@ if ($_POST['play']==1) {
 </td>
 </tr>
 </table>
-<?
+<?php
                  }
                  else {
                          echo "<p><center><font class=bloked>У Вас недостаточно денег!</font></center><p>";

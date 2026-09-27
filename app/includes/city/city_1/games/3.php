@@ -1,4 +1,4 @@
-<?
+<?php
 if ($_GET['sets'] == "buy"){
 	if ($stat['credits'] >= 1){
 	$nums = mysql_fetch_array(mysql_query("select MAX(number) as number from lotto"));
@@ -49,7 +49,7 @@ if ($_GET['sets'] == "play"){
 <tr>
 <td width=45% valign=top>
 <FIELDSET><LEGEND>Победители прошлых розыгрышей</LEGEND>
-<?
+<?php
 
 $otchet=mysql_query("SELECT * FROM lotto_winner order by id desc");
 	for ($i=0; $i<mysql_num_rows($otchet); $i++) {
@@ -80,10 +80,10 @@ $sum=mysql_fetch_array(mysql_query("SELECT fond FROM lotto_fond"));
         <br><br>
         <center>          
 
-<?
+<?php
 if ($stat['rank'] == 100) print "<input type=button class=input value='Провести лотто' onclick='window.location = \"/map/?gameroom=3&sets=play\"' class=search style='WIDTH: 100px'>
 &nbsp;&nbsp;&nbsp;&nbsp; ";?>
-<? print "<input type=button class=input value='Купить билет' onclick='window.location = \"/map/?gameroom=3&sets=buy\"' class=search style='WIDTH: 100px'>"; ?>
+<?php print "<input type=button class=input value='Купить билет' onclick='window.location = \"/map/?gameroom=3&sets=buy\"' class=search style='WIDTH: 100px'>"; ?>
         </center>
         </FIELDSET>
         </form>
@@ -91,7 +91,7 @@ if ($stat['rank'] == 100) print "<input type=button class=input value='Пров�
         </tr>
         </table>
 
-<?
+<?php
 if ($stat['kwest0'] == 17)
 echo"<center><fieldset style='WIDTH: 70%'><font face=Verdana size=2><legend>Сообщение о Квесте</legend></font>
 <div align=center><font face=Verdana size=2>

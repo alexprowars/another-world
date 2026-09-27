@@ -1,4 +1,4 @@
-<?
+<?php
 if (!empty($sale) && is_numeric($sale))
 {
 	// Продаем

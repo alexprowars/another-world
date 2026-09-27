@@ -17,7 +17,7 @@ if (isset($userOffer['BattleID']))
 				</td>
 			</tr>
 		</table>
-	<?
+	<?php
 	}
 	else
 	{
@@ -40,7 +40,7 @@ if (isset($userOffer['BattleID']))
 					</td>
 				</tr>
 			</table>
-		<?
+		<?php
 		}
 		else if ($userOffer['BattleType'] == 1)
 		{
@@ -52,7 +52,7 @@ if (isset($userOffer['BattleID']))
 					</td>
 				</tr>
 			</table>
-		<?
+		<?php
 		}
 	}
 }
@@ -125,7 +125,7 @@ else
 			</tr>
 		</table>
 	</form>
-	<?
+	<?php
 }
 
 
@@ -137,7 +137,7 @@ else
 			<th width=46 align=center><b><img src='/images/images/clock.gif'></b></th>
 			<th>&nbsp;</th>
 		</tr>
-<?
+<?php
 
 $offers = $this->db->query("SELECT * FROM `game_battle` WHERE `StartTime` > " . time() . " AND `BattleType` = '".$battleType."' AND `Status` = 'Zayavka' ORDER BY StartTime DESC");
 

@@ -78,7 +78,7 @@ if (!isset($userOffer['BattleID']))
 			</tr>
 		</table>
 	</form>
-	<?
+	<?php
 	//
 }
 ?>
@@ -117,7 +117,7 @@ if (!isset($userOffer['BattleID']))
 			<td align=center><b>Команда #2</b></td>
 		</tr>
 
-<?
+<?php
 
 $cn = 0;
 

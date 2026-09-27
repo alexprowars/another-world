@@ -79,7 +79,7 @@ if (!isset($userOffer['BattleID']))
 			</tr>
 		</table>
 	</form>
-	<?
+	<?php
 	//
 }
 
@@ -91,7 +91,7 @@ if (!isset($userOffer['BattleID']))
 			<td width=46 align=center><b><img src='/images/images/clock.gif'></b></td>
 			<td align=left><b>Участники:</b></td>
 		</tr>
-<?
+<?php
 
 $cn = 0;
 

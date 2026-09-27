@@ -1,4 +1,4 @@
-<?
+<?php
 if (!empty($otdel)) {
 
         $shop=mysql_query("SELECT shop.*, items.* FROM shop, items WHERE items.name=shop.name AND items.craft=1 ORDER BY items.price");

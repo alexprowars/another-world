@@ -1,4 +1,4 @@
-<?
+<?php
 
 
 $otdel = $_GET['otdel'];
