@@ -19,7 +19,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence', 'battery']">
+				<tr v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence']">
 					<td class="align-middle">
 						<img src="/assets/images/help.gif" class="text" v-tooltip="{ content: '<b>' + $t('stats.' + stat) + '</b><br>' + $t('stats-info.' + stat), html: true }">
 					</td>

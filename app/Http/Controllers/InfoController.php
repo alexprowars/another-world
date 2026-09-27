@@ -65,7 +65,7 @@ class InfoController extends Controller
 
 		$parse['w_h'] = $info->getPercent($info->hp_now, $info->hp_max);
 		$parse['w_e'] = $info->getPercent($info->energy_now, $info->energy_max);
-		$parse['w_u'] = $info->getPercent($info->ustal_now, $info->ustal_max);
+		$parse['w_u'] = $info->getPercent($info->stamina_now, $info->stamina_max);
 
 		if ($info->tribe > 0)
 			$tribe = $this->db->query("SELECT * FROM game_tribes WHERE id = '".$info->tribe."'")->fetch();

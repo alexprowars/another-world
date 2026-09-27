@@ -2,26 +2,21 @@
 
 namespace App\Engine\Map\Arena;
 
-use App\Engine\Battle\BattleStatus;
-use App\Models\Battle;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\BattleService;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class City
 {
-	public function __invoke()
+	public function __invoke(): Response|RedirectResponse
 	{
 		$user = auth()->user();
 		$room = request()->integer('room');
 
 		if ($room == 23 || $room == 2 || $room == 8) {
-			$existBattleRequest = Battle::query()
-				->where('status', BattleStatus::WAITING)
-				->whereHas('members', function (Builder $query) use ($user) {
-					$query->whereBelongsTo($user);
-				})
-				->exists();
+			$existBattleRequest = BattleService::getCurrentUserRequest($user);
 
 			if ($existBattleRequest) {
 				flash('Вы подали заявку и пытаетесь убежать с поля битвы! Нехорошо...');

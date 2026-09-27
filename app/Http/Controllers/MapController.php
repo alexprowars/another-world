@@ -20,6 +20,10 @@ class MapController extends Controller
 		$user = auth()->user();
 
 		try {
+			if ($user->prison_until?->isFuture()) {
+				throw new Exception('Нельзя покинуть тюрьму до окончания срока наказания');
+			}
+
 			if ($user->r_date || $user->r_type) {
 				throw new Exception('Нельзя перемещаться по городу пока занят работой');
 			}
@@ -134,8 +138,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/administ.php'));
 				break; // Админка
 			case 16:
-				return include(app_path('/includes/city/city_1/works.php'));
-				break; // Центр занятости
+				return new Map\Works()();
 			case 17:
 				return include(app_path('/includes/city/city_1/bank.php'));
 				break; // Банк
@@ -163,8 +166,7 @@ class MapController extends Controller
 				return include(app_path('/includes/city/city_1/kwest.php'));
 				break; // Таверна
 			case 666:
-				return include(app_path('/includes/city/city_1/prison.php'));
-				break; // Тюрьма
+				return new Map\Prison()();
 			case 101:
 			case 103:
 			case 104:
@@ -172,8 +174,8 @@ class MapController extends Controller
 			case 23:
 				return new Map\Street()();
 			default:
-				if ($this->user->room >= 200 && $this->user->room <= 370) {
-					return include(app_path('/includes/city/city_1/vault.php'));
+				if ($roomId >= 200 && $roomId <= 370) {
+					return new Map\Vault()();
 				} else {
 					return new Map\Arena\City()();
 				}

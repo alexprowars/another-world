@@ -35,7 +35,6 @@ class User extends Authenticatable implements HasMedia
 	public $vitality;
 	public $magic;
 	public $intelligence;
-	public $battery;
 
 	/**
 	 * Вычисляемые модификаторы
@@ -63,6 +62,8 @@ class User extends Authenticatable implements HasMedia
 	protected $casts = [
 		'hp_now' => 'float',
 		'blocked_at' => 'immutable_datetime',
+		'injury' => 'immutable_datetime',
+		'prison_until' => 'immutable_datetime',
 		'online' => 'immutable_datetime',
 		'r_date' => 'immutable_datetime',
 		'silence' => 'immutable_datetime',
@@ -98,6 +99,12 @@ class User extends Authenticatable implements HasMedia
 	public function battle(): BelongsTo
 	{
 		return $this->belongsTo(Battle::class, 'battle_id');
+	}
+
+	/** @return BelongsTo<Work, $this> */
+	public function work(): BelongsTo
+	{
+		return $this->belongsTo(Work::class, 'work_id');
 	}
 
 	/** @return HasMany<UserItem, $this> */

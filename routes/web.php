@@ -28,6 +28,6 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/person/inventory', [Controllers\PersonController::class, 'inventory'])->name('person.inventory');
 		Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');
 		Route::get('/map/change/{room}', [Controllers\MapController::class, 'change']);
-		Route::get('/battle', [Controllers\BattleController::class, 'index'])->name('battle');
+		Route::match(['get', 'post'], '/battle', [Controllers\BattleController::class, 'index'])->name('battle');
 	});
 });

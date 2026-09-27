@@ -568,12 +568,8 @@ class Battle
 			$this->battle->save();
 		}
 
-		// Поднимаем активность
-		if ($this->user->battery * 20 > $this->user->ustal_now + 20) {
-			$this->user->ustal_now += 20;
-		} else {
-			$this->user->ustal_now = $this->user->battery * 20;
-		}
+		// Восстанавливаем запас сил
+		$this->user->stamina_now = min($this->user->stamina_now + 20, $this->user->vitality * 20);
 
 		if ($type == 1) {
 			$this->user->draws += 1;

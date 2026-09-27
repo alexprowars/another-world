@@ -2,327 +2,176 @@
 
 namespace App\Http\Controllers;
 
-use App\Engine\Battle\Battle;
+use App\Engine\Battle\Battle as BattleEngine;
+use App\Engine\Battle\BattleStatus;
+use App\Engine\Battle\BattleType;
+use App\Engine\Map\Arena\Training;
+use App\Exceptions\Exception;
 use App\Http\Controller;
+use App\Http\Resources\BattleOfferResource;
+use App\Models\Battle;
+use App\Services\BattleService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class BattleController extends Controller
 {
-	public function index(Request $request)
+	public function index(Request $request): Response|JsonResponse|RedirectResponse
 	{
-		if ($request->has('teleport')) {
-			$this->user->room = 1;
-			$this->user->save();
-		}
+		$user = $request->user();
 
-		if ($this->user->room == 2 && !$this->user->battle_id) {
-			return include(app_path('/includes/city/city_1/trening.php'));
-		}
+		if ($user->battle && in_array($user->battle->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)) {
+			if ($request->isMethod('post')) {
+				return to_route('battle');
+			}
 
-		if ($this->user->battle) {
-			if ($request->expectsJson()) {
-				$result = DB::transaction(function () use ($request) {
-					$battle = new Battle($this->user->battle, $request->user());
+			if ($request->expectsJson() && !$request->header('X-Inertia')) {
+				$result = DB::transaction(function () use ($user) {
+					$battle = new BattleEngine($user->battle, $user);
 					$battle->init();
 
 					return $battle->show();
 				});
 
 				return response()->json($result);
-			} else {
-				return Inertia::render('Battle', [
-					'id' => $this->user->battle->id,
-				]);
 			}
+
+			return Inertia::render('Battle', ['id' => $user->battle->id]);
 		}
 
-		$this->view->pick('battle/list');
-
-		$offerId 	= $request->integer('offer');
-		$page 		= $request->input('page');
-		$battleType = $request->integer('battle_type', 1);
-		$battleType = min(3, max(1, $battleType));
-
-		$this->user->getSlotsInfo();
-		$this->user->calculate();
-
-		$message = '';
-		$alert = '';
-		$userOffer = $this->getCurrentUserRequest();
-
-		if (isset($userOffer['BattleID'])) {
-			$battleType = $userOffer['BattleType'];
+		if ($user->room == 2 && !$request->has('action')) {
+			return new Training()();
 		}
 
-		$this->view->setVar('battleType', $battleType);
-
-		switch ($page) {
-			case "take_it":
-				$message = $this->takeOffer($offerId);
-
-				echo $message;
-
-				if ($message == '') {
-					$userOffer = $this->getCurrentUserRequest();
-				}
-
-				break;
-
-			case "dismiss":
-				if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
-					if (!$userOffer['Team']) {
-						$opponent = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $userOffer['BattleID'] . " AND f.Team = 1 AND f.FighterID = u.id")->fetch();
-
-						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` != " . $this->user->getId() . "");
-
-						if (isset($opponent['user'])) {
-							$this->game->insertInChat("<b>" . $this->user->username . "</b> отказал в поединке!", $opponent['username'], true);
-						}
-					} else {
-						$message = "Что-то тут не так...";
-					}
-				} else {
-					$message = 'Заявки несуществует или истек срок её размещения';
-				}
-
-				break;
-
-			case "take_back":
-				if (isset($userOffer['BattleID']) && $userOffer['BattleType'] == 1) {
-					if (!$userOffer['Team']) {
-						$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
-						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . "");
-					} else {
-						$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $userOffer['BattleID'] . " AND `FighterID` = " . $this->user->getId() . "");
-					}
-
-					unset($userOffer);
-				} else {
-					$message = 'Заявки несуществует или истек срок её размещения';
-				}
-
-				break;
-
-			case "newbattle":
-				$this->createOffer($battleType);
-
-				if ($message == '') {
-					$userOffer = $this->getCurrentUserRequest();
-				}
-
-				break;
+		if ($request->isMethod('post')) {
+			return $this->updateOffer($request);
 		}
 
-		ob_start();
+		$userOffer = BattleService::getCurrentUserRequest($user);
 
-		switch ($battleType) {
-			case 2:
-				if ($this->user->level < 2) {
-					$message = 'Извините, групповые бои с 2-ого уровня';
-				} else {
-					if ($page == "start" || $page == '') {
-						$this->startOffer($battleType);
-					}
+		$battleType = $userOffer?->battle->type
+			?? BattleType::from(min(3, max(1, $request->integer('battle_type', 1))));
 
-					include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
-				}
+		if ($userOffer && $battleType !== BattleType::DUEL) {
+			if (BattleService::startOffer($user, $battleType)) {
+				return to_route('battle');
+			}
 
-				break;
-
-			case 3:
-				if ($this->user->level < 3) {
-					$message = 'Извините, хаотические бои с 3-ого уровня';
-				} else {
-					if ($page == "start" || $page == '') {
-						$this->startOffer($battleType);
-					}
-
-					include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
-				}
-
-				break;
-
-			default:
-				if ($page == "start") {
-					$this->startOffer($battleType);
-				}
-
-				include(ROOT_PATH . "/app/includes/battle/show_offers_" . $battleType . ".php");
+			$userOffer = $userOffer->fresh(['battle']);
 		}
 
-		$list = ob_get_contents();
-		ob_end_clean();
+		$userOffer?->battle->load('members.user.tribe');
 
-		$this->view->setVar('alert', $alert);
-		$this->view->setVar('message', $message);
-		$this->view->setVar('list', $list);
-		$this->view->setVar('battleId', (isset($userOffer['BattleID']) ? $userOffer['BattleID'] : 0));
+		$offers = Battle::query()
+			->with('members.user.tribe')
+			->where('status', BattleStatus::WAITING)
+			->where('type', $battleType)
+			->where('started_at', '>', now())
+			->whereHas('members')
+			->when($userOffer, fn(Builder $query) => $query->whereNot('id', $userOffer->battle_id))
+			->when($battleType === BattleType::DUEL, fn(Builder $query) => $query->has('members', '=', 1))
+			->orderByDesc('started_at')
+			->get();
+
+		$offerError = null;
+
+		try {
+			BattleService::offerValidation($user, $battleType);
+		} catch (Exception $e) {
+			$offerError = $e->getMessage();
+		}
+
+		return Inertia::render('Battle/Offers', [
+			'battleType' => $battleType->value,
+			'offers' => BattleOfferResource::collection($offers),
+			'currentOffer' => $userOffer ? BattleOfferResource::make($userOffer->battle) : null,
+			'currentSide' => $userOffer?->side,
+			'offerError' => $offerError,
+			'canTeleport' => !in_array($user->room, [1, 2, 3, 4], true) && !$user->r_type && !$user->prison_until?->isFuture(),
+		]);
 	}
 
-	private function startOffer($battleType)
+	private function updateOffer(Request $request): RedirectResponse
 	{
-		if ($battleType == 1) {
-			$user_offer = $this->db->query("SELECT b.BattleID, b.WeaponUsing FROM game_battle b, game_battle_users f WHERE b.StartTime > " . time() . " AND b.BattleType = 1 AND b.Status = 'Zayavka' AND f.FighterID = " . $this->user->getId() . " AND b.BattleID = f.BattleID")->fetch();
+		$request->validate([
+			'action' => ['required', 'in:create,take,withdraw,dismiss,start,teleport'],
+			'battle_type' => ['sometimes', 'integer', 'in:1,2,3'],
+			'offer' => ['required_if:action,take', 'integer', 'min:1'],
+			'battle_side' => ['sometimes', 'integer', 'in:0,1'],
+			'timeout' => ['sometimes', 'integer', 'in:1,3,5,10'],
+			'comment' => ['nullable', 'string', 'max:255'],
+			'offer_level' => ['sometimes', 'integer', 'in:1,2,3,4'],
+			'time_battle_start' => ['sometimes', 'integer', 'in:180,300,600,900'],
+			'capacity' => ['sometimes', 'integer', 'between:2,25'],
+			'blood' => ['sometimes', 'boolean'],
+			'unarmed' => ['sometimes', 'boolean'],
+		]);
 
-			if (isset($user_offer['BattleID'])) {
-				// Узнаём сколько человек в бою
-				$participants = $this->db->query("SELECT count(distinct Team) AS num FROM game_battle_users WHERE BattleID = " . $user_offer['BattleID'] . "")->fetch()['num'];
+		$user = $request->user();
 
-				// Если в бою 2 чела
-				if ($participants == 2) {
-					// Записываем что бой начался
-					$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $user_offer['BattleID'] . "");
+		$battleType = BattleType::from($request->integer('battle_type', 1));
 
-					$bdate = date("d.m.y H:i", time());
+		try {
+			switch ($request->input('action')) {
+				case 'create':
+					BattleService::createOffer($user, $battleType, [
+						'timeout' => $request->integer('timeout', 3),
+						'comment' => $request->input('comment', ''),
+						'offer_level' => $request->integer('offer_level', 1),
+						'time_battle_start' => $request->integer('time_battle_start', 180),
+						'capacity' => $request->integer('capacity', 2),
+						'blood' => $request->boolean('blood'),
+						'unarmed' => $request->boolean('unarmed'),
+					]);
 
-					// Добавляем системку в лог боя
-					$this->db->query("INSERT INTO game_battle_log (HitID, BattleID, HitTime, RedComment) VALUES (0, " . $user_offer['BattleID'] . ", " . time() . ", 71)");
+					break;
+				case 'take':
+					$battle = Battle::query()->find($request->integer('offer'));
 
-					// Узнаём кто в бою (ид, ник и комнату)
-					$members = $this->db->query("SELECT f.FighterID, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $user_offer['BattleID'] . " AND f.FighterID = u.id");
-
-					while ($member = $members->fetch()) {
-						// Добовляем перса в поединок и выводим системку в чат
-						$this->db->query("UPDATE `game_users` SET `battle` = '" . $user_offer['BattleID'] . "' WHERE `id` = '" . $member['FighterID'] . "'");
-						$this->game->insertInChat("Часы показывали <U>$bdate</U>, когда Ваш бой начался!", $member['username'], true);
-
-						// Если кулачный бой то снимаем вещи с перса
-						if ($user_offer['WeaponUsing'] == 1) {
-							$this->db->query("UPDATE slots SET slots.1=0, slots.2=0, slots.3=0, slots.4=0, slots.5=0, slots.6=0, slots.7=0, slots.8=0, slots.9=0, slots.10=0, slots.11=0, slots.12=0, slots.13=0, slots.14=0, slots.15=0, slots.16=0, slots.17=0, slots.18=0, slots.19=0, slots.20=0, slots.21=0, slots.22=0 WHERE id='" . $member['FighterID'] . "'");
-						}
+					if (!$battle) {
+						throw new Exception('Заявки не существует или истёк срок её размещения');
 					}
 
-					$this->response->redirect('battle/');
-					$this->view->disable();
-				}
+					$battleType = $battle->type;
+
+					BattleService::takeOffer($battle, $user, $request->integer('battle_side'));
+
+					break;
+				case 'withdraw':
+					BattleService::withdrawOffer($user);
+
+					break;
+				case 'dismiss':
+					BattleService::withdrawOffer($user, true);
+
+					break;
+				case 'start':
+					$offer = BattleService::getCurrentUserRequest($user);
+
+					if (!$offer || !BattleService::startOffer($user, $offer->battle->type)) {
+						flash('Бой пока не может начаться. Обновите список заявок.');
+					}
+
+					break;
+				case 'teleport':
+					if ($user->r_type || $user->prison_until?->isFuture()) {
+						throw new Exception('Сейчас вы не можете переместиться на арену');
+					}
+
+					$user->room = 1;
+					$user->save();
+
+					break;
 			}
-		} elseif ($battleType == 2) {
-			$currentOffer = $this->db->query("SELECT b.BattleID FROM game_battle b, game_battle_users f WHERE b.StartTime <= " . (time() - 10) . " AND f.FighterID = " . $this->user->getId() . " AND b.BattleType = '2' AND b.Status = 'Zayavka' AND b.BattleID = f.BattleID")->fetch();
-
-			if (isset($currentOffer['BattleID'])) {
-				$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $currentOffer['BattleID']);
-
-				$participants = $this->db->query("SELECT count(distinct Team) AS num FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'])->fetch()['num'];
-
-				if ($participants >= 2) {
-					$this->db->query("INSERT INTO game_battle_log (HitID, BattleID, HitTime, RedComment) VALUES (0, " . $currentOffer['BattleID'] . ", " . time() . ", 71)");
-
-					$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id");
-
-					while ($member = $members->fetch()) {
-						$this->db->query("UPDATE `game_users` SET `battle` = " . $currentOffer['BattleID'] . ", `side` = " . $member['Team'] . " WHERE `id` = " . $member['FighterID'] . "");
-
-						$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i:s", time()) . "</U>, когда Ваш бой начался!", $member['username'], true);
-					}
-
-					$this->response->redirect('battle/');
-					$this->view->disable();
-				} else {
-					$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
-					$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
-
-					$this->game->insertInChat("Ваш бой не может начаться, т.к. группа не набрана!", $this->user->username, true);
-				}
-			}
-		} elseif ($battleType == 3) {
-			$currentOffer = $this->db->query("SELECT b.BattleID, b.alg FROM game_battle b, game_battle_users f WHERE b.StartTime <= " . (time() - 10) . " AND f.FighterID = " . $this->user->getId() . " AND b.BattleType = '3' AND b.Status = 'Zayavka' AND b.BattleID = f.BattleID")->fetch();
-
-			if (isset($currentOffer['BattleID'])) {
-				$this->db->query("UPDATE `game_battle` SET `Status` = 'InProcess', `RaundTime` = '" . time() . "' WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
-
-				$participants = $this->db->query("SELECT count(distinct FighterID) AS num FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'])->fetch()['num'];
-
-				$parts_num = $participants - $participants % 2;
-
-				if ($parts_num >= 4) {
-					$ms = 3;
-					$kol = 0;
-
-					$this->db->query("INSERT INTO game_battle_log (HitID, BattleID, HitTime, RedComment) VALUES (0, " . $currentOffer['BattleID'] . ", " . time() . ", 71)");
-
-					if ($currentOffer['alg'] == 2) {
-						$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room, u.reit FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id ORDER BY u.reit ASC");
-					} else {
-						$members = $this->db->query("SELECT f.FighterID, f.Team, u.username, u.room, u.reit FROM game_battle_users f, game_users u WHERE f.BattleID = " . $currentOffer['BattleID'] . " AND f.FighterID = u.id ORDER by RAND()");
-					}
-
-					if ($currentOffer['alg'] == 1 || $currentOffer['alg'] == 2) {
-						$a = array();
-						$b = array();
-
-						while ($member = $members->fetch()) {
-							$a[] = $members['reit'];
-							$b[] = array('id' => $members['FighterID'], 'user' => $members['username']);
-						}
-
-						$a1 = array();
-						$a2 = array();
-						$b1 = array();
-						$b2 = array();
-
-						$col = count($a);
-						$c1 = 0;
-						$c2 = count($a) - 1;
-
-						while ($col > 0) {
-							if (array_sum($a1) <= array_sum($a2)) {
-								$a1[] = $a[$c1];
-								$b1[] = $b[$c1];
-								$c1++;
-								$col--;
-							}
-							if (array_sum($a1) > array_sum($a2)) {
-								$a2[] = $a[$c2];
-								$b2[] = $b[$c2];
-								$c2--;
-								$col--;
-							}
-						}
-
-						foreach ($b1 as $id => $data) {
-							$this->db->query("UPDATE game_battle_users SET Team = '1' WHERE FighterID = " . $data['id'] . " and BattleID = " . $currentOffer['BattleID'] . "");
-							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = 1 WHERE id = " . $data['id'] . "");
-
-							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $data['user'], true);
-						}
-
-						foreach ($b2 as $id => $data) {
-							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = 0 WHERE id = " . $data['id'] . "");
-
-							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $data['user'], true);
-						}
-					} else {
-						while ($member = $members->fetch()) {
-							if ($ms < 2 || $kol >= $parts_num) {
-								$this->db->query("UPDATE game_battle_users SET Team = '1' WHERE FighterID = " . $member['FighterID'] . " and BattleID = " . $currentOffer['BattleID'] . "");
-								$participant['Team'] = 1;
-							}
-
-							$ms = $kol % 4;
-							$kol = $kol + 1;
-
-							$this->db->query("UPDATE game_users SET battle = " . $currentOffer['BattleID'] . ", side = " . $member['Team'] . " WHERE id = " . $member['FighterID'] . "");
-
-							$this->game->insertInChat("Часы показывали <U>" . date("d.m.y H:i", time()) . "</U>, когда Ваш бой начался!", $member['username'], true);
-						}
-					}
-
-					$this->response->redirect('battle/');
-					$this->view->disable();
-				} else {
-					$this->db->query("DELETE FROM `game_battle` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
-					$this->db->query("DELETE FROM `game_battle_users` WHERE `BattleID` = " . $currentOffer['BattleID'] . "");
-
-					$this->game->insertInChat("Ваш бой не может начаться, т.к. группа не набрана!", $this->user->username, true);
-				}
-			}
+		} catch (Exception $e) {
+			flash($e->getMessage());
 		}
-	}
 
-	private function getCurrentUserRequest()
-	{
-		return $this->db->query("SELECT b.BattleID, b.StartTime, b.BattleType, f.Team FROM game_battle b, game_battle_users f WHERE b.StartTime > " . time() . " AND b.Status = 'Zayavka' AND f.BattleID = b.BattleID AND f.FighterID = " . $this->user->getId() . "")->fetch();
+		return to_route('battle', ['battle_type' => $battleType->value]);
 	}
 }

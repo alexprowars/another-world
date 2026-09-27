@@ -74,7 +74,7 @@ class UserService
 	public static function getUserRaiting(User $user): int
 	{
 		// Вычисление рейтинга крутизны (цена вещей, статы, процент побед)
-		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->battery + $user->power - 14;
+		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->power - 13;
 		$b = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
 
 		return (int) round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
@@ -97,10 +97,6 @@ class UserService
 
 	public static function calculateStats(User $user)
 	{
-		if ($user->provin == 1) {
-			$user->battery = 1;
-		}
-
 		//$user['hp'] = 0;
 		//$user['energy'] = 0;
 
@@ -143,15 +139,15 @@ class UserService
 			}
 		}
 
-		// HP, Energy, Battery
+		// HP, Energy, Stamina
 		$user->hp_max = $user->vitality * 5 + $user->hp;
 		$user->hp_now = min($user->hp_now, $user->hp_max);
 
 		$user->energy_max = ceil($user->magic * 5 + $user->energy);
 		$user->energy_now = min($user->energy_now, $user->energy_max);
 
-		$user->ustal_max = $user->battery * 20;
-		$user->ustal_now = min($user->ustal_now, $user->ustal_max);
+		$user->stamina_max = $user->vitality * 20;
+		$user->stamina_now = min($user->stamina_now, $user->stamina_max);
 
 		$user->save();
 	}

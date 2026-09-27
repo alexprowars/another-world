@@ -14,7 +14,6 @@ class CharacterCalculator
 	public $vitality = 0;
 	public $power = 0;
 	public $razum = 0;
-	public $battery = 0;
 
 	public $br1 = 0;
 	public $br2 = 0;
@@ -44,15 +43,10 @@ class CharacterCalculator
 		$this->vitality = $this->user->vitality;
 		$this->power = $this->user->power;
 		$this->razum = $this->user->razum;
-		$this->battery = $this->user->battery;
 	}
 
 	public function checkEffects()
 	{
-		if ($this->user->provin == 1) {
-			$this->battery = 1;
-		}
-
 		//$user['hp'] = 0;
 		//$user['energy'] = 0;
 
@@ -96,11 +90,11 @@ class CharacterCalculator
 			}
 		}
 
-		// HP, Energy, Battery
+		// HP, Energy, Stamina
 
 		$hp_max = $this->vitality * 5 + $this->hp;
 		$this->energy_max = ceil($this->power * 5 + $this->energy);
-		$this->ustal_max = $this->battery * 20;
+		$this->stamina_max = $this->vitality * 20;
 
 		if ($this->hp_max != $hp_max) {
 			$this->hp_max = $hp_max;
@@ -114,8 +108,8 @@ class CharacterCalculator
 			$this->energy_now = $this->energy_max;
 		}
 
-		if ($this->ustal_now > $this->ustal_max) {
-			$this->ustal_now = $this->ustal_max;
+		if ($this->stamina_now > $this->stamina_max) {
+			$this->stamina_now = $this->stamina_max;
 		}
 
 		$this->update();

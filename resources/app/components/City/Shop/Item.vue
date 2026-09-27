@@ -63,7 +63,7 @@
 			<div v-if="item.item['requirements']['profession']" :class="{ 'text-red-600': user.profession !== item.item['requirements']['profession'] }">
 				Профессия: {{ $t('profession.' + item.item['requirements']['profession']) }}
 			</div>
-			<template v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence', 'battery']">
+			<template v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence']">
 				<div v-if="item.item['requirements'][stat]" :class="{ 'text-red-600': user[stat] !== item.item['requirements'][stat] }">
 					{{ $t('stats.' + stat) }}: {{ item.item['requirements'][stat] }}
 				</div>

@@ -57,10 +57,14 @@ class GameMiddleware
 					UserService::checkRoom($user, 11);
 					$dispatch = MapController::class;
 					break;
+				case 8:
 				case 10:
 					$dispatch = MapController::class;
 					break;
 			}
+		} elseif ($user->prison_until) {
+			UserService::checkRoom($user, 666);
+			$dispatch = MapController::class;
 		}
 
 		if ($dispatch) {

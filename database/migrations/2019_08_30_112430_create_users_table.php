@@ -15,6 +15,8 @@ return new class extends Migration {
 			$table->string('password')->nullable();
 			$table->string('name', 100)->nullable();
 			$table->timestamp('blocked_at')->nullable();
+			$table->timestamp('prison_until')->nullable()->index();
+			$table->string('prison_reason', 255)->nullable();
 			$table->timestamp('online')->nullable();
 			$table->bigInteger('ip')->nullable();
 			$table->enum('gender', ['M', 'F'])->nullable();
@@ -42,8 +44,8 @@ return new class extends Migration {
 			$table->unsignedInteger('hp_max')->default(15);
 			$table->decimal('energy_now', 12, 4)->default(0);
 			$table->unsignedInteger('energy_max')->default(0);
-			$table->decimal('ustal_now', 12, 4)->default(0);
-			$table->unsignedInteger('ustal_max')->default(0);
+			$table->decimal('stamina_now', 12, 4)->default(0);
+			$table->unsignedInteger('stamina_max')->default(0);
 			$table->unsignedInteger('rating')->default(0);
 			$table->foreignId('tribe_id')->nullable()->constrained('tribes')->nullOnDelete();
 			$table->foreignId('battle_id')->nullable()->constrained('battles')->nullOnDelete();

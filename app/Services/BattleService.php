@@ -10,10 +10,11 @@ use App\Models\BattleMember;
 use App\Models\Level;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class BattleService
 {
-	public static function fight(User $user, User $enemy, $type = 1)
+	public static function fight(User $user, User $enemy, int $type = 1): void
 	{
 		if ($enemy->is($user)) {
 			throw new Exception('Нападение на самого себя - это уже мазохизм...');
@@ -23,7 +24,7 @@ class BattleService
 			throw new Exception('Персонаж <u>' . $enemy->name . '</u> не является ботом!');
 		}
 
-		if ($user->injury > time() && $user->injury_type > 2) {
+		if ($user->injury?->isFuture() && $user->injury_type > 2) {
 			throw new Exception('С тяжелой травмой в бой нельзя!');
 		}
 
@@ -145,251 +146,149 @@ class BattleService
 	public static function getCurrentUserRequest(User $user): ?BattleMember
 	{
 		return BattleMember::query()
+			->with('battle')
 			->whereBelongsTo($user)
 			->whereHas('battle', function (Builder $query) {
-				$query->where('started_at', '>', now())
-					->where('Status', 'waiting');
+				$query->where('status', BattleStatus::WAITING)
+					->where(function (Builder $query) {
+						$query->where('type', '!=', BattleType::DUEL)
+							->orWhere('started_at', '>', now());
+					});
 			})
 			->first();
 	}
 
-	public static function createOffer(User $user, BattleType $battleType)
+	public static function offerValidation(User $user, BattleType $battleType): void
 	{
-		$userOffer = self::getCurrentUserRequest($user);
-
-		switch (request()->integer('timeout')) {
-			case 1:
-				$timeout = 90;
-				break;
-			case 3:
-				$timeout = 180;
-				break;
-			case 5:
-				$timeout = 300;
-				break;
-			case 10:
-				$timeout = 600;
-				break;
-			default:
-				$timeout = 180;
-				break;
+		if (!in_array($battleType, [BattleType::DUEL, BattleType::GROUP, BattleType::CHAOS], true)) {
+			throw new Exception('Неизвестный тип боя');
 		}
 
-		$comment = htmlspecialchars(request()->post('comment', ''));
-
-		$message = '';
-
-		if ($userOffer) {
-			throw new Exception('Для начала с одной заявкой разберись...');
+		if ($user->battle_id) {
+			throw new Exception('Вы уже участвуете в бою!');
 		}
 
-		if ($user->hp_now < $user->hp_max / 3) {
-			throw new Exception('Вы слишком ослаблены для поединка! Восстановитесь...');
+		if ($user->injury?->isFuture()) {
+			throw new Exception('Вы не можете драться, пока не зажила травма. Вам необходим отдых!');
 		}
 
-		$battle = new Battle();
-		$battle->status = BattleStatus::WAITING;
-		$battle->timeout = $timeout;
-		$battle->comment = $comment;
-
-		switch ($battleType) {
-			case BattleType::DUEL:
-				$battle->started_at = now()->addSeconds(600);
-				$battle->type = BattleType::DUEL;
-				$battle->is_blood = request()->boolean('blood');
-				$battle->use_weapons = !request()->boolean('kulak');
-
-				break;
-
-			case 2:
-				if ($user->level < 2) {
-					throw new Exception('Извините, групповые бои с 2-ого уровня');
-				}
-
-				$time_battle_start = request()->integer('time_battle_start');
-
-				if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
-					$time_battle_start = 180;
-				}
-
-				switch (request()->integer('offer_level')) {
-					case 2:
-						$level_min = $user->level;
-						$level_max = $user->level;
-						break;
-					case 3:
-						$level_min = 0;
-						$level_max = $user->level;
-						break;
-					case 4:
-						$level_min = 0;
-						$level_max = $user->level - 1;
-						break;
-					default:
-						$level_min = 0;
-						$level_max = 12;
-				}
-
-				$capacity 	= request()->integer('capacity', 2);
-
-				// Размеры команд
-				if ($capacity < 2 || $capacity > 25) {
-					$capacity = 2;
-				}
-
-				$battle->started_at = now()->addSeconds($time_battle_start);
-				$battle->type = BattleType::GROUP;
-				$battle->capacity = $capacity;
-				$battle->min_level = $level_min;
-				$battle->max_level = $level_max;
-
-				break;
-
-			case 3:
-				if ($user->level < 3) {
-					throw new Exception('Извините, хаотические бои с 3-ого уровня');
-				}
-
-				$time_battle_start = request()->integer('time_battle_start');
-
-				$alg = request()->integer('alg', 1);
-				$alg = min(1, max(0, $alg));
-
-				$inv = request()->integer('inv', 1);
-				$inv = min(1, max(0, $inv));
-
-				// Время до начала поединка
-				if ($time_battle_start != 180 && $time_battle_start != 300 && $time_battle_start != 600 && $time_battle_start != 900) {
-					$time_battle_start = 180;
-				}
-
-				// Уровни
-				switch (request()->integer('offer_level')) {
-					case 2:
-						$level_min = $user->level;
-						$level_max = $user->level;
-						break;
-					case 3:
-						$level_min = 0;
-						$level_max = $user->level;
-						break;
-					case 4:
-						$level_min = 0;
-						$level_max = $user->level - 1;
-						break;
-					default:
-						$level_min = 0;
-						$level_max = 12;
-				}
-
-				$battle->started_at = now()->addSeconds($time_battle_start);
-				$battle->type = BattleType::CHAOS;
-				$battle->capacity = 50;
-				$battle->min_level = $level_min;
-				$battle->max_level = $level_max;
-				$battle->is_blood = request()->boolean('blood');
-
-				//						'alg'				=> $alg,
-				//						'inv'				=> $inv,
-
-				break;
-			default:
-				throw new Exception('unknown battle type');
+		if (!in_array($user->room, [1, 2, 3, 4], true)) {
+			throw new Exception('Для участия в поединках необходимо переместиться на арену.');
 		}
 
-		$battle->save();
-		$battle->members()->create([
-			'user_id' => $user->id,
-			'side' => 0,
-			'exp' => self::getBaseLevelExp($user->level),
-		]);
+		if ($battleType === BattleType::GROUP && $user->level < 2) {
+			throw new Exception('Извините, групповые бои со 2-го уровня');
+		}
 
-		return $message;
+		if ($battleType === BattleType::CHAOS && $user->level < 3) {
+			throw new Exception('Извините, хаотические бои с 3-го уровня');
+		}
 	}
 
-	public static function takeOffer(Battle $battle, User $user)
+	public static function createOffer(User $user, BattleType $battleType, array $options): Battle
 	{
-		$existOffer = self::getCurrentUserRequest($user);
+		return DB::transaction(function () use ($user, $battleType, $options) {
+			$user->refreshForUpdate();
 
-		if (isset($existOffer)) {
-			throw new Exception('Для начала с одной заявкой разберись...');
-		}
+			self::checkOfferParticipant($user, $battleType);
 
-		if ($user->hp_now < $user->hp_max / 3) {
-			throw new Exception('Вы слишком ослаблены для поединка, подлечитесь!');
-		}
+			$levelRange = match ($options['offer_level'] ?? 1) {
+				2 => [$user->level, $user->level],
+				3 => [0, $user->level],
+				4 => [0, $user->level - 1],
+				default => [0, 12],
+			};
 
-		if ($battle->type == BattleType::DUEL) {
-			$battle->loadMissing(['members', 'members.user']);
+			$capacity = match ($battleType) {
+				BattleType::DUEL => 1,
+				BattleType::GROUP => $options['capacity'] ?? 2,
+				default => 50,
+			};
 
-			switch ($battle->members->count()) {
-				case 1:
-					$opponent = $battle->members
-						->where('side', 0)
-						->first();
+			$timeout = match ($options['timeout'] ?? 3) {
+				1 => 90,
+				5 => 300,
+				10 => 600,
+				default => 180,
+			};
 
-					if (!$opponent) {
-						throw new Exception('Оппонент не найден');
-					}
+			$startedAt = now()->addSeconds(
+				$battleType === BattleType::DUEL ? 600 : ($options['time_battle_start'] ?? 180)
+			);
 
-					if ($opponent->user->ip == $user->ip && !$user->isAdmin()) {
-						throw new Exception('Вы не можете выступать против персонажа с таким же IP как у вас!');
-					}
+			$battle = Battle::query()->create([
+				'status' => BattleStatus::WAITING,
+				'type' => $battleType,
+				'timeout' => $timeout,
+				'comment' => $options['comment'] ?? '',
+				'started_at' => $startedAt,
+				'capacity' => $capacity,
+				'min_level' => $battleType === BattleType::DUEL ? null : $levelRange[0],
+				'max_level' => $battleType === BattleType::DUEL ? null : $levelRange[1],
+				'is_blood' => $battleType !== BattleType::GROUP && ($options['blood'] ?? false),
+				'use_weapons' => $battleType !== BattleType::DUEL || !($options['unarmed'] ?? false),
+			]);
 
-					$battle->members()->create([
-						'user_id' => $user->id,
-						'side' => 1,
-						'exp' => self::getBaseLevelExp($user->level),
-					]);
+			$battle->members()->create([
+				'user_id' => $user->id,
+				'side' => 0,
+				'exp' => self::getBaseLevelExp($user->level),
+			]);
 
-					ChatService::insertInChat($opponent->user, '<b>' . $user->name . '</b> принял Вашу заявку!');
+			return $battle;
+		});
+	}
 
-					break;
-				case 2:
+	public static function takeOffer(Battle $battle, User $user, int $side = 0): void
+	{
+		DB::transaction(function () use ($battle, $user, $side) {
+			$battle = Battle::query()
+				->lockForUpdate()
+				->find($battle->id);
+
+			if (!$battle || $battle->status !== BattleStatus::WAITING || !$battle->started_at?->isFuture()) {
+				throw new Exception('Заявки не существует или истёк срок её размещения');
+			}
+
+			$user->refreshForUpdate();
+
+			self::checkOfferParticipant($user, $battle->type);
+
+			$members = $battle->members()
+				->with('user')
+				->get();
+
+			if ($battle->type === BattleType::DUEL) {
+				if ($members->count() !== 1) {
 					throw new Exception('Кто-то оказался быстрее и перехватил заявку');
-				default:
-					throw new Exception('Боец отозвал заявку или её не существует!');
-			}
-		} elseif ($battle->type == BattleType::GROUP) {
-			if ($user->level < 2) {
-				throw new Exception('Извините, групповые бои с 2-ого уровня');
-			}
+				}
 
-			$side = min(1, max(0, request()->integer('battle_side')));
+				$opponent = $members->firstOrFail()->user;
 
-			$side_0 = $battle->members->where('side', 0)->count();
-			$side_1 = $battle->members->where('side', 1)->count();
+				if ($opponent->ip === $user->ip && !$user->isAdmin()) {
+					throw new Exception('Вы не можете выступать против персонажа с таким же IP как у вас!');
+				}
 
-			if ($side_0 >= $battle->capacity && $side == 0) {
-				throw new Exception('Группа уже набрана!');
-			}
+				$side = 1;
+			} else {
+				if ($user->level < $battle->min_level || $user->level > $battle->max_level) {
+					throw new Exception('Ваш уровень не соответствует условиям заявки');
+				}
 
-			if ($side_1 >= $battle->capacity && $side == 1) {
-				throw new Exception('Группа уже набрана!');
-			}
+				if ($battle->type === BattleType::CHAOS) {
+					$side = 0;
+					$count = $members->count();
+				} else {
+					if (!in_array($side, [0, 1], true)) {
+						throw new Exception('Неизвестная команда');
+					}
 
-			if ($user->level < $battle->min_level && $side == 0) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
-			}
+					$count = $members->where('side', $side)->count();
+				}
 
-			if (($battle->min_level == $battle->max_level) && ($user->level != $battle->min_level) && $side == 0) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
-			}
-
-			if ($user->level > $battle->max_level && $side == 0) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
-			}
-
-			if ($user->level < $battle->min_level && $side == 1) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
-			}
-
-			if (($battle->min_level == $battle->max_level) && ($user->level != $battle->min_level) && $side == 1) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
-			}
-
-			if ($user->level > $battle->max_level && $side == 1) {
-				throw new Exception('Эта заявка не может быть принята Вами!');
+				if ($count >= $battle->capacity) {
+					throw new Exception('Группа уже набрана!');
+				}
 			}
 
 			$battle->members()->create([
@@ -397,32 +296,165 @@ class BattleService
 				'side' => $side,
 				'exp' => self::getBaseLevelExp($user->level),
 			]);
-		} elseif ($battle->type == BattleType::CHAOS) {
-			if ($user->level < 3) {
-				throw new Exception('Извините, хаотические бои с 3-ого уровня');
-			} else {
-				if ($user->level < $battle->min_level) {
-					throw new Exception('Эта заявка не может быть принята Вами!');
-				}
 
-				if (($battle->min_level == $battle->max_level) && ($user->level != $battle->min_level)) {
-					throw new Exception('Эта заявка не может быть принята Вами!');
-				}
-
-				if ($user->level > $battle->max_level) {
-					throw new Exception('Эта заявка не может быть принята Вами!');
-				}
-
-				$battle->members()->create([
-					'user_id' => $user->id,
-					'side' => 0,
-					'exp' => self::getBaseLevelExp($user->level),
-				]);
+			if (isset($opponent)) {
+				ChatService::insertInChat($opponent, '<b>' . e($user->name) . '</b> принял Вашу заявку!');
 			}
+		});
+	}
+
+	private static function checkOfferParticipant(User $user, BattleType $battleType): void
+	{
+		self::offerValidation($user, $battleType);
+
+		if (self::getCurrentUserRequest($user)) {
+			throw new Exception('Для начала с одной заявкой разберись...');
 		}
 
-		$user->battle()->associate($battle);
-		$user->save();
+		$user->calculate();
+
+		if ($user->hp_now < $user->hp_max / 3) {
+			throw new Exception('Вы слишком ослаблены для поединка! Восстановитесь...');
+		}
+	}
+
+	public static function withdrawOffer(User $user, bool $dismissOpponent = false): void
+	{
+		DB::transaction(function () use ($user, $dismissOpponent) {
+			$offer = self::getCurrentUserRequest($user);
+
+			$battle = null;
+
+			if ($offer) {
+				$battle = Battle::query()
+					->lockForUpdate()
+					->find($offer->battle_id);
+			}
+
+			if (!$battle || $battle->status !== BattleStatus::WAITING || $battle->type !== BattleType::DUEL || !$battle->started_at?->isFuture()) {
+				throw new Exception('Заявки не существует или истёк срок её размещения');
+			}
+
+			$member = $battle->members()
+				->whereBelongsTo($user)
+				->first();
+
+			if (!$member || ($dismissOpponent && $member->side != 0)) {
+				throw new Exception('Вы не можете отказаться за другого участника');
+			}
+
+			if ($member->side == 1) {
+				$member->delete();
+
+				return;
+			}
+
+			$opponent = $battle->members()
+				->with('user')
+				->where('side', 1)
+				->first();
+
+			if ($dismissOpponent) {
+				$opponent?->delete();
+			} else {
+				$battle->members()->delete();
+				$battle->delete();
+			}
+
+			if ($opponent) {
+				ChatService::insertInChat($opponent->user, '<b>' . e($user->name) . '</b> отказал в поединке!');
+			}
+		});
+	}
+
+	public static function startOffer(User $user, BattleType $battleType): bool
+	{
+		if (!in_array($battleType, [BattleType::DUEL, BattleType::GROUP, BattleType::CHAOS], true)) {
+			return false;
+		}
+
+		return DB::transaction(function () use ($user, $battleType) {
+			$now = now();
+
+			$query = Battle::query()
+				->where('type', $battleType)
+				->where('status', BattleStatus::WAITING)
+				->whereHas('members', fn(Builder $query) => $query->whereBelongsTo($user));
+
+			if ($battleType === BattleType::DUEL) {
+				$query->where('started_at', '>', $now);
+			} else {
+				$query->where('started_at', '<=', $now->subSeconds(10));
+			}
+
+			$battle = $query->lockForUpdate()
+				->first();
+
+			if (!$battle) {
+				return false;
+			}
+
+			$members = $battle->members()
+				->with('user')
+				->lockForUpdate()
+				->get();
+
+			$sideCount = $members->pluck('side')
+				->unique()->count();
+
+			if ($battleType === BattleType::DUEL && !$members->contains(fn(BattleMember $member) => $member->user_id === $user->id && $member->side == 0)) {
+				throw new Exception('Начать поединок может только автор заявки');
+			}
+
+			if ($battleType === BattleType::DUEL && $sideCount !== 2) {
+				return false;
+			}
+
+			if (($battleType === BattleType::GROUP && $sideCount < 2) || ($battleType === BattleType::CHAOS && $members->pluck('user_id')->unique()->count() < 4)) {
+				User::query()->whereBelongsTo($battle)
+					->update(['battle_id' => null]);
+
+				$battle->members()->delete();
+				$battle->delete();
+
+				ChatService::insertInChat($user, 'Ваш бой не может начаться, т.к. группа не набрана!');
+
+				return false;
+			}
+
+			if ($battleType === BattleType::CHAOS) {
+				$members = $members->shuffle();
+				$pairedCount = $members->count() - $members->count() % 2;
+
+				foreach ($members as $index => $member) {
+					$member->side = $index >= $pairedCount || in_array($index % 4, [1, 2], true) ? 1 : 0;
+					$member->save();
+				}
+			}
+
+			$battle->status = BattleStatus::ACTIVE;
+			$battle->round_at = $now;
+			$battle->save();
+
+			$battle->logs()->create([
+				'member_id' => $members->firstOrFail()->id,
+				'date' => $now,
+				'comment_id' => 71,
+			]);
+
+			foreach ($members as $member) {
+				$member->user->battle()->associate($battle);
+				$member->user->save();
+
+				if ($battleType === BattleType::DUEL && !$battle->use_weapons) {
+					InventoryService::unsetAllObject($member->user);
+				}
+
+				ChatService::insertInChat($member->user, 'Часы показывали <U>' . $now->format('d.m.y H:i') . '</U>, когда Ваш бой начался!');
+			}
+
+			return true;
+		});
 	}
 
 	public static function getBaseLevelExp(int $lvl): int

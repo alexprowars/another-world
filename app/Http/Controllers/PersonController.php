@@ -95,9 +95,6 @@ class PersonController extends Controller
 					case 'intelligence':
 						$st_name = "intelligence";
 						break;
-					case 'battery':
-						$st_name = "battery";
-						break;
 					case 'duh':
 						$st_name = "duh";
 						break;

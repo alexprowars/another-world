@@ -13,6 +13,7 @@
     },
     "require": {
         "php": "^8.5",
+        "ext-gd": "*",
         "inertiajs/inertia-laravel": "^3.0",
         "kirschbaum-development/eloquent-power-joins": "^4.3",
         "laravel/framework": "^13.7",

@@ -47,7 +47,7 @@
 				<hr/>
 			</td>
 		</tr>
-		<tr v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence', 'battery']">
+		<tr v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence']">
 			<td class="tc_dbl">{{ $t('stats.' + stat) }}</td>
 			<td align="right">
 				<Popper>
