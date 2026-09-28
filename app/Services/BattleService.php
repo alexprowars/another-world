@@ -9,11 +9,43 @@ use App\Models\Battle;
 use App\Models\BattleMember;
 use App\Models\Level;
 use App\Models\User;
+use App\Models\UserItem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BattleService
 {
+	private const array INJURIES = [
+		// лёгкие
+		1 => [
+			0 => ['param' => 'strength', 'name' => 'шишка на лбу'],
+			1 => ['param' => 'strength', 'name' => 'ушиб коленки'],
+			2 => ['param' => 'agility', 'name' => 'фингал под глазом'],
+			3 => ['param' => 'agility', 'name' => 'растяжение руки'],
+			4 => ['param' => 'dexterity', 'name' => 'ушиб ВЦ'],
+			5 => ['param' => 'dexterity', 'name' => 'шишка на кулаке'],
+		],
+		// средние
+		2 => [
+			0 => ['param' => 'strength', 'name' => 'ушиб коленки второй степени'],
+			1 => ['param' => 'strength', 'name' => 'растяжение ВЦ'],
+			2 => ['param' => 'agility', 'name' => 'выбитый зуб'],
+			3 => ['param' => 'agility', 'name' => 'глубокий порез'],
+			4 => ['param' => 'dexterity', 'name' => 'перелом ключицы'],
+			5 => ['param' => 'dexterity', 'name' => 'отбитые почки'],
+		],
+		// тяжелые
+		3 => [
+			0 => ['param' => 'strength', 'name' => 'открытый перелом руки'],
+			1 => ['param' => 'strength', 'name' => 'перелом позвоночника'],
+			2 => ['param' => 'agility', 'name' => 'открытый перелом ноги'],
+			3 => ['param' => 'agility', 'name' => 'разрыв селезёнки'],
+			4 => ['param' => 'dexterity', 'name' => 'множественные порезы'],
+			5 => ['param' => 'dexterity', 'name' => 'выбитый глаз'],
+		],
+	];
+
 	public static function fight(User $user, User $enemy, int $type = 1): void
 	{
 		if ($enemy->is($user)) {
@@ -22,6 +54,10 @@ class BattleService
 
 		if ($type == 2 && $enemy->rank != 60) {
 			throw new Exception('Персонаж <u>' . $enemy->name . '</u> не является ботом!');
+		}
+
+		if ($type == 2 && $enemy->is_clone) {
+			throw new Exception('Этот клон доступен только в вызвавшем его бою');
 		}
 
 		if ($user->injury?->isFuture() && $user->injury_type > 2) {
@@ -36,7 +72,7 @@ class BattleService
 			throw new Exception('Для нападния Вам необходимо находится в одной комнате!');
 		}
 
-		if ($user->hp_now < ($user->hp_max * 0.33)) {
+		if ($user->hp_now <= 0 || $user->hp_now < ($user->hp_max * 0.33)) {
 			throw new Exception('Вы слишком ослаблены для боя!');
 		}
 
@@ -141,6 +177,191 @@ class BattleService
 				->member()->associate($memberUser)
 				->save();
 		}
+	}
+
+	/** Вызывается MagicService внутри транзакции с блокировками боя и участников. */
+	public static function attackWithMagic(User $user, User $enemy, bool $blood): void
+	{
+		if ($user->is($enemy)) {
+			throw new Exception('Нельзя напасть на себя');
+		}
+
+		if ($user->battle_id) {
+			throw new Exception('В бою нападение невозможно');
+		}
+
+		if ($enemy->isBot() || $enemy->rank > 13) {
+			throw new Exception('На этого персонажа нельзя напасть');
+		}
+
+		if ($enemy->attack_protection_until?->isFuture()) {
+			throw new Exception('Персонаж защищён от нападения');
+		}
+
+		if ($enemy->injury?->isFuture()) {
+			throw new Exception('Нельзя напасть на травмированного персонажа');
+		}
+
+		if ($enemy->room == 2 || $enemy->prison_until?->isFuture() || !$enemy->isFree()) {
+			throw new Exception('Персонаж сейчас недоступен для нападения');
+		}
+
+		if ($enemy->hp_now <= 5) {
+			throw new Exception('Персонаж слишком слаб для поединка');
+		}
+
+		if ($user->level - $enemy->level >= 2) {
+			throw new Exception('Нельзя нападать на персонажа ниже вас на два уровня или больше');
+		}
+
+		if (self::getCurrentUserRequest($user) || self::getCurrentUserRequest($enemy)) {
+			throw new Exception('Один из персонажей уже участвует в заявке на бой');
+		}
+
+		$joining = $enemy->battle_id !== null;
+
+		if ($joining) {
+			$battle = $enemy->battle;
+
+			if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result) {
+				throw new Exception('Этот бой уже завершён или ещё не начался');
+			}
+
+			if ($battle->type === ($blood ? BattleType::CHAOS : BattleType::ALIGN)) {
+				throw new Exception('Этим свитком нельзя вмешаться в такой бой');
+			}
+
+			$member = $battle->members()->whereBelongsTo($enemy)->first();
+
+			if (!$member || $member->died_at) {
+				throw new Exception('Персонаж уже выбыл из боя');
+			}
+		}
+
+		self::fight($user, $enemy);
+
+		$battle = $user->battle;
+
+		if ($blood) {
+			$battle->is_blood = true;
+		}
+
+		if (!$joining) {
+			$battle->timeout = 60;
+		}
+
+		$battle->save();
+	}
+
+	/** Вызывается MagicService внутри транзакции с блокировками боя и участников. */
+	public static function changeSideWithMagic(User $user, User $target): void
+	{
+		if ($user->is($target)) {
+			throw new Exception('Нельзя переманить себя');
+		}
+
+		if (!$user->battle_id || $user->battle_id !== $target->battle_id) {
+			throw new Exception('Для переманивания нужно находиться в одном бою');
+		}
+
+		$battle = $target->battle;
+
+		if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result || $battle->type === BattleType::DUEL) {
+			throw new Exception('Переманивание доступно только в продолжающемся групповом бою');
+		}
+
+		$members = $battle->members()->get()->keyBy('user_id');
+		$fighter = $members->get($user->id);
+		$enemy = $members->get($target->id);
+
+		if (!$fighter || !$enemy || $fighter->died_at || $enemy->died_at || $user->hp_now <= 0 || $target->hp_now <= 0) {
+			throw new Exception('Переманивать могут только живые участники боя');
+		}
+
+		if ($fighter->side === $enemy->side) {
+			throw new Exception('Персонаж уже сражается на вашей стороне');
+		}
+
+		$enemy->side = $fighter->side;
+		$enemy->save();
+
+		// После смены команды разрешаем заново выбрать ходы, направленные на новых союзников.
+		$turns = $battle->logs()
+			->with(['member', 'enemy'])
+			->where('round', $battle->round)
+			->whereNotNull('enemy_id')
+			->get();
+
+		foreach ($turns as $turn) {
+			if ($turn->member->side === $turn->enemy->side) {
+				$turn->member->finished_at = null;
+				$turn->member->save();
+				$turn->delete();
+			}
+		}
+	}
+
+	/** Вызывается MagicService внутри транзакции с блокировкой пользователя. */
+	public static function fightMirror(User $user): void
+	{
+		if ($user->battle_id || self::getCurrentUserRequest($user)) {
+			throw new Exception('Нельзя вызвать клона во время боя или ожидания заявки');
+		}
+
+		if ($user->level > 5) {
+			throw new Exception('Вызов клона доступен только до 5-го уровня включительно');
+		}
+
+		if ($user->hp_now <= 0 || $user->hp_now < $user->hp_max * 0.33) {
+			throw new Exception('Вы слишком ослаблены для боя');
+		}
+
+		$clone = User::create([
+			'email' => Str::uuid()->toString() . '@mirror.invalid',
+			'name' => 'Клон ' . mb_substr($user->name, 0, 95),
+			'rank' => 60,
+			'is_clone' => true,
+			'level' => $user->level,
+			'up' => $user->up,
+			'exp' => $user->exp,
+			'gender' => $user->gender,
+			'image' => $user->image,
+			'room' => $user->room,
+			's_strength' => $user->s_strength,
+			's_dexterity' => $user->s_dexterity,
+			's_agility' => $user->s_agility,
+			's_vitality' => $user->s_vitality,
+			's_magic' => $user->s_magic,
+			's_intelligence' => $user->s_intelligence,
+			'magic_resistance' => $user->magic_resistance,
+			'hp_now' => $user->hp_max,
+			'energy_now' => $user->energy_max,
+			'online' => now(),
+		]);
+
+		$cloneSlots = $clone->getSlot();
+
+		foreach ($user->getSlot()->getItems() as $item) {
+			$copy = $item->replicate();
+			$copy->user()->associate($clone);
+			$copy->save();
+
+			for ($slot = 1; $slot <= $cloneSlots::MAX_SLOTS; $slot++) {
+				if ($user->getSlot()->{'i' . $slot} === $item->id) {
+					$cloneSlots->{'i' . $slot} = $copy->id;
+				}
+			}
+		}
+
+		$cloneSlots->save();
+
+		foreach ($user->effects()->whereFuture('date')->get() as $effect) {
+			$copy = $effect->replicate();
+			$copy->user()->associate($clone);
+			$copy->save();
+		}
+
+		self::fight($user, $clone->fresh());
 	}
 
 	public static function getCurrentUserRequest(User $user): ?BattleMember
@@ -455,6 +676,86 @@ class BattleService
 
 			return true;
 		});
+	}
+
+	public static function setInjury(User $user, User $enemy, int $level): bool
+	{
+		if ($enemy->rank == 60) {
+			return false;
+		}
+
+		if ($enemy->injury?->isFuture()) {
+			return false;
+		}
+
+		$time = 300 + (300 * $level);
+
+		$param = self::INJURIES[$level][array_rand(self::INJURIES[$level])];
+
+		$strength = $dexterity = $agility = 0;
+
+		if ($param['param'] == 'strength') {
+			$strength = round($enemy->strength * ($level / 3.2)) * (-1);
+		} elseif ($param['param'] == 'dexterity') {
+			$dexterity = round($enemy->dexterity * ($level / 3.2)) * (-1);
+		} elseif ($param['param'] == 'agility') {
+			$agility = round($enemy->agility * ($level / 3.2)) * (-1);
+		}
+
+		$enemy->injury = now()->addSeconds($time);
+		$enemy->injury_type = $level;
+		$enemy->save();
+
+		$enemy->effects()->create([
+			'type' => 3,
+			'date' => now()->addSeconds($time),
+			'strength' => $strength,
+			'dexterity' => $dexterity,
+			'agility' => $agility,
+		]);
+
+		$message = '<b>' . e($enemy->name) . '</b> получает в бою ';
+
+		if ($level == 1) {
+			$message .= 'лёгкую травму';
+		} elseif ($level == 2) {
+			$message .= 'среднюю травму';
+		} elseif ($level == 3) {
+			$message .= 'тяжёлую травму';
+		} else {
+			$message .= 'неизлечимую травму';
+		}
+
+		$message .= ' <b style="color: red">' . $param['name'] . '</b> от <b>' . e($user->name)
+			. '</b>, которая очень сильно повлияла на параметр <b>' . __('stats.' . $param['param']) . '</b>';
+
+		ChatService::insertInChat($enemy, $message);
+
+		return true;
+	}
+
+	/** @return list<UserItem> */
+	public static function wearout(User $user): array
+	{
+		$items = $user->getSlot()->getItems()
+			->filter(fn(UserItem $item) => $item->type != 12);
+
+		if ($items->isEmpty()) {
+			return [];
+		}
+
+		$wornItems = $items->random(random_int(1, $items->count()));
+
+		foreach ($wornItems as $item) {
+			$item->wearout += 1;
+			$item->save();
+
+			if ($item->wearout_max <= $item->wearout) {
+				InventoryService::unsetObject($user, $item->onset);
+			}
+		}
+
+		return $wornItems->values()->all();
 	}
 
 	public static function getBaseLevelExp(int $lvl): int

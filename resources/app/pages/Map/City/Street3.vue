@@ -7,7 +7,6 @@
 		:places="places"
 		places-title="Места в парке"
 		:exits="exits"
-		:decorations="decorations"
 	/>
 </template>
 
@@ -17,92 +16,65 @@
 	defineProps({ page: Object });
 
 	const map = {
-		image: '2_bg.jpg',
+		image: 'street3.jpg',
 		alt: 'Карта парка',
-		width: 550,
-		height: 300,
+		width: 1200,
+		height: 654,
 	};
+
 	const places = [
 		{
 			room: 10,
 			title: 'Башня магов',
 			description: 'Магия и заклинания',
 			number: 1,
-			image: '2_Mage.gif',
-			x: 283,
-			y: 20,
-			width: 32,
-			height: 101,
+			x: 625,
+			y: 14,
+			width: 102,
+			height: 201,
 		},
 		{
 			room: 16,
 			title: 'Центр занятости',
 			description: 'Работа и заработок',
 			number: 2,
-			image: '2_Gift.gif',
-			x: 246,
-			y: 174,
-			width: 91,
-			height: 69,
+			x: 569,
+			y: 321,
+			width: 205,
+			height: 155,
 		},
 		{
 			room: 13,
 			title: 'Сувениры',
 			description: 'Подарки для друзей',
 			number: 3,
-			image: '2_Loto.gif',
-			x: 348,
-			y: 204,
-			width: 71,
-			height: 49,
+			x: 777,
+			y: 371,
+			width: 198,
+			height: 113,
 		},
 	];
+
 	const exits = [
 		{
 			room: 103,
 			title: 'Торговая площадь',
-			image: '2_Left.gif',
-			x: 7,
-			y: 230,
-			width: 25,
-			height: 24,
+			number: '←',
+			x: 0,
+			y: 448,
+			width: 60,
+			height: 120,
 			direction: 'left',
 		},
 		{
 			room: 105,
 			title: 'Промышленная зона',
-			image: '2_Right.gif',
-			x: 502,
-			y: 265,
-			width: 29,
-			height: 26,
+			number: '→',
+			x: 1134,
+			y: 448,
+			width: 66,
+			height: 120,
 			direction: 'right',
-		},
-	];
-	const decorations = [
-		{
-			title: 'Игорный дом',
-			image: '2_LV.gif',
-			x: 37,
-			y: 29,
-			width: 187,
-			height: 193,
-		},
-		{
-			title: 'Таверна',
-			image: '2_Tavern.gif',
-			x: 28,
-			y: 197,
-			width: 96,
-			height: 100,
-		},
-		{
-			title: 'Проход закрыт',
-			image: '2_Bottom.gif',
-			x: 118,
-			y: 273,
-			width: 19,
-			height: 20,
 		},
 	];
 </script>

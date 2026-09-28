@@ -60,8 +60,14 @@ class Smithy
 		} elseif ($section === 4 && $user->profession != 2) {
 			$notice = 'Вставлять камни может только кузнец.';
 		} elseif (!$user->r_date && !$user->r_type) {
-			$inventory = $user->items()->where('bank', false)->where('market', false)->where('pawnshop', false)->orderByDesc('created_at')->get()
+			$inventory = $user->items()
+				->where('bank', false)
+				->where('market', false)
+				->where('pawnshop', false)
+				->orderByDesc('created_at')
+				->get()
 				->filter(fn (UserItem $item) => SmithyService::available($item));
+
 			$equipped = $user->getSlot()->getItemsId();
 			$unequipped = $inventory->filter(fn (UserItem $item) => !$item->onset && !in_array($item->id, $equipped));
 

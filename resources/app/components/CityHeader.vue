@@ -9,6 +9,9 @@
 
 <script setup>
 	defineProps({
-		title: { type: String, default: '' },
+		title: {
+			type: String,
+			default: '',
+		},
 	});
 </script>

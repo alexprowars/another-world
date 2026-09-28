@@ -13,11 +13,18 @@
 	import CatalogItem from './CatalogItem.vue';
 
 	const props = defineProps({
-		item: { type: Object, required: true },
+		item: {
+			type: Object,
+			required: true
+		},
 	});
+
 	const state = useState();
 
 	function giftItem() {
-		openPopupModal(Form, { item: props.item });
+		openPopupModal(Form, {
+			item: props.item,
+			title: 'Подарить подарок'
+		});
 	}
 </script>

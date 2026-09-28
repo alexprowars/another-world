@@ -71,6 +71,10 @@ class User extends Authenticatable implements HasMedia
 		'r_date' => 'immutable_datetime',
 		'silence' => 'immutable_datetime',
 		'invisible' => 'immutable_datetime',
+		'magic_protection_until' => 'immutable_datetime',
+		'attack_protection_until' => 'immutable_datetime',
+		'vampire_protection_until' => 'immutable_datetime',
+		'is_clone' => 'boolean',
 		'vip' => 'immutable_datetime',
 	];
 

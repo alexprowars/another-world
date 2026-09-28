@@ -22,7 +22,7 @@ class ChatService
 		$parsed = ChatMessageResource::make($result)->resolve();
 		$parsed['redirect'] = $redirect;
 
-		event(new ChatPrivateMessage(auth()->id(), $parsed));
+		event(new ChatPrivateMessage($user->id ?? auth()->id(), $parsed));
 	}
 
 	public static function sendSystemMessage(User $user, string $from, string $message, bool $isPrivate = true, ?string $redirect = null)

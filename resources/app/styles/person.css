@@ -653,6 +653,10 @@
 	margin: var(--space-14) 0 var(--space-6);
 }
 
+.inventory-section-heading--count-only {
+	justify-content: flex-end;
+}
+
 .inventory-section-heading h2 {
 	margin: 0;
 	color: var(--paper-heading);

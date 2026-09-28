@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\UserItem;
+use App\Services\MagicService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -17,6 +18,7 @@ class UserSlotItemResource extends JsonResource
 			'code' => $this->resource->code,
 			'type' => $this->resource->type,
 			'title' => $this->resource->title,
+			'can_use' => MagicService::canUse($this->resource),
 			'position' => $this->resource->getPosition(),
 			'min' => $this->resource->min,
 			'max' => $this->resource->max,

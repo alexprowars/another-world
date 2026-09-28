@@ -34,7 +34,7 @@ class Street
 			101 => Inertia::render('Map/City/Street1', ['city' => $city]),
 			103 => Inertia::render('Map/City/Street2', ['city' => $city]),
 			104 => Inertia::render('Map/City/Street3', ['city' => $city]),
-			23 => Inertia::render('Map/City/Street4'),
+			23 => Inertia::render('Map/City/Street4', ['city' => $city]),
 			105 => Inertia::render('Map/City/Street5', ['city' => $city]),
 			default => throw new Exception('Неизвестная локация'),
 		};

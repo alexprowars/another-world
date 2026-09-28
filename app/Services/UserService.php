@@ -161,12 +161,6 @@ class UserService
 		//$user['hp'] = 0;
 		//$user['energy'] = 0;
 
-		// МФ
-		$user->krit		+= ($user->dexterity * 5);
-		$user->unkrit	+= ($user->dexterity * 5);
-		$user->uv		+= ($user->agility * 5);
-		$user->unuv		+= ($user->agility * 5);
-
 		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
 		$effects = $user->effects()
 			->whereFuture('date')
@@ -207,8 +201,14 @@ class UserService
 		$user->energy_max = ceil($user->magic * 5 + $user->energy);
 		$user->energy_now = min($user->energy_now, $user->energy_max);
 
-		$user->stamina_max = $user->vitality * 20;
+		$user->stamina_max = max(0, ($user->vitality + $effects->sum('battery')) * 20);
 		$user->stamina_now = min($user->stamina_now, $user->stamina_max);
+
+		// Модификаторы зависят от характеристик после применения зелий и штрафов.
+		$user->krit += $user->dexterity * 5;
+		$user->unkrit += $user->dexterity * 5;
+		$user->uv += $user->agility * 5;
+		$user->unuv += $user->agility * 5;
 
 		if ($persist) {
 			$user->save();

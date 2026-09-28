@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Effect extends Model
 {
+	public const int AURA = 1;
+	public const int POTION = 2;
+	public const int INJURY = 3;
+	public const int POISON = 4;
+
 	public $timestamps = false;
 	protected $table = 'effects';
 

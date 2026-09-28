@@ -48,15 +48,21 @@
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 
-	defineProps({ sets: Array });
+	defineProps({
+		sets: Array,
+	});
 
 	const saveForm = useForm({ action: 'save', name: '' });
 	const actionForm = useForm({ action: '', id: null });
 	const busy = computed(() => saveForm.processing || actionForm.processing);
 
 	function save() {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		actionForm.clearErrors();
+
 		saveForm.post('/person/inventory/sets', {
 			preserveScroll: true,
 			onSuccess: () => saveForm.reset('name'),
@@ -64,8 +70,12 @@
 	}
 
 	function act(action, id) {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		saveForm.clearErrors();
+
 		actionForm.action = action;
 		actionForm.id = id;
 		actionForm.post('/person/inventory/sets', { preserveScroll: true });

@@ -80,7 +80,13 @@
 	import { computed } from 'vue';
 	import { useI18n } from 'vue-i18n';
 
-	const props = defineProps({ item: { type: Object, required: true } });
+	const props = defineProps({
+		item: {
+			type: Object,
+			required: true,
+		},
+	});
+
 	const { t } = useI18n();
 
 	const requirements = computed(() =>

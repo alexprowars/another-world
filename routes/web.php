@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/chat/last', [Controllers\ChatController::class, 'last']);
 	Route::post('/chat/send', [Controllers\ChatController::class, 'send']);
 	Route::get('/chat/online', [Controllers\ChatController::class, 'online']);
+	Route::post('/magic', [Controllers\MagicController::class, 'store'])->name('magic.store');
 
 	Route::middleware(['game'])->group(function () {
 		Route::get('/tribe', [Controllers\TribeController::class, 'index'])->name('tribe');

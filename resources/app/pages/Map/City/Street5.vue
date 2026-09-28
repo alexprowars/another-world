@@ -7,7 +7,6 @@
 		:places="places"
 		places-title="Места в квартале"
 		:exits="exits"
-		:decorations="decorations"
 	/>
 </template>
 
@@ -17,74 +16,55 @@
 	defineProps({ page: Object });
 
 	const map = {
-		image: '3_bg.jpg',
+		image: 'street5.jpg',
 		alt: 'Карта промышленной улицы',
-		width: 550,
-		height: 300,
+		width: 1200,
+		height: 654,
 	};
+
 	const places = [
 		{
 			room: 200,
 			title: 'Шахта',
 			description: 'Добыча ресурсов',
 			number: 1,
-			image: '3_Mine.gif',
-			x: 247,
-			y: 135,
-			width: 30,
-			height: 26,
+			x: 519,
+			y: 173,
+			width: 163,
+			height: 124,
 		},
 		{
 			room: 666,
 			title: 'Тюрьма',
 			description: 'Место заключения',
 			number: 2,
-			image: '3_Prison.gif',
-			x: 340,
-			y: 108,
-			width: 130,
-			height: 105,
+			x: 770,
+			y: 145,
+			width: 343,
+			height: 251,
 		},
 		{
 			room: 28,
 			title: 'Ломбард',
 			description: 'Операции с вещами',
 			number: 3,
-			image: '3_Storage.gif',
-			x: 195,
-			y: 206,
-			width: 102,
-			height: 79,
+			x: 410,
+			y: 357,
+			width: 276,
+			height: 187,
 		},
 	];
+
 	const exits = [
 		{
 			room: 104,
 			title: 'Парк',
-			image: '3_Left.gif',
-			x: 72,
-			y: 191,
-			width: 24,
-			height: 23,
+			number: '←',
+			x: 0,
+			y: 304,
+			width: 71,
+			height: 127,
 			direction: 'left',
-		},
-	];
-	const decorations = [
-		{
-			title: 'Проход закрыт',
-			image: '3_Tower.gif',
-			x: 14,
-			y: 134,
-			width: 54,
-			height: 74,
-		},
-		{
-			title: 'Проход закрыт',
-			image: '3_Right.gif',
-			x: 504,
-			y: 219,
-			width: 26,
-			height: 25,
 		},
 	];
 </script>

@@ -33,3 +33,9 @@ img {
 	max-width: initial;
 	display: inline-block;
 }
+
+.v-popper__popper.v-popper--theme-tooltip .v-popper__inner {
+	font-size: 14px;
+	padding: var(--space-4) var(--space-8) var(--space-4);
+	border-radius: 4px;
+}

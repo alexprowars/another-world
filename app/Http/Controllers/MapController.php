@@ -157,9 +157,6 @@ class MapController extends Controller
 				return new Map\PawnShop()();
 			case 29:
 				return new Map\Boutique()();
-			case 35:
-				return include(app_path('/includes/city/city_1/kwest.php'));
-				break; // Таверна
 			case 666:
 				return new Map\Prison()();
 			case 101:

@@ -9,8 +9,8 @@ use App\Models\Level;
 use App\Models\User;
 use App\Models\UserItem;
 use App\Models\Battle as BattleModel;
+use App\Services\BattleService;
 use App\Services\ChatService;
-use App\Services\InventoryService;
 use Illuminate\Support\Facades\DB;
 
 define('PRECESSION', '100000');
@@ -44,36 +44,6 @@ class Battle
 		$this->fighter = $battle->members->where('user_id', $this->user->id)->first();
 	}
 
-	protected $injury = [
-		// лёгкие
-		1 => [
-			0 => ['param' => 'strength', 'name' => 'шишка на лбу'],
-			1 => ['param' => 'strength', 'name' => 'ушиб коленки'],
-			2 => ['param' => 'agility', 'name' => 'фингал под глазом'],
-			3 => ['param' => 'agility', 'name' => 'растяжение руки'],
-			4 => ['param' => 'dexterity', 'name' => 'ушиб ВЦ'],
-			5 => ['param' => 'dexterity', 'name' => 'шишка на кулаке'],
-		],
-		// средние
-		2 => [
-			0 => ['param' => 'strength', 'name' => 'ушиб коленки второй степени'],
-			1 => ['param' => 'strength', 'name' => 'растяжение ВЦ'],
-			2 => ['param' => 'agility', 'name' => 'выбитый зуб'],
-			3 => ['param' => 'agility', 'name' => 'глубокий порез'],
-			4 => ['param' => 'dexterity', 'name' => 'перелом ключицы'],
-			5 => ['param' => 'dexterity', 'name' => 'отбитые почки'],
-		],
-		// тяжелые
-		3 => [
-			0 => ['param' => 'strength', 'name' => 'открытый перелом руки'],
-			1 => ['param' => 'strength', 'name' => 'перелом позвоночника'],
-			2 => ['param' => 'agility', 'name' => 'открытый перелом ноги'],
-			3 => ['param' => 'agility', 'name' => 'разрыв селезёнки'],
-			4 => ['param' => 'dexterity', 'name' => 'множественные порезы'],
-			5 => ['param' => 'dexterity', 'name' => 'выбитый глаз'],
-		],
-	];
-
 	public function init()
 	{
 	}
@@ -84,6 +54,7 @@ class Battle
 			'time' => now()->toAtomString(),
 			'action' => 'impactForm',
 			'result' => null,
+			'opponents' => [],
 		];
 
 		// Основные боевые константы
@@ -95,25 +66,53 @@ class Battle
 
 		$logId = request()->integer('lastLogId');
 
-		if (request()->has('ability') && $abilityId = request()->integer('ability')) {
+		$abilities = $this->user->abilities()
+			->pluck('ability', 'slot');
+
+		$isCurrentRound = request()->integer('round') === $this->battle->round;
+
+		if (!$isCurrentRound && request()->hasAny([
+			'ability', 'headImpact', 'caseImpact', 'stomachImpact', 'beltImpact', 'legsImpact',
+		])) {
+			$json['m'] = 'Раунд уже изменился. Выберите действие заново';
+		}
+
+		if ($isCurrentRound && request()->has('ability')) {
+			$abilityId = request()->integer('ability');
+
 			$ability = $priem_full[$abilityId] ?? null;
 
-			if ($ability) {
-				$this->fighter->ability = $abilityId;
-				$this->fighter->wait = $ability['wait'] ?? 0;
-				$this->fighter->time = $ability['time'] ?? 0;
-				$this->fighter->hits -= $ability['hit'] ?? 0;
-				$this->fighter->blocks -= $ability['block'] ?? 0;
-				$this->fighter->crits -= $ability['crit'] ?? 0;
-				$this->fighter->spirit -= $ability['magic'] ?? 0;
-				$this->fighter->parry -= $ability['parry'] ?? 0;
-				$this->fighter->hp -= $ability['damage'] ?? 0;
-				$this->fighter->save();
+			if ($ability === null) {
+				$json['m'] = 'Такого приёма не существует';
+			} elseif (!$abilities->contains($abilityId)) {
+				$json['m'] = 'Этот приём не выбран у персонажа';
+			} else {
+				$abilityError = $this->getAbilityError($ability);
+
+				if ($abilityError !== null) {
+					$json['m'] = $abilityError;
+				} else {
+					$this->fighter->ability = $abilityId;
+					$this->fighter->wait = $ability['wait'];
+					$this->fighter->time = $ability['time'];
+					$this->fighter->hits -= $ability['hit'];
+					$this->fighter->blocks -= $ability['block'];
+					$this->fighter->crits -= $ability['crit'];
+					$this->fighter->spirit -= $ability['magic'];
+					$this->fighter->parry -= $ability['parry'];
+					$this->fighter->hp -= $ability['damage'];
+					$this->fighter->save();
+				}
 			}
 		}
 
-		$this->processKick();
-		$this->checkFinished();
+		if ($this->battle->status === BattleStatus::ACTIVE && !$this->battle->result) {
+			if ($isCurrentRound) {
+				$this->processKick();
+			}
+
+			$this->checkFinished();
+		}
 
 		// Вычисляем время таймаута
 		$timeout = $this->battle->timeout - $this->battle->round_at->diffInSeconds();
@@ -129,9 +128,11 @@ class Battle
 			}
 
 			$this->checkBattleResult();
-		} else {
-			$json['opponents'] = [];
 
+			$json['action'] = 'userDead';
+			$this->numKicks = 0;
+			$this->numBlocks = 0;
+		} else {
 			$accept = 0;
 
 			$n = 0;
@@ -244,27 +245,24 @@ class Battle
 			$json['abilities']['list']['p_' . $i] = null;
 		}
 
-		$abilities = $this->user->abilities()
-			->pluck('ability', 'slot');
+		foreach ($abilities as $slot => $abilityId) {
+			$ability = $priem_full[$abilityId] ?? null;
 
-		foreach ($abilities as $slot => $ability) {
-			if ($p_block < $priem_full[$ability]['block'] || $p_hit < $priem_full[$ability]['hit'] || $p_krit < $priem_full[$ability]['crit'] || $p_mag < $priem_full[$ability]['magic'] || $p_parry < $priem_full[$ability]['parry'] || $p_hp < $priem_full[$ability]['damage'] || $this->fighter->wait > 0) {
-				$w = 1;
-			} else {
-				$w = 0;
+			if ($ability === null) {
+				continue;
 			}
 
 			$json['abilities']['list']['p_' . $slot] = [
-				'id' => $ability,
-				'n' => $priem_full[$ability]['name'],
-				'b' => $priem_full[$ability]['block'],
-				'h' => $priem_full[$ability]['hit'],
-				'k' => $priem_full[$ability]['crit'],
-				'm' => $priem_full[$ability]['magic'],
-				'p' => $priem_full[$ability]['parry'],
-				'd' => $priem_full[$ability]['damage'],
-				'a' => $priem_full[$ability]['about'],
-				'w' => $w,
+				'id' => $abilityId,
+				'n' => $ability['name'],
+				'b' => $ability['block'],
+				'h' => $ability['hit'],
+				'k' => $ability['crit'],
+				'm' => $ability['magic'],
+				'p' => $ability['parry'],
+				'd' => $ability['damage'],
+				'a' => $ability['about'],
+				'w' => $this->getAbilityError($ability) === null ? 0 : 1,
 			];
 		}
 
@@ -330,7 +328,7 @@ class Battle
 			}
 		}
 
-		$json['oppenent_id'] = null;
+		$json['opponent_id'] = null;
 		$json['opponent'] = null;
 
 		if ($timeout && $this->user->hp_now > 0 && !$this->battle->result && isset($victims[$random])) {
@@ -360,16 +358,23 @@ class Battle
 
 		$json['damage'] = $this->fighter->damage;
 		$json['id'] = $this->user->battle_id;
+		$json['round'] = $this->battle->round;
 		$json['timeout_left'] = (int) max(0, $timeout);
 		$json['timeout'] = $this->battle->timeout;
 
 		$json['logs'] = [];
+
+		// Не выдаём и более поздние сообщения: иначе курсор пропустит скрытые ходы.
+		$pendingLogId = $this->battle->result ? null : $this->battle->logs()
+			->where('round', '>=', $this->battle->round)
+			->min('id');
 
 		$lastLogs = $this->battle->logs()
 			->with(['member', 'member.user', 'enemy', 'enemy.user'])
 			->orderByDesc('round')
 			->orderByDesc('id')
 			->where('id', '>', $logId)
+			->when($pendingLogId !== null, fn($query) => $query->where('id', '<', $pendingLogId))
 			->get();
 
 		foreach ($lastLogs as $turn) {
@@ -385,11 +390,52 @@ class Battle
 				'enemy' => $turn->enemy->user->name ?? null,
 				'enemy_blocks' => $turn->enemy_block,
 				'comment' => $turn->comment_id,
-				'my' => $this->user->is($turn->member->user) || $this->user->is($turn->enemy->user),
+				'my' => $this->user->is($turn->member->user) || $this->user->is($turn->enemy?->user),
 			];
 		}
 
 		return $json;
+	}
+
+	private function getAbilityError(array $ability): ?string
+	{
+		if (
+			$this->battle->status !== BattleStatus::ACTIVE
+			|| $this->battle->result
+			|| $this->fighter->died_at
+			|| $this->user->hp_now <= 0
+		) {
+			return 'Сейчас вы не можете использовать приёмы';
+		}
+
+		if ($this->fighter->finished_at) {
+			return 'Вы уже завершили ход';
+		}
+
+		if ($this->battle->round_at->addSeconds($this->battle->timeout)->isPast()) {
+			return 'Время хода истекло';
+		}
+
+		if ($this->user->level < $ability['level']) {
+			return 'Ваш уровень слишком мал для этого приёма';
+		}
+
+		if ($this->fighter->wait > 0) {
+			return 'Дождитесь окончания текущего приёма';
+		}
+
+		if (
+			$this->fighter->hits < $ability['hit']
+			|| $this->fighter->blocks < $ability['block']
+			|| $this->fighter->crits < $ability['crit']
+			|| $this->fighter->spirit < $ability['magic']
+			|| $this->fighter->parry < $ability['parry']
+			|| $this->fighter->hp < $ability['damage']
+		) {
+			return 'Недостаточно боевых очков для этого приёма';
+		}
+
+		return null;
 	}
 
 	private function endRound()
@@ -400,24 +446,28 @@ class Battle
 			->orderBy('id')
 			->get();
 
+		$logsByMember = $logs->keyBy('member_id');
+		$aliveAtRoundStart = $logs
+			->filter(fn(BattleLog $log) => !$log->member->died_at && $log->member->user->hp_now > 0)
+			->pluck('member_id');
+
 		foreach ($logs as $user) {
-			foreach ($logs as $enemy) {
-				if ($user->member->is($enemy->enemy)) {
-					$user->member->user->calculate();
-					$enemy->member->user->calculate();
-
-					$damage = $this->kick($user, $enemy, $this->battle->round);
-
-					//dump($user->member_id, $damage);
-
-					if ($this->user->is($enemy->member->user)) {
-						$this->user->hp_now -= $damage;
-					}
-				}
+			// Погибший от магии до расчёта раунда не выполняет ранее выбранный удар.
+			if (!$aliveAtRoundStart->contains($user->member_id)) {
+				continue;
 			}
-		}
 
-		//dd($this->battle->members->toArray());
+			$enemy = $logsByMember->get($user->enemy_id);
+
+			if (!$enemy || $user->member->side === $enemy->member->side) {
+				continue;
+			}
+
+			$user->member->user->calculate();
+			$enemy->member->user->calculate();
+
+			$this->kick($user, $enemy, $this->battle->round);
+		}
 
 		$this->battle->round++;
 		$this->battle->round_at = now();
@@ -429,105 +479,9 @@ class Battle
 		});
 
 		$this->battle->refresh();
+		$this->user->refresh();
 
 		return true;
-	}
-
-	//	принцип действия: лёгкая травма лишает игрока 1/3 одного из статов
-	//	средняя травма заберёт 2/3
-	//	тяжёлая - в ноль.
-	//	лёгкая травма даёт возможность играть относительно нормально
-	//	средняя - только рукопашку и снимает все вещи
-	//	тяжёлая - лишает возможности играть и снимает все вещи
-	//	две лёгкие = 1 средняя
-	//	все остальные комбинации = 1 тяжёлая
-	private function setInjury(User $user, User $enemy, $level)
-	{
-		if ($enemy->rank == 60) {
-			return false;
-		}
-
-		if ($enemy->injury?->isFuture()) {
-			return false;
-		}
-
-		$time = 300 + (300 * $level);
-
-		$param = $this->injury[$level][array_rand($this->injury[$level])];
-
-		$strength = $dex = $agility = 0;
-
-		if ($param['param'] == 'strength') {
-			$strength = round($enemy->strength * ($level / 3.2)) * (-1);
-		} elseif ($param['param'] == 'dexterity') {
-			$dex = round($enemy->dexterity * ($level / 3.2)) * (-1);
-		} elseif ($param['param'] == 'agility') {
-			$agility = round($enemy->agility * ($level / 3.2)) * (-1);
-		}
-
-		$enemy->injury = now()->addSeconds($time);
-		$enemy->injury_type = $level;
-		$enemy->save();
-
-		$enemy->effects()->create([
-			'type' => 3,
-			'date' => now()->addSeconds($time),
-			'strength' => $strength,
-			'dexterity' => $dex,
-			'agility' => $agility,
-		]);
-
-		$message = '<b>' . $enemy['username'] . '</b> получает в бою ';
-
-		if ($level == 1) {
-			$message .= 'лёгкую травму';
-		} elseif ($level == 2) {
-			$message .= 'среднюю травму';
-		} elseif ($level == 3) {
-			$message .= 'тяжёлую травму';
-		} else {
-			$message .= 'неизлечимую травму';
-		}
-
-		$message .= ' <b style="color: red">' . $param['name'] . '</b> от <b>' . $user['username'] . '</b>, которая очень сильно повлияла на параметр <b>' . __('stats.' . $param['param']) . '</b>';
-
-		ChatService::insertInChat($enemy, $message);
-
-		return true;
-	}
-
-	private function wearout(User $user)
-	{
-		$result = [];
-
-		$slot = $user->getSlot();
-
-		$wearList = $slot->getItems()
-			->filter(function (UserItem $item) {
-				return $item->type != 12;
-			});
-
-		if ($wearList->isNotEmpty()) {
-			$rand = random_int(1, count($wearList));
-			$rand_wears = $slot->getItems()->random($rand);
-
-			foreach ($rand_wears as $wear) {
-				$wear->wearout += 1;
-				$wear->save();
-
-				if ($wear->wearout_max <= $wear->wearout) {
-					InventoryService::unsetObject($user, $wear->onset);
-				}
-
-				$result[] = '<b>' . $wear->title . '</b>';
-			}
-		}
-
-		if (count($result) > 0) {
-			return 'Ваши Вещи приобрели единицу износа: ' . implode(', ', $result);
-		}
-
-		return '';
 	}
 
 	private function battleResult($type)
@@ -635,10 +589,10 @@ class Battle
 			$this->user->injury = now()->addHours(3);
 		}
 
-		$message = '';
+		$wornItems = [];
 
 		if ($type != 3) {
-			$message = $this->wearout($this->user);
+			$wornItems = BattleService::wearout($this->user);
 		}
 
 		if ($type == 1) {
@@ -649,7 +603,10 @@ class Battle
 			ChatService::insertInChat($this->user, 'Вы одержали победу! Нанесено урона: <b><u>' . $this->fighter->damage . ' HP</u></b>. Получено опыта: <b><u>' . $addexp . '</u></b>.' . ($addmoney > 0 ? ' Получена награда: <b><u>' . $addmoney . '</u> золота</b>.' : ''));
 		}
 
-		if ($message != '') {
+		if (!empty($wornItems)) {
+			$itemNames = array_map(fn(UserItem $item) => '<b>' . e($item->title) . '</b>', $wornItems);
+			$message = 'Ваши вещи приобрели единицу износа: ' . implode(', ', $itemNames);
+
 			ChatService::insertInChat($this->user, $message);
 		}
 
@@ -663,37 +620,33 @@ class Battle
 		$this->user->save();
 	}
 
-	// ----- # Функция расчёта опыта # ----- //
+	/** Начисляет опыт и обновляет характеристики пользователя; сохранение выполняет вызывающий код. */
 	private function getExp(User $user): int
 	{
-		$addexp = 0;
+		$addExp = 0;
 
-		$levelup = Level::query()
+		$levelUp = Level::query()
 			->where('level', $user->level)
 			->where('up', $user->up)
 			->first();
 
-		if ($levelup) {
-			$level = Level::query()
-				->where('id', $levelup->id + 1)
-				->first();
-
+		if ($levelUp) {
 			// ----- # Расчитываем получаемый опыт для физического поединка # ----- //
 			if ($this->battle->type == BattleType::DUEL) {
 				/** @var BattleMember $enemy */
 				$enemy = $this->battle->members
-					->where('user_id', '!=', $this->user->id)
+					->where('user_id', '!=', $user->id)
 					->first();
 
-				$addexp = round($enemy->exp * random_int(1, 1.2));
+				$addExp = round($enemy->exp * random_int(1, 1.2));
 			} else { // ----- # ... для группового поединка # ----- //
 				//include("includes_2/battle/exp.php");
 			}
 
-			$addexp *= 2;
+			$addExp *= 2;
 
 			if ($this->battle->type == BattleType::CHAOS) {
-				$addexp *= 1.3;
+				$addExp *= 1.3;
 			}
 
 			$maxExp = match ($user->level) {
@@ -706,69 +659,66 @@ class Battle
 				default => 12000,
 			};
 
-			if ($addexp > $maxExp) {
-				$addexp = $maxExp;
+			if ($addExp > $maxExp) {
+				$addExp = $maxExp;
 			}
 
 			// ----- # Если есть ускорение, то опыта в 2 раза больше # ----- //
 			if ($user->sign > time()) {
-				$addexp *= 2;
+				$addExp *= 2;
 			}
 			// ----- # Если есть вип значёк, то опыта в 3 раза больше # ----- //
-			if ($user->vip == 1) {
-				$addexp *= 3;
+			if ($user->vip?->isFuture()) {
+				$addExp *= 3;
 			}
 			// ----- # Если противник бот, то опыта в 2 раза меньше # ----- //
 			//if ($opp_stat['rank'] == 60)
-			//	$addexp *= 1;
+			//	$addExp *= 1;
 
-			$addexp = (int) round($addexp);
+			$addExp = (int) round($addExp);
 
-			if ($user->exp + $addexp >= $level->exp) {
-				$newExp = $user->exp + $addexp;
+			$newExp = $user->exp + $addExp;
 
-				$up_level = Level::query()->where('exp', '>', $newExp)
-					->orderBy('id')
+			$reachedLevel = Level::query()
+				->where('id', '>', $levelUp->id)
+				->where('exp', '<=', $newExp)
+				->orderByDesc('id')
+				->first();
+
+			if ($reachedLevel) {
+				$addons = Level::query()
+					->select(
+						DB::raw('SUM(credits) as credits'),
+						DB::raw('SUM(updates) as updates'),
+					)
+					->where('id', '>', $levelUp->id)
+					->where('id', '<=', $reachedLevel->id)
+					->toBase()
 					->first();
 
-				if ($up_level) {
-					$addons = Level::query()
-						->select(
-							DB::raw('SUM(credits) as credits'),
-							DB::raw('SUM(updates) as updates'),
-							DB::raw('SUM(raseup) as raseup'),
-						)
-						->where('id', '>', $levelup->id)
-						->where('id', '<=', $up_level->id - 1)
-						->toBase()
-						->first();
-
-					$ups = Level::query()
-						->where('id', $up_level->id - 1)
-						->first();
-
-					if ($ups->level > $user->level) {
-						ChatService::insertInChat(null, "Персонаж <b>" . $user->name . "</b> получил повышение! Теперь он <b>" . $ups->level . "</b> уровня! Поздравим его с этим достижением.", false);
-					}
-
-					$user->wins += 1;
-					$user->exp += $addexp;
-					$user->level = $ups->level;
-					$user->up = $ups->up;
-
-					if ($addons) {
-						$user->updates += $addons->updates;
-						//$user->o_updates += $addons['raseup'];
-						$user->credits += $addons->credits;
-					}
+				if ($reachedLevel->level > $user->level) {
+					ChatService::insertInChat(
+						null,
+						'Персонаж <b>' . $user->name . '</b> получил повышение! Теперь он <b>'
+							. $reachedLevel->level . '</b> уровня! Поздравим его с этим достижением.',
+						false,
+					);
 				}
-			} else {
-				$user->wins += 1;
-				$user->exp += $addexp;
+
+				$user->level = $reachedLevel->level;
+				$user->up = $reachedLevel->up;
+
+				if ($addons) {
+					$user->updates += $addons->updates;
+					$user->credits += $addons->credits;
+				}
 			}
+
+			$user->wins += 1;
+			$user->exp = $newExp;
 		}
 
-		return $addexp;
+		return $addExp;
 	}
 
 	private function timeout()
@@ -803,6 +753,11 @@ class Battle
 
 	private function calcMF($x, $y)
 	{
+		if ($y == 0) {
+			// Равные нулевые характеристики дают тот же шанс, что и равные положительные.
+			return $x == 0 ? 0.1 : 0;
+		}
+
 		$MF = 0;
 
 		if (4 * $x <= $y) {
@@ -827,11 +782,11 @@ class Battle
 	private function calcInjury(User $user, User $opp, $hp, $hpfull)
 	{
 		if ($hp >= $hpfull * TRAVMA_HARD) {
-			return $this->setInjury($user, $opp, 3);
+			return BattleService::setInjury($user, $opp, 3);
 		} elseif ($hp >= $hpfull * TRAVMA_MEDIUM) {
-			return $this->setInjury($user, $opp, 2);
+			return BattleService::setInjury($user, $opp, 2);
 		} elseif ($hp >= $hpfull * TRAVMA_LIGHT) {
-			return $this->setInjury($user, $opp, 1);
+			return BattleService::setInjury($user, $opp, 1);
 		}
 
 		return false;
@@ -944,11 +899,11 @@ class Battle
 		$enemyBlock = $enemy->block ?? [];
 
 		$b = [
-			$enemy->member->user->br1,
-			$enemy->member->user->br2,
-			$enemy->member->user->br3,
-			$enemy->member->user->br4,
-			$enemy->member->user->br5,
+			$enemy->member->user->armor1,
+			$enemy->member->user->armor2,
+			$enemy->member->user->armor3,
+			$enemy->member->user->armor4,
+			$enemy->member->user->armor5,
 		];
 
 		// Расчёт вероятности нашего уворота
@@ -957,18 +912,18 @@ class Battle
 		$pu = $this->calcMF($x, $y);
 
 		// Расчёт вероятности нашего крита
-		$x = $enemy->member->user->dex + $enemy->member->user->unkrit / STATS_VS_MOD;
-		$y = $user->member->user->dex + $user->member->user->krit / STATS_VS_MOD;
+		$x = $enemy->member->user->dexterity + $enemy->member->user->unkrit / STATS_VS_MOD;
+		$y = $user->member->user->dexterity + $user->member->user->krit / STATS_VS_MOD;
 		$pi = $this->calcMF($x, $y);
 
 		// Расчёт вероятности пробоя блока
-		$x = $enemy->member->user->strength + $enemy->member->user->pblock / STATS_VS_MOD;
-		$y = $user->member->user->strength + $user->member->user->mblock / STATS_VS_MOD;
+		$x = $enemy->member->user->strength + $enemy->member->user->mblock / STATS_VS_MOD;
+		$y = $user->member->user->strength + $user->member->user->pblock / STATS_VS_MOD;
 		$pbl = $this->calcMF($x, $y);
 
 		// Расчёт вероятности пробоя брони
-		$x = $enemy->member->user->strength + $enemy->member->user->pbr / STATS_VS_MOD;
-		$y = $user->member->user->strength + $user->member->user->kbr / STATS_VS_MOD;
+		$x = $enemy->member->user->strength + $enemy->member->user->kbr / STATS_VS_MOD;
+		$y = $user->member->user->strength + $user->member->user->pbr / STATS_VS_MOD;
 		$pbr = $this->calcMF($x, $y);
 
 		$a = random_int(0, PRECESSION) / PRECESSION; // случайное число на (0,1), показывающее, сработал ли уворот в данном случае.
@@ -998,7 +953,7 @@ class Battle
 				if (isset($userKick[$i - 1]) && $userKick[$i - 1] > 0) {
 					$rnd = random_int(0, PRECESSION) / PRECESSION;
 
-					if ($userKick[$i - 1] == $enemyBlock[0] || (isset($enemyBlock[1]) && $userKick[$i - 1] == $enemyBlock[1]) || (isset($enemyBlock[2]) && $userKick[$i - 1] == $enemyBlock[2])) {
+					if (in_array($userKick[$i - 1], $enemyBlock, true)) {
 						if ($pbl > $rnd) {
 							$kickDamage[$i] = random_int(0.5 * ($user->member->user->strength / 3 + $user->member->user->min), 0.75 * ($user->member->user->strength / 1.5 + $user->member->user->max));
 
@@ -1015,7 +970,7 @@ class Battle
 						}
 					} else {
 						if ($pbr > $bpr) {
-							$b[$userKick[$i - 1] + 1] = 0;
+							$b[$userKick[$i - 1] - 1] = 0;
 
 							$user->member->user->min = ceil($user->member->user->min * 0.5);
 							$user->member->user->max = ceil($user->member->user->max * 0.5);
@@ -1120,7 +1075,7 @@ class Battle
 			$user->member->time -= 1;
 			$user->member->time = max($user->member->time, 0);
 
-			if ($user->member->time <= 1) {
+			if ($user->member->time == 0) {
 				$user->member->wait = 0;
 			}
 		}
@@ -1133,11 +1088,14 @@ class Battle
 			$this->calcInjury($user->member->user, $enemy->member->user, $damage, $enemy->member->user->hp_max);
 		}
 
-		$enemy->member->damage += $damage;
 		$enemy->member->save();
 
 		$enemy->member->user->hp_now = max(0, $enemy->member->user->hp_now - $damage);
 		$enemy->member->user->save();
+
+		$user->member->damage += $damage;
+		$user->member->save();
+		$user->member->user->save();
 
 		$user->damage = $damage;
 		$user->enemy_block = $enemyBlock;
@@ -1165,9 +1123,6 @@ class Battle
 		// Зануляем удары и блоки
 		$kick1 = 0;
 		$kick2 = 0;
-		$block1 = 0;
-		$block2 = 0;
-		$block3 = 0;
 
 		// Вычисляем цифровые значения ударов и блоков по зонам удара
 		if (request()->has('headImpact') && request()->boolean('headImpact')) {
@@ -1203,46 +1158,23 @@ class Battle
 			}
 		}
 
-		if (request()->has('headBlock') && request()->boolean('headBlock')) {
-			$block1 = 1;
-		}
+		$blocks = [];
+		$blockZones = [
+			'headBlock' => 1,
+			'caseBlock' => 2,
+			'stomachBlock' => 3,
+			'beltBlock' => 4,
+			'legsBlock' => 5,
+		];
 
-		if (request()->has('caseBlock') && request()->boolean('caseBlock')) {
-			if ($block1 > 0 && $block2 == 0) {
-				$block2 = 2;
-			} else {
-				$block1 = 2;
+		foreach ($blockZones as $field => $zone) {
+			if (request()->boolean($field)) {
+				$blocks[] = $zone;
 			}
 		}
 
-		if (request()->has('stomachBlock') && request()->boolean('stomachBlock')) {
-			if ($block1 > 0 && $block2 == 0) {
-				$block2 = 3;
-			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
-				$block3 = 3;
-			} else {
-				$block1 = 3;
-			}
-		}
-
-		if (request()->has('beltBlock') && request()->boolean('beltBlock')) {
-			if ($block1 > 0 && $block2 == 0) {
-				$block2 = 4;
-			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
-				$block3 = 4;
-			} else {
-				$block1 = 4;
-			}
-		}
-
-		if (request()->has('legsBlock') && request()->boolean('legsBlock')) {
-			if ($block1 > 0 && $block2 == 0) {
-				$block2 = 5;
-			} elseif ($block1 > 0 && $block2 > 0 && $this->numBlocks == 3 && $block3 == 0) {
-				$block3 = 5;
-			} else {
-				$block1 = 5;
-			}
+		if (count($blocks) > $this->numBlocks) {
+			throw new Exception('Выбрано больше блоков, чем разрешено');
 		}
 
 		$enemyId = request()->integer('opponent');
@@ -1262,8 +1194,12 @@ class Battle
 		// Если есть у перса жизни и он ещё не ходил, то он может сделать ход
 		if ($this->user->hp_now > 0 && !$this->fighter->finished_at && !$this->fighter->died_at) {
 			// Если стоит хоть один удар, блок и есть противник
-			if ($kick1 > 0 && $block1 > 0 && $enemyId > 0) {
-				$enemy = $this->battle->members->where('id', $enemyId)->first();
+			if ($kick1 > 0 && !empty($blocks) && $enemyId > 0) {
+				$enemy = $this->battle->members
+					->where('id', $enemyId)
+					->where('side', $this->fighter->side == 1 ? 0 : 1)
+					->whereNull('died_at')
+					->first();
 
 				if (!$enemy) {
 					throw new Exception('Противник не найден');
@@ -1282,7 +1218,7 @@ class Battle
 					$log = $this->battle->logs()->make();
 					$log->round = $this->battle->round;
 					$log->hit = array_filter([$kick1, $kick2]);
-					$log->block = array_filter([$block1, $block2, $block3]);
+					$log->block = $blocks;
 					$log->member()->associate($this->fighter);
 					$log->enemy()->associate($enemy);
 					$log->save();

@@ -16,5 +16,7 @@
 <script setup>
 	import { Link } from '@inertiajs/vue3';
 
-	defineProps({ active: [Number, String] });
+	defineProps({
+		active: [Number, String],
+	});
 </script>

@@ -13,18 +13,8 @@
 			<img src="/assets/images/images/inf.png" alt="Профиль" />
 		</Link>
 		<div class="online-user-statuses">
-			<img
-				v-if="user.profession"
-				:src="'/assets/images/guild/' + user.profession + '.png'"
-				:title="$t('profession.' + user.profession)"
-				:alt="$t('profession.' + user.profession)"
-			/>
-			<img
-				v-if="user.silence"
-				src="/assets/images/chat/molch.gif"
-				:title="'Молчанка до ' + $formatDate(user.silence, 'DD MMM HH:mm:ss')"
-				alt="Молчанка"
-			/>
+			<img v-if="user.profession" :src="'/assets/images/guild/' + user.profession + '.png'" :title="$t('profession.' + user.profession)" :alt="$t('profession.' + user.profession)"/>
+			<img v-if="user.silence" src="/assets/images/chat/molch.gif" :title="'Молчанка до ' + $formatDate(user.silence, 'DD MMM HH:mm:ss')" alt="Молчанка"/>
 			<a v-if="user.battle" :href="'/view_logs.php?log=' + user.battle" target="_blank" class="online-user-action" title="В бою — открыть журнал">
 				<img src="/assets/images/chat/noweapon.gif" alt="В бою" />
 			</a>
@@ -36,6 +26,9 @@
 <script setup>
 	import { Link } from '@inertiajs/vue3';
 
-	defineProps({ user: Object });
+	defineProps({
+		user: Object
+	});
+
 	const emit = defineEmits(['player', 'private']);
 </script>

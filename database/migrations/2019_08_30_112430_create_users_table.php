@@ -35,6 +35,7 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('draws')->default(0);
 			$table->unsignedSmallInteger('room')->default(0);
 			$table->unsignedSmallInteger('rank')->nullable();
+			$table->boolean('is_clone')->default(false);
 			$table->smallInteger('s_strength')->default(3);
 			$table->smallInteger('s_dexterity')->default(3);
 			$table->smallInteger('s_agility')->default(3);
@@ -61,6 +62,11 @@ return new class extends Migration {
 			$table->tinyInteger('injury_type')->nullable();
 			$table->tinyInteger('tutorial')->default(0);
 			$table->timestamp('invisible')->nullable();
+			$table->timestamp('magic_protection_until')->nullable();
+			$table->timestamp('attack_protection_until')->nullable();
+			$table->timestamp('vampire_protection_until')->nullable();
+			$table->unsignedTinyInteger('magic_resistance')->default(0);
+			$table->unsignedSmallInteger('aura_duration_bonus')->default(0);
 			$table->timestamp('vip')->nullable();
 			$table->smallInteger('poison')->nullable();
 			$table->rememberToken();

@@ -31,23 +31,33 @@
 	const sort = ref('name');
 	const loading = ref(false);
 	const error = ref('');
+
 	let refreshTimer;
+
 	const visibleUsers = computed(() =>
 		users.value.toSorted((a, b) => (sort.value === 'level' ? (Number(b.level) || 0) - (Number(a.level) || 0) : a.name.localeCompare(b.name, 'ru'))),
 	);
 
-	defineExpose({ refresh: loadChatList, loading });
+	defineExpose({
+		refresh: loadChatList,
+		loading
+	});
 
 	onMounted(() => {
 		loadChatList();
 		refreshTimer = setInterval(loadChatList, 60000);
 	});
+
 	onBeforeUnmount(() => clearInterval(refreshTimer));
 
 	async function loadChatList() {
-		if (loading.value) return;
+		if (loading.value) {
+			return;
+		}
+
 		loading.value = true;
 		error.value = '';
+
 		try {
 			const result = await useHttp().get('/chat/online');
 			users.value = result.users;

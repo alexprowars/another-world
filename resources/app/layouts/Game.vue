@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-	import { Link } from '@inertiajs/vue3';
+	import { Link, router } from '@inertiajs/vue3';
 	import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue';
 	import useState from '~/composables/useState.js';
 	import { onClickOutside, useLocalStorage, useResizeObserver } from '@vueuse/core';
@@ -274,6 +274,10 @@
 
 		echo?.private('user.' + user.value.id).listen('ChatPrivateMessage', ({ message }) => {
 			chat.addMessage(message);
+
+			if (message.redirect) {
+				router.visit(message.redirect);
+			}
 		});
 	}
 

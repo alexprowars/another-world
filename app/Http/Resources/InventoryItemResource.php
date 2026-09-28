@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\UserItem;
 use App\Services\InventoryService;
+use App\Services\MagicService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -20,6 +21,7 @@ class InventoryItemResource extends JsonResource
 			'title' => $this->title,
 			'type' => $this->type,
 			'can_drop' => InventoryService::canDrop($this->resource),
+			'can_use' => MagicService::canUse($this->resource),
 			'requirements' => $this->requirements,
 			'wearout' => $this->wearout,
 			'wearout_max' => $this->wearout_max,

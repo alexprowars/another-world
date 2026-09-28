@@ -58,6 +58,7 @@
 	const state = useState();
 	const user = computed(() => state.user);
 	const page = usePage();
+
 	const logoutForm = useForm({});
 	const navigation = [
 		{ href: '/map', label: 'Город', icon: 'city' },
@@ -68,13 +69,20 @@
 	];
 
 	function logout() {
-		if (logoutForm.processing) return;
+		if (logoutForm.processing) {
+			return;
+		}
+
 		logoutForm.post('/logout');
 	}
 
 	function isActive(href) {
 		const path = page.url.split('?')[0];
-		if (href === '/person' && path === '/person/work') return false;
+
+		if (href === '/person' && path === '/person/work') {
+			return false;
+		}
+
 		return path === href || path.startsWith(href + '/');
 	}
 </script>

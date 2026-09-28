@@ -30,6 +30,7 @@ class Training
 		$list = User::query()
 			->where('room', 2)
 			->where('rank', 60)
+			->where('is_clone', false)
 			->where('level', '>=', $request->user()->level)
 			->orderBy('level')
 			->get();

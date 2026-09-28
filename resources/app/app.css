@@ -3,11 +3,10 @@
 @import './styles/palette.css';
 @import './styles/base.css';
 @import './styles/frame.css';
-@import './styles/styles.css';
 @import './styles/main.css';
 @import './styles/ui.css';
 @import './styles/shop.css';
-@import './styles/info.css';
+@import './styles/gift.css';
 @import './styles/battle.css';
 @import './styles/arena.css';
 @import './styles/modal.css';

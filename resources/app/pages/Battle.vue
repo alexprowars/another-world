@@ -37,6 +37,11 @@
 									@complete="gofight"
 								/>
 								<BattleAbilities :abilities="data.abilities || null" @use="useAbility" />
+								<div v-if="magicItems.length" class="flex flex-wrap justify-center gap-2">
+									<button v-for="item in magicItems" :key="item.id" type="button" class="ui-button ui-button--compact" @click="useMagic(item)">
+										{{ item.title }}
+									</button>
+								</div>
 							</template>
 						</div>
 
@@ -110,13 +115,15 @@
 
 <script setup>
 	import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-	import { Link, useHttp } from '@inertiajs/vue3';
+	import { Link, router, useHttp } from '@inertiajs/vue3';
 	import { toast } from 'vue3-toastify';
 	import BattleFighter from '~/components/Battle/BattleFighter.vue';
 	import BattleImpactForm from '~/components/Battle/BattleImpactForm.vue';
 	import BattleLogs from '~/components/Battle/BattleLogs.vue';
 	import BattleAbilities from '~/components/Battle/BattleAbilities.vue';
 	import BattleUsers from '~/components/Battle/BattleUsers.vue';
+	import UseMagic from '~/components/Dialogs/UseMagic.vue';
+	import { openPopupModal } from '~/composables/useModals.js';
 
 	defineProps({
 		page: Object,
@@ -137,11 +144,24 @@
 
 	const isFinished = computed(() => data.value?.action === 'finishBattle');
 	const showNoEnemy = computed(() => !isFinished.value);
+	const magicItems = computed(() => Object.values(data.value?.user?.items || {}).filter(item => item.can_use));
+
+	function useMagic(item) {
+		openPopupModal(UseMagic, {
+			title: 'Использовать магию',
+			item,
+			selfName: data.value.user.name,
+			opponentName: data.value.opponent?.name || '',
+			battle: data.value.id,
+			round: data.value.round,
+			onUsed: loaderRefresh,
+		});
+	}
 
 	const lastLogId = computed(() => {
 		let last = -1;
 
-		data.value?.['logs'].forEach(item => {
+		logs.value.forEach(item => {
 			if (item.id > last) {
 				last = item.id;
 			}
@@ -175,6 +195,7 @@
 		try {
 			const result = await useHttp({
 				lastLogId: lastLogId.value || 0,
+				round: data.value?.round || 0,
 				opponent: selectedEnemy.value || 0,
 				...extra,
 			}).get('/battle');
@@ -221,6 +242,13 @@
 	}
 
 	async function actionRefresh(res) {
+		if (res.action === 'reload') {
+			clearTimeout(refreshTimer);
+			clearTimeout(timeoutTimer);
+			router.visit('/battle');
+			return;
+		}
+
 		if (res.action === 'refresh') {
 			loaderRefresh();
 			return;

@@ -10,6 +10,7 @@ use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\BattleOfferResource;
 use App\Models\Battle;
+use App\Models\User;
 use App\Services\BattleService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,19 @@ class BattleController extends Controller
 
 			if ($request->expectsJson() && !$request->header('X-Inertia')) {
 				$result = DB::transaction(function () use ($user) {
-					$battle = new BattleEngine($user->battle, $user);
+					$battleModel = Battle::query()
+						->lockForUpdate()
+						->findOrFail($user->battle_id);
+
+					$user = User::query()
+						->lockForUpdate()
+						->findOrFail($user->id);
+
+					if ($user->battle_id !== $battleModel->id) {
+						return ['action' => 'reload'];
+					}
+
+					$battle = new BattleEngine($battleModel, $user);
 					$battle->init();
 
 					return $battle->show();
