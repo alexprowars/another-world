@@ -2,7 +2,7 @@
 	<div class="max-w-[1000px] m-auto">
 		<div v-if="data" class="battle battle-layout">
 			<div class="battle-layout__fighter battle-layout__fighter--left">
-				<BattleFighter v-if="data?.user" :fighter="data.user" :current="true"/>
+				<BattleFighter v-if="data?.user" :fighter="data.user" :current="true" />
 			</div>
 
 			<div class="battle-layout__center">
@@ -21,43 +21,41 @@
 									<template v-if="data.result === 'draw'">Ничья!</template>
 									<template v-if="data.result === 'lose'">Вы проиграли!</template>
 								</div>
-								<Link href="/person" class="standbut">
-									Вернуться
-								</Link>
+								<Link href="/person" class="ui-button ui-button--compact">Вернуться</Link>
 							</div>
-							<div v-if="data.action === 'waitImpact'" class="text-red-600 font-bold">
-								Ожидаем хода противника...
-							</div>
+							<div v-if="data.action === 'waitImpact'" class="text-red-600 font-bold">Ожидаем хода противника...</div>
 							<div v-if="data.action === 'userDead'" class="text-red-600 font-bold">
 								Для вас бой окончен, подождите пока остальные игроки закончат поединок
 							</div>
 
 							<template v-if="data.action === 'impactForm' && !isFinished">
-								<BattleImpactForm ref="impactForm"
+								<BattleImpactForm
+									ref="impactForm"
 									v-model:auto="autoGo"
 									:blocks-count="data.blocks"
 									:impacts-count="data.kicks"
 									@complete="gofight"
 								/>
-								<BattleAbilities :abilities="data.abilities || null" @use="useAbility"/>
+								<BattleAbilities :abilities="data.abilities || null" @use="useAbility" />
 							</template>
 						</div>
 
 						<div v-show="loading" class="mt-3">
-							<img src="/assets/images/refresh.gif" alt="">
+							<img src="/assets/images/refresh.gif" alt="" />
 						</div>
 
 						<div v-show="!isFinished" class="text-center mt-4">
-							До тайм-аута: <b>{{ timeoutText }}</b>
-							<hr color="e2e0e0">
+							До тайм-аута:
+							<b>{{ timeoutText }}</b>
+							<hr color="e2e0e0" />
 						</div>
 
-						<div v-if="!isFinished" class="flex justify-center gap-4">
+						<div v-if="!isFinished" class="flex flex-wrap justify-center gap-4">
 							<div class="text-center">
-								<input type="button" value="Ударить" class="standbut" @click="gofight">
+								<input type="button" value="Ударить" class="ui-button ui-button--compact" @click="gofight" />
 							</div>
 							<div v-if="data.opponents.length > 1" class="text-center battle-change">
-								<input type="button" value="Сменить" class="standbut" @click="toggleEnemyList">
+								<input type="button" value="Сменить" class="ui-button ui-button--compact" @click="toggleEnemyList" />
 								<div v-if="showEnemyList" id="oMen" class="battle-change__menu">
 									<div class="battle-change__title">Выберите противника:</div>
 									<div v-for="opponent in data.opponents" :key="opponent.id" class="battle-change__item">
@@ -66,35 +64,47 @@
 								</div>
 							</div>
 							<div v-show="!loading" class="text-center" id="refresh_b">
-								<input type="button" value="Обновить" class="standbut" @click="loaderRefresh">
+								<input type="button" value="Обновить" class="ui-button ui-button--compact" @click="loaderRefresh" />
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<BattleUsers v-show="!isFinished" :users="data.teams"/>
+				<BattleUsers v-show="!isFinished" :users="data.teams" />
 
 				<div v-show="!isFinished" id="centerInfo" class="battle-info">
-					<div class="battle-info__item">Нанесено урона: <u>{{ data.damage }}</u> HP</div>
-					<div class="battle-info__item">Тайм-аут: <u>{{ data.timeout / 60 }}</u> мин.</div>
+					<div class="battle-info__item">
+						Нанесено урона:
+						<u>{{ data.damage }}</u>
+						HP
+					</div>
+					<div class="battle-info__item">
+						Тайм-аут:
+						<u>{{ data.timeout / 60 }}</u>
+						мин.
+					</div>
 				</div>
 
 				<div v-show="!isFinished" class="text-center mt-4">
-					<b>Полный лог боя <a :href="'/logs/' + page.id" target="_blank"> тут</a></b>
-					<hr color="e2e0e0">
+					<b>
+						Полный лог боя
+						<a :href="'/logs/' + page.id" target="_blank">тут</a>
+					</b>
+					<hr color="e2e0e0" />
 				</div>
 			</div>
 
 			<div class="battle-layout__fighter battle-layout__fighter--right">
-				<BattleFighter v-if="data?.opponent && !isFinished" :fighter="data.opponent"/>
+				<BattleFighter v-if="data?.opponent && !isFinished" :fighter="data.opponent" />
 				<div v-else class="battle-no-enemy">
-					<b v-if="showNoEnemy">Нет противника в зоне досягаемости...</b><br v-if="showNoEnemy">
-					<img src="/assets/images/battle/1.gif" width="210" :height="showNoEnemy ? 277 : 230" alt="">
+					<b v-if="showNoEnemy">Нет противника в зоне досягаемости...</b>
+					<br v-if="showNoEnemy" />
+					<img src="/assets/images/battle/1.gif" width="210" :height="showNoEnemy ? 277 : 230" alt="" />
 				</div>
 			</div>
 		</div>
 
-		<BattleLogs :logs="logs"/>
+		<BattleLogs :logs="logs" />
 	</div>
 </template>
 
@@ -131,7 +141,7 @@
 	const lastLogId = computed(() => {
 		let last = -1;
 
-		data.value?.['logs'].forEach((item) => {
+		data.value?.['logs'].forEach(item => {
 			if (item.id > last) {
 				last = item.id;
 			}

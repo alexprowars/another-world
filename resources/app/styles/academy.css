@@ -1,0 +1,14 @@
+.academy-professions {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+	gap: var(--space-16);
+}
+
+.academy-profession {
+	display: flex;
+	flex-direction: column;
+}
+
+.academy-profession .service-panel-body {
+	margin-top: auto;
+}

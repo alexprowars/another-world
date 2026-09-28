@@ -14,14 +14,14 @@ export const startLoading = (force = false) => {
 			setLayoutProps({
 				loading: true,
 			});
-		}, 500)
+		}, 500);
 	}
-}
+};
 
 export const stopLoading = () => {
-	clearTimeout(loaderTimeout)
+	clearTimeout(loaderTimeout);
 
 	setLayoutProps({
 		loading: false,
 	});
-}
+};

@@ -1,13 +1,56 @@
 <template>
-	<Head :title="'Энциклопедия — ' + page.title"/>
-	<ContentBlock title="Энциклопедия">
-		<div class="flex flex-col gap-6 md:flex-row">
-			<main class="min-w-0 flex-1">
-				<h1 class="mb-4 text-center text-lg font-bold">{{ page.title }}</h1>
+	<Head :title="'Энциклопедия — ' + page.title" />
+	<ContentBlock title="Энциклопедия" class="library">
+		<template #actions>
+			<Link href="/map" class="ui-icon-button" title="Вернуться в город">
+				<GameIcon name="back" />
+			</Link>
+			<Link :href="'/library?section=' + page.section" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
+
+		<div class="library-layout">
+			<label class="library-mobile-navigation">
+				<span>Раздел энциклопедии</span>
+				<select class="ui-input" :value="page.section" @change="router.get('/library', { section: Number($event.target.value) })">
+					<optgroup v-for="group in page.groups" :key="group.title" :label="group.title">
+						<option v-for="section in group.sections" :key="section.id" :value="section.id">{{ section.title }}</option>
+					</optgroup>
+				</select>
+			</label>
+			<nav class="ui-menu library-navigation">
+				<p class="library-navigation-title">
+					<GameIcon name="book" />
+					Оглавление
+				</p>
+				<section v-for="group in page.groups" :key="group.title" class="library-navigation-group">
+					<h2>{{ group.title }}</h2>
+					<ul class="ui-menu-list">
+						<li v-for="section in group.sections" :key="section.id">
+							<Link class="ui-menu-link" :href="'/library?section=' + section.id" :class="{ 'is-active': page.section === section.id }">
+								{{ section.title }}
+							</Link>
+						</li>
+					</ul>
+				</section>
+			</nav>
+
+			<main class="library-content">
+				<header class="library-heading">
+					<div>
+						<p class="library-eyebrow">{{ activeGroup }}</p>
+						<h1>{{ page.title }}</h1>
+					</div>
+					<label v-if="isCatalog" class="library-search">
+						<span>Поиск в разделе</span>
+						<input class="ui-input" v-model="search" type="search" placeholder="Название предмета" />
+					</label>
+				</header>
 
 				<template v-if="page.section === 20">
-					<div v-if="page.levels.length" class="overflow-x-auto">
-						<table class="library-table">
+					<div v-if="page.levels.length" class="ui-table-wrap library-table-wrap">
+						<table class="ui-table library-table">
 							<thead>
 								<tr>
 									<th>Уровень</th>
@@ -41,13 +84,18 @@
 
 				<div v-else-if="page.section === 21" class="space-y-4">
 					<p>В центре занятости можно заработать золото. Работа расходует запас сил, который восстанавливается в боях.</p>
-					<fieldset v-for="type in page.workTypes" :key="type.id" class="rounded border border-slate-300 p-3">
+					<fieldset v-for="type in page.workTypes" :key="type.id" class="library-work">
 						<legend class="px-2 font-bold">{{ type.title }}</legend>
 						<p class="mb-3">Требуется уровень {{ type.level }}. Расход сил: {{ type.activity }} ед. за час.</p>
-						<div v-if="type.works.length" class="overflow-x-auto">
-							<table class="library-table">
+						<div v-if="type.works.length" class="ui-table-wrap library-table-wrap">
+							<table class="ui-table library-table">
 								<thead>
-									<tr><th>№</th><th>Наименование</th><th>Срок работы</th><th>Зарплата</th></tr>
+									<tr>
+										<th>№</th>
+										<th>Наименование</th>
+										<th>Срок работы</th>
+										<th>Зарплата</th>
+									</tr>
 								</thead>
 								<tbody>
 									<tr v-for="(work, index) in type.works" :key="work.id">
@@ -66,10 +114,16 @@
 
 				<div v-else-if="page.section === 22" class="space-y-4">
 					<p>В Академии можно получить профессию. Ниже приведены требования, срок и стоимость обучения.</p>
-					<div v-if="page.professions.length" class="overflow-x-auto">
-						<table class="library-table">
+					<div v-if="page.professions.length" class="ui-table-wrap library-table-wrap">
+						<table class="ui-table library-table">
 							<thead>
-								<tr><th>№</th><th>Наименование</th><th>Уровень</th><th>Срок обучения</th><th>Стоимость обучения</th></tr>
+								<tr>
+									<th>№</th>
+									<th>Наименование</th>
+									<th>Уровень</th>
+									<th>Срок обучения</th>
+									<th>Стоимость обучения</th>
+								</tr>
 							</thead>
 							<tbody>
 								<tr v-for="(profession, index) in page.professions" :key="profession.id">
@@ -85,56 +139,45 @@
 					<p v-else class="text-center">Список профессий пока пуст.</p>
 				</div>
 
-				<Modifiers v-else-if="page.section === 23"/>
+				<Modifiers v-else-if="page.section === 23" />
 
 				<template v-else>
-					<div v-if="page.items.length" class="shop-items grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-						<Item v-for="item in page.items" :key="item.id" :item="item" read-only/>
+					<div v-if="filteredItems.length" class="library-items">
+						<ItemCard v-for="entry in filteredItems" :key="entry.id" :item="entry.item" />
 					</div>
-					<p v-else class="text-center">В данном отделе нет предметов.</p>
+					<div v-else class="ui-empty">
+						<GameIcon name="book" />
+						<h2>{{ search.trim() ? 'Ничего не найдено' : 'Раздел пока пуст' }}</h2>
+						<p>{{ search.trim() ? 'Попробуйте другое название предмета.' : 'Здесь появятся предметы и их характеристики.' }}</p>
+						<button v-if="search" type="button" class="ui-button" @click="search = ''">Сбросить поиск</button>
+					</div>
 				</template>
 			</main>
-
-			<nav class="w-full shrink-0 space-y-4 md:w-52" aria-label="Библиотека">
-				<section v-for="group in page.groups" :key="group.title" class="rounded border border-slate-300 p-3">
-					<h2 class="mb-2 font-bold">{{ group.title }}</h2>
-					<ul class="space-y-1">
-						<li v-for="section in group.sections" :key="section.id">
-							<Link :href="'/library?section=' + section.id"
-								:class="{ 'font-bold underline': page.section === section.id }"
-								:aria-current="page.section === section.id ? 'page' : undefined"
-							>{{ section.title }}</Link>
-						</li>
-					</ul>
-				</section>
-			</nav>
 		</div>
 	</ContentBlock>
 </template>
 
 <script setup>
-	import { Head, Link } from '@inertiajs/vue3';
+	import { Head, Link, router } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
-	import Item from '~/components/City/Shop/Item.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
+	import { computed, ref, watch } from 'vue';
+	import ItemCard from '~/components/Library/ItemCard.vue';
 	import Modifiers from '~/components/Library/Modifiers.vue';
 
-	defineProps({ page: Object });
+	const props = defineProps({ page: { type: Object, required: true } });
+	const search = ref('');
+	const isCatalog = computed(() => Array.isArray(props.page.items));
+	const activeGroup = computed(() => props.page.groups.find(group => group.sections.some(section => section.id === props.page.section))?.title);
+	const filteredItems = computed(() => {
+		const query = search.value.trim().toLocaleLowerCase('ru');
+		return (props.page.items ?? []).filter(entry => entry.item.title.toLocaleLowerCase('ru').includes(query));
+	});
+
+	watch(
+		() => props.page.section,
+		() => {
+			search.value = '';
+		},
+	);
 </script>
-
-<style scoped>
-	.library-table {
-		width: 100%;
-		border-collapse: collapse;
-		text-align: center;
-	}
-
-	.library-table th,
-	.library-table td {
-		padding: 0.5rem;
-		border-bottom: 1px solid #cbd5e1;
-	}
-
-	.library-table tbody tr:nth-child(odd) {
-		background: rgb(241 245 249 / 50%);
-	}
-</style>

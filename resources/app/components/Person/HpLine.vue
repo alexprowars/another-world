@@ -1,15 +1,10 @@
 <template>
-	<div class="flex items-center gap-2 justify-between">
-		<div class="bdg stbox">
-			<div :class="[color]" :style="{ width: width + '%' }">
-				<img src="/assets/images/main/empty.gif" width="1" height="10" alt="">
-			</div>
+	<div class="hp-line" :class="'hp-line--' + color">
+		<slot name="icon" />
+		<div class="hp-line-track">
+			<div class="hp-line-fill" :style="{ width: width + '%' }"></div>
 		</div>
-		<div class="flex gap-1">
-			<div class="fntc flex items-center">{{ current }}</div>
-			<div class="intf">|</div>
-			<div class="minf flex items-center w-8">{{ max }}</div>
-		</div>
+		<span class="hp-line-value">{{ current }} / {{ max }}</span>
 	</div>
 </template>
 
@@ -20,7 +15,7 @@
 		color: String,
 		current: Number,
 		max: Number,
-	})
+	});
 
 	const width = computed(() => {
 		if (props.max <= 0) {
@@ -28,5 +23,5 @@
 		}
 
 		return Math.min(100, Math.max(0, (props.current / props.max) * 100));
-	})
+	});
 </script>

@@ -1,0 +1,13 @@
+node_modules/
+vendor/
+public/
+storage/
+bootstrap/cache/
+output/
+.idea/
+.playwright-cli/
+.env*
+package-lock.json
+composer.json
+composer.lock
+**/*.php

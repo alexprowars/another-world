@@ -1,0 +1,210 @@
+.hospital {
+	display: grid;
+	gap: var(--space-20);
+	max-width: 860px;
+	margin-inline: auto;
+}
+
+.hospital-recovery {
+	overflow: hidden;
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-highlight);
+}
+
+.hospital-heading {
+	display: flex;
+	align-items: center;
+	gap: var(--space-18);
+	padding: var(--space-24);
+}
+
+.hospital-emblem {
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 60px;
+	height: 60px;
+	border: 3px double var(--paper-border);
+	border-radius: 50%;
+	background: var(--paper-panel);
+	color: var(--resource-health);
+}
+
+.hospital-emblem svg {
+	width: 28px;
+	height: 28px;
+}
+
+.hospital-heading h2 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 700 22px/1.3 var(--font-interface);
+}
+
+.hospital-heading p,
+.hospital-injury-copy p {
+	margin: var(--space-8) 0 0;
+	color: var(--paper-muted);
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.hospital-health {
+	display: grid;
+	gap: var(--space-10);
+	padding: 0 var(--space-24) var(--space-24);
+}
+
+.hospital-label {
+	display: block;
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+.hospital-health .hp-line {
+	max-width: none;
+	gap: var(--space-16);
+	font-size: 14px;
+}
+
+.hospital-health .hp-line-track {
+	height: 10px;
+}
+
+.hospital-treatment {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-20);
+	padding: var(--space-20) var(--space-24);
+	border-top: 1px solid var(--paper-border);
+	background: var(--paper-stripe);
+}
+
+.hospital-duration,
+.hospital-price {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+	color: var(--paper-link);
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+}
+
+.hospital-duration {
+	margin-top: var(--space-8);
+}
+
+.hospital-duration svg,
+.hospital-price svg,
+.hospital-injury-copy h3 svg {
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+}
+
+.hospital-countdown {
+	margin-top: var(--space-8);
+	color: var(--paper-link);
+	font:
+		700 30px/1.2 ui-monospace,
+		'Menlo',
+		'Consolas',
+		monospace;
+	font-variant-numeric: tabular-nums;
+}
+
+.hospital-hint {
+	margin: 0;
+	color: var(--paper-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.hospital-injury {
+	display: flex;
+	align-items: center;
+	gap: var(--space-24);
+	padding: var(--space-20) var(--space-24);
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-stripe);
+}
+
+.hospital-injury-copy {
+	flex: 1;
+	min-width: 0;
+}
+
+.hospital-injury-copy h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+	margin: 0;
+	color: var(--paper-heading);
+	font: 600 17px/1.3 var(--font-interface);
+}
+
+.hospital-injury-copy h3 svg {
+	color: var(--paper-link);
+}
+
+.hospital-injury-action {
+	display: grid;
+	justify-items: center;
+	flex-shrink: 0;
+	gap: var(--space-10);
+}
+
+.hospital-hint--error {
+	color: var(--paper-danger);
+}
+
+@container (max-width: 560px) {
+	.hospital-heading {
+		align-items: flex-start;
+		gap: var(--space-12);
+		padding: var(--space-18) var(--space-16);
+	}
+
+	.hospital-emblem {
+		width: 44px;
+		height: 44px;
+	}
+
+	.hospital-emblem svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	.hospital-heading h2 {
+		font-size: 18px;
+	}
+
+	.hospital-health {
+		padding: 0 var(--space-16) var(--space-18);
+	}
+
+	.hospital-treatment,
+	.hospital-injury {
+		gap: var(--space-16);
+		padding: var(--space-18) var(--space-16);
+	}
+
+	.hospital-treatment > .ui-button,
+	.hospital-injury-action,
+	.hospital-injury-action .ui-button {
+		width: 100%;
+	}
+
+	.hospital-injury {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.hospital-injury-action {
+		justify-items: start;
+	}
+}

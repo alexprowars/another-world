@@ -20,7 +20,6 @@ class IndexController extends Controller
 
 			$this->assets->addJs('js/jquery-1.11.2.min.js');
 			$this->assets->addJs('js/index/swf.js');
-			$this->assets->addJs('js/index/common.js');
 
 			$this->assets->addCss('css/index/general.css');
 			$this->assets->addCss('css/index/content.css');

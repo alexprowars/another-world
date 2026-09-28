@@ -25,7 +25,7 @@
 	const now = useNow({ interval: 1000 });
 	const time = computed(() => dayjs(props.value).diff(now.value) / 1000);
 
-	const unwatch = watch(time, (value) => {
+	const unwatch = watch(time, value => {
 		if (value <= 0) {
 			unwatch();
 			props.callback();

@@ -14,7 +14,7 @@ export default {
 			theme: 'auto',
 		});
 
-		router.on('flash', (event) => {
+		router.on('flash', event => {
 			const notifications = event.detail.flash.notifications || [];
 
 			notifications.forEach(notification => {
@@ -27,7 +27,7 @@ export default {
 						type: notification?.type || 'default',
 					});
 				}
-			})
+			});
 		});
-	}
-}
+	},
+};

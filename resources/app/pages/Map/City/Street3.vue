@@ -1,62 +1,108 @@
 <template>
-	<ContentBlock title="Парк">
-		<table class='ltable'>
-			<tr>
-				<td style="vertical-align: top">
-					<div style="text-align:justify; width:98%; padding: 0 10px 10px" class="small">
-						Красивая, ровно постриженная и высокая трава, резные и весьма удобные деревянные лавочки, чистый воздух, тихая, приятная атмосфера - что может быть лучше для полноценного отдыха?
-						Большинство посетителей парка приходят сюда для расслабления. Остальные же хотят развлечений - испытать свою удачу в казино или лотерее, а временами и выбрать подарок для близких и уважаемых людей.
-						Это любимое место путешественников, ведь по выстеленным ровной брусчаткой парковым дорожкам, разбегающимся во все четыре стороны, можно уйти очень далеко…
-					</div>
-	
-					<ul class="mapHints">
-						<li><Link href='?room=103'>Торговая площадь</Link></li>
-						<li><Link href='?room=10'>Башня магов</Link></li>
-						<li><Link href='?room=16'>Центр занятости</Link></li>
-						<li><Link href='?room=13'>Сувениры</Link></li>
-						<li><Link href='?room=105'>Промышленная зона</Link></li>
-					</ul>
-				</td>
-				<td>
-					<div style="position:relative;width: 550px;">
-						<img :src="'/assets/images/world/city/' + page.city + '/2_bg.jpg'" alt="" width="550" height="300"/>
-	
-						<div style="position:absolute; left:37px; top:29px; width:187px; height:193px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/2_LV.gif'" v-tooltip="'Игорный дом'" class="tooltip text">
-						</div>
-						<div style="position:absolute; left:246px; top:174px; width:91px; height:69px;">
-							<Link href="?room=16"><img :src="'/assets/images/world/city/' + page.city + '/2_Gift.gif'" v-tooltip="'Центр занятости'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:348px; top:204px; width:71px; height:49px;">
-							<Link href='?room=13'><img :src="'/assets/images/world/city/' + page.city + '/2_Loto.gif'" v-tooltip="'Сувениры'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:28px; top:197px; width:96px; height:100px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/2_Tavern.gif'" v-tooltip="'Таверна'" class="tooltip text">
-						</div>
-						<div style="position:absolute; left:7px; top:230px; width:25px; height:24px;">
-							<Link href="?room=103"><img :src="'/assets/images/world/city/' + page.city + '/2_Left.gif'" v-tooltip="'Торговая площадь'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:502px; top:265px; width:29px; height:26px;">
-							<Link href="?room=105"><img :src="'/assets/images/world/city/' + page.city + '/2_Right.gif'" v-tooltip="'Промышленная зона'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:118px; top:273px; width:19px; height:20px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/2_Bottom.gif'" v-tooltip="'Проход закрыт'" class="tooltip text aFilter">
-						</div>
-						<div style="position:absolute; left:283px; top:20px; width:32px; height:101px;">
-							<Link href="?room=10"><img :src="'/assets/images/world/city/' + page.city + '/2_Mage.gif'" v-tooltip="'Башня Магов'" class="tooltip text aFilter"></Link>
-						</div>
-					</div>
-				</td>
-			</tr>
-		</table>
-	</ContentBlock>
+	<CityLocation
+		title="Парк"
+		description="Тихие аллеи, резные скамейки и свежий воздух. Место для отдыха и новых встреч на городских дорожках."
+		:image-path="'/assets/images/world/city/' + page.city + '/'"
+		:map="map"
+		:places="places"
+		places-title="Места в парке"
+		:exits="exits"
+		:decorations="decorations"
+	/>
 </template>
 
 <script setup>
-	import { Link } from '@inertiajs/vue3';
-	import ContentBlock from '~/components/ContentBlock.vue';
+	import CityLocation from '~/components/City/CityLocation.vue';
 
-	defineProps({
-		page: Object,
-	})
+	defineProps({ page: Object });
+
+	const map = {
+		image: '2_bg.jpg',
+		alt: 'Карта парка',
+		width: 550,
+		height: 300,
+	};
+	const places = [
+		{
+			room: 10,
+			title: 'Башня магов',
+			description: 'Магия и заклинания',
+			number: 1,
+			image: '2_Mage.gif',
+			x: 283,
+			y: 20,
+			width: 32,
+			height: 101,
+		},
+		{
+			room: 16,
+			title: 'Центр занятости',
+			description: 'Работа и заработок',
+			number: 2,
+			image: '2_Gift.gif',
+			x: 246,
+			y: 174,
+			width: 91,
+			height: 69,
+		},
+		{
+			room: 13,
+			title: 'Сувениры',
+			description: 'Подарки для друзей',
+			number: 3,
+			image: '2_Loto.gif',
+			x: 348,
+			y: 204,
+			width: 71,
+			height: 49,
+		},
+	];
+	const exits = [
+		{
+			room: 103,
+			title: 'Торговая площадь',
+			image: '2_Left.gif',
+			x: 7,
+			y: 230,
+			width: 25,
+			height: 24,
+			direction: 'left',
+		},
+		{
+			room: 105,
+			title: 'Промышленная зона',
+			image: '2_Right.gif',
+			x: 502,
+			y: 265,
+			width: 29,
+			height: 26,
+			direction: 'right',
+		},
+	];
+	const decorations = [
+		{
+			title: 'Игорный дом',
+			image: '2_LV.gif',
+			x: 37,
+			y: 29,
+			width: 187,
+			height: 193,
+		},
+		{
+			title: 'Таверна',
+			image: '2_Tavern.gif',
+			x: 28,
+			y: 197,
+			width: 96,
+			height: 100,
+		},
+		{
+			title: 'Проход закрыт',
+			image: '2_Bottom.gif',
+			x: 118,
+			y: 273,
+			width: 19,
+			height: 20,
+		},
+	];
 </script>

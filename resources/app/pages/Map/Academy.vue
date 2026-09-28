@@ -1,64 +1,84 @@
 <template>
 	<ContentBlock title="Академия">
-		<div class="mb-4 flex w-full justify-end gap-1">
-			<a href="/map"><img src="/assets/images/images/refresh.gif" alt="Обновить"></a>
-			<a href="/map/change/9"><img src="/assets/images/images/back.gif" alt="Вернуться"></a>
+		<template #actions>
+			<Link href="/map/change/9" class="ui-icon-button" title="Назад">
+				<GameIcon name="back" />
+			</Link>
+			<Link href="/map" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
+
+		<div v-if="Object.keys(form.errors).length" class="ui-notice ui-notice--red" role="alert">
+			<p v-for="(error, field) in form.errors" :key="field">{{ error }}</p>
 		</div>
-
-		<div class="w-full text-center">
-			<div v-if="user.r_date" class="inline-flex flex-wrap items-center justify-center gap-2 text-red-600">
-				<span class="font-bold">Оставшееся время обучения:</span>
-				<Timer :value="user.r_date" class="font-bold underline"/>
-			</div>
-
-			<div v-else class="space-y-4">
-				<p class="font-bold">
-					В нашем заведении Вы можете стать высококвалифицированным специалистом.
-					Ниже приведён список предлагаемых Вам профессий:
-				</p>
-
-				<div class="overflow-x-auto">
-					<table class="w-full border-collapse text-left">
-						<thead>
-							<tr class="border-b border-slate-300">
-								<th class="w-5 px-2 py-2 text-center font-bold">№</th>
-								<th class="px-2 py-2 font-bold">Наименование</th>
-								<th class="w-36 px-2 py-2 text-center font-bold">Уровень</th>
-								<th class="w-36 px-2 py-2 text-center font-bold">Срок обучения</th>
-								<th class="w-40 px-2 py-2 text-center font-bold">Стоимость обучения</th>
-								<th class="w-32 px-2 py-2 text-center font-bold">Действие</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="(item, i) in page.professions" :key="item.id" class="border-b border-slate-200 last:border-b-0">
-								<td class="px-2 py-2 text-center font-bold">{{ i + 1 }}</td>
-								<td class="px-2 py-2 font-bold">{{ item['title'] }}</td>
-								<td class="px-2 py-2 text-center font-bold">{{ item['level'] }}</td>
-								<td class="px-2 py-2 text-center font-bold">{{ $formatTime(item['duration']) }}</td>
-								<td class="px-2 py-2 text-center font-bold">{{ item['price'] }} зол.</td>
-								<td class="px-2 py-2 text-center">
-									<a href="" @click.prevent="learn(item)"
-										class="inline-flex min-h-8 items-center justify-center rounded bg-blue-600 px-3 py-1.5 text-sm font-bold text-white hover:bg-blue-700"
-									>
-										Обучаться
-									</a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+		<section v-if="user.r_date" class="ui-panel service-panel service-panel--narrow">
+			<header class="service-panel-heading">
+				<GameIcon name="book" />
+				<h2>Обучение идёт</h2>
+			</header>
+			<div class="service-panel-body">
+				<p class="service-hint">Осваивайте новое ремесло. Обучение завершится по истечении указанного времени.</p>
+				<div class="service-timer">
+					<span>До окончания обучения</span>
+					<Timer :key="user.r_date" :value="user.r_date" :callback="onTimeout" class="service-countdown" />
 				</div>
 			</div>
-		</div>
+		</section>
+		<template v-else>
+			<header class="service-heading">
+				<h2>Выберите профессию</h2>
+				<p>Освойте ремесло, которое откроет новые возможности в мире игры.</p>
+			</header>
+			<div v-if="page.professions.length" class="academy-professions">
+				<article v-for="item in page.professions" :key="item.id" class="ui-panel service-panel academy-profession">
+					<header class="service-panel-heading">
+						<GameIcon name="book" />
+						<h2>{{ item.title }}</h2>
+					</header>
+					<div class="service-panel-body">
+						<dl class="service-facts">
+							<div>
+								<dt>Уровень</dt>
+								<dd>{{ item.level }}</dd>
+							</div>
+							<div>
+								<dt>Срок обучения</dt>
+								<dd>{{ $formatTime(item.duration) }}</dd>
+							</div>
+							<div>
+								<dt>Стоимость</dt>
+								<dd>{{ item.price }} зол.</dd>
+							</div>
+						</dl>
+						<button type="button" class="ui-button" :disabled="form.processing" @click="learn(item)">
+							{{ form.processing && form.learn === item.id ? 'Начинаем обучение…' : 'Обучаться' }}
+						</button>
+					</div>
+				</article>
+			</div>
+			<div v-else class="ui-empty" role="status">
+				<GameIcon name="book" />
+				<h3>Нет доступных профессий</h3>
+				<p>Загляните в академию позже.</p>
+			</div>
+		</template>
+
+		<template #footer>
+			<GameIcon name="book" />
+			<span>Стоимость и длительность обучения зависят от выбранной профессии.</span>
+		</template>
 	</ContentBlock>
 </template>
 
 <script setup>
 	import ContentBlock from '~/components/ContentBlock.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import Timer from '~/components/Timer.vue';
 	import { openConfirmModal } from '~/composables/useModals.js';
-	import { router } from '@inertiajs/vue3';
+	import { Link, router, useForm } from '@inertiajs/vue3';
 
 	defineProps({
 		page: Object,
@@ -66,21 +86,26 @@
 
 	const state = useState();
 	const user = computed(() => state.user);
+	const form = useForm({ learn: null });
 
 	function learn(item) {
-		openConfirmModal(
-			'Подтвердите действие',
-			'Вы действительно хотите получить данную профессию?',
-			[{
+		if (form.processing) return;
+		openConfirmModal('Подтвердите действие', 'Вы действительно хотите получить данную профессию?', [
+			{
 				title: 'Нет',
-			}, {
+			},
+			{
 				title: 'Да',
 				handler() {
-					router.post('/map', {
-						learn: item.id,
-					})
-				}
-			}]
-		)
+					if (form.processing) return;
+					form.learn = item.id;
+					form.post('/map', { preserveScroll: true });
+				},
+			},
+		]);
+	}
+
+	function onTimeout() {
+		router.reload();
 	}
 </script>

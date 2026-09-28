@@ -17,6 +17,8 @@ Route::middleware([RedirectToGame::class])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+	Route::post('/logout', [Controllers\LoginController::class, 'logout'])->name('logout');
+
 	Route::get('/library', [Controllers\LibraryController::class, 'index'])->name('library');
 
 	Route::get('/chat/last', [Controllers\ChatController::class, 'last']);
@@ -36,7 +38,7 @@ Route::middleware(['auth'])->group(function () {
 		Route::match(['get', 'post'], '/person/avatar', [Controllers\AvatarController::class, 'index'])->name('person.avatar');
 		Route::get('/person/inventory', [Controllers\PersonController::class, 'inventory'])->name('person.inventory');
 		Route::post('/person/inventory/drop', [Controllers\PersonController::class, 'drop'])->name('person.inventory.drop');
-		Route::post('/person/inventory/sets', [Controllers\PersonController::class, 'sets'])->name('person.inventory.sets');
+		Route::match(['get', 'post'], '/person/inventory/sets', [Controllers\PersonController::class, 'sets'])->name('person.inventory.sets');
 		Route::match(['get', 'post'], '/person/friends', [Controllers\PersonController::class, 'friends'])->name('person.friends');
 		Route::match(['get', 'post'], '/person/settings', [Controllers\PersonController::class, 'settings'])->name('person.settings');
 		Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');

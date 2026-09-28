@@ -2,24 +2,48 @@
 	<div class="battle-impact-form text-center">
 		<div class="battle-impact-form__header">
 			<div class="battle-impact-form__column battle-impact-form__column--impact">
-				<b><small><a href="#" @click.prevent="randomFill('impact')">Атака</a>&nbsp;(<span id="colImp">{{ impactsLeft }}</span>)</small></b>
+				<b>
+					<small>
+						<a href="#" @click.prevent="randomFill('impact')">Атака</a>
+						&nbsp;(
+						<span id="colImp">{{ impactsLeft }}</span>
+						)
+					</small>
+				</b>
 			</div>
 			<div class="battle-impact-form__column battle-impact-form__column--block">
-				<b><small><a href="#" @click.prevent="randomFill('block')">Защита</a> (<span id="colbl">{{ blocksLeft }}</span>)</small></b>
+				<b>
+					<small>
+						<a href="#" @click.prevent="randomFill('block')">Защита</a>
+						(
+						<span id="colbl">{{ blocksLeft }}</span>
+						)
+					</small>
+				</b>
 			</div>
 		</div>
 		<div class="battle-impact-form__body">
 			<div class="battle-impact-form__column battle-impact-form__column--impact">
 				<div class="battle-impact-form__areas">
-					<div v-for="area in areas" class="battle-impact-form__area" :style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }" @click="toggleImpact(area.key)">
-						<img :src="`/assets/images/battle/impact_action_${selectedImpacts[area.key] ? 'true' : 'false'}.gif`" alt="">
+					<div
+						v-for="area in areas"
+						class="battle-impact-form__area"
+						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
+						@click="toggleImpact(area.key)"
+					>
+						<img :src="`/assets/images/battle/impact_action_${selectedImpacts[area.key] ? 'true' : 'false'}.gif`" alt="" />
 					</div>
 				</div>
 			</div>
 			<div class="battle-impact-form__column battle-impact-form__column--block">
 				<div class="battle-impact-form__areas">
-					<div v-for="area in areas" class="battle-impact-form__area" :style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }" @click="toggleBlock(area.key)">
-						<img :src="`/assets/images/battle/block_action_${selectedBlocks[area.key] ? 'true' : 'false'}.gif`" alt="">
+					<div
+						v-for="area in areas"
+						class="battle-impact-form__area"
+						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
+						@click="toggleBlock(area.key)"
+					>
+						<img :src="`/assets/images/battle/block_action_${selectedBlocks[area.key] ? 'true' : 'false'}.gif`" alt="" />
 					</div>
 				</div>
 			</div>
@@ -27,8 +51,8 @@
 	</div>
 
 	<div class="text-center">
-		<input type="checkbox" name="auto" id="autofight" :checked="auto" @change="$emit('update:auto', $event.target.checked)">
-		<label for="autofight"> - автоматический ход, если выбран удар и блок</label>
+		<input type="checkbox" name="auto" id="autofight" :checked="auto" @change="$emit('update:auto', $event.target.checked)" />
+		<label for="autofight">- автоматический ход, если выбран удар и блок</label>
 	</div>
 </template>
 

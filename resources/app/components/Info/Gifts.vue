@@ -3,7 +3,7 @@
 		<h2 class="mb-3 font-bold">Подарки</h2>
 		<div v-if="gifts.length" class="flex flex-wrap gap-3">
 			<Popper v-for="gift in gifts" :key="gift.id">
-				<img :src="gift.image" :alt="gift.title" class="max-h-20 max-w-20" loading="lazy">
+				<img :src="gift.image" :alt="gift.title" class="max-h-20 max-w-20" loading="lazy" />
 				<template #content>
 					<div class="max-w-64 space-y-2 break-words text-sm">
 						<p class="font-bold">{{ gift.title }}</p>

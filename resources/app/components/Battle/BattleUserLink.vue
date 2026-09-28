@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<a href="#" @click.prevent="toUser" @contextmenu.prevent="toPrivate">
-			<span style="color: #CFA87A">{{ user.name }} [{{ user.level }}]</span>
+			<span style="color: #cfa87a">{{ user.name }} [{{ user.level }}]</span>
 		</a>
 		<span :style="{ color: user.finished ? 'red' : 'black' }">
-			<small> [{{ user.hp }} HP]</small>
+			<small>[{{ user.hp }} HP]</small>
 		</span>
 	</div>
 </template>

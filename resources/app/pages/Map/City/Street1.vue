@@ -1,62 +1,106 @@
 <template>
-	<ContentBlock title="Королевская Улица">
-		<table class='ltable'>
-			<tr>
-				<td style="vertical-align: top">
-					<div style="text-align:justify; width:98%; padding: 0 10px 10px;" class="small">
-						Атмосфера королевской улицы насквозь пропитана запахами величия и важных дел.
-						Из Храма, прерываясь на время свадебными словами священника, звучат радостные песни, восторженные голоса и звон бокалов.
-						Из-за высоких и основательных стен Городской управы то и дело доносятся отголоски политических споров, которые порой накаляются до такой степени, что о делах государственной важности слышит вся округа.
-						Аукцион объявляет о себе голосами, выкрикивающими цены. Торжество и Дело, как бы ни были они противоположны, заполняют собой Королевская улица - пожалуй, одно из самых торжественных и величественных мест в городе.
-					</div>
-
-					<ul class="mapHints">
-						<li><Link href='?room=14'>Замок святой инквизиции</Link></li>
-						<li><Link href='?room=29'>Бутик</Link></li>
-						<li><Link href='/?room=8'>Больница</Link></li>
-						<li><Link href='?room=103'>Торговая площадь</Link></li>
-					</ul>
-				</td>
-				<td>
-					<div style="position:relative;width: 550px;">
-						<img :src="'/assets/images/world/city/' + page.city + '/4_bg.jpg'" alt="" width="550" height="300"/>
-
-						<div style="position:absolute; left:58px; top:36px; width:134px; height:170px;">
-							<Link href="?room=14"><img :src="'/assets/images/world/city/' + page.city + '/4_castle.gif'" v-tooltip="'Замок святой инквизиции'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:221px; top:134px; width:63px; height:75px;">
-							<Link href="?room=8"><img :src="'/assets/images/world/city/' + page.city + '/4_shop.gif'" v-tooltip="'Больница'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:289px; top:134px; width:59px; height:78px;">
-							<Link href="?room=29"><img :src="'/assets/images/world/city/' + page.city + '/4_trade.gif'" v-tooltip="'Бутик'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:61px; top:192px; width:70px; height:77px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/4_bkm.gif'" v-tooltip="'Домик знахаря'" class="tooltip text">
-						</div>
-						<div style="position:absolute; left:358px; top:4px; width:139px; height:206px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/4_church.gif'" v-tooltip="'Храм'" class="tooltip text">
-						</div>
-						<div style="position:absolute; left:24px; top:205px; width:26px; height:24px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/4_left.gif'" v-tooltip="'Проход закрыт'" class="tooltip text">
-						</div>
-						<div style="position:absolute; left:493px; top:215px; width:27px; height:24px;">
-							<Link href="?room=103"><img :src="'/assets/images/world/city/' + page.city + '/4_right.gif'" v-tooltip="'Торговая площадь'" class="tooltip text aFilter"></Link>
-						</div>
-						<div style="position:absolute; left:145px; top:234px; width:17px; height:19px;">
-							<img :src="'/assets/images/world/city/' + page.city + '/4_bottom.gif'" v-tooltip="'Проход закрыт'" class="tooltip text"/>
-						</div>
-					</div>
-				</td>
-			</tr>
-		</table>
-	</ContentBlock>
+	<CityLocation
+		title="Королевская улица"
+		description="Колокольный звон, величественные стены и важные дела. Здесь бьётся сердце королевского города."
+		:image-path="'/assets/images/world/city/' + page.city + '/'"
+		:map="map"
+		:places="places"
+		places-title="Места на улице"
+		:exits="exits"
+		:decorations="decorations"
+	/>
 </template>
 
 <script setup>
-	import { Link } from '@inertiajs/vue3';
-	import ContentBlock from '~/components/ContentBlock.vue';
+	import CityLocation from '~/components/City/CityLocation.vue';
 
-	defineProps({
-		page: Object,
-	})
+	defineProps({ page: Object });
+
+	const map = {
+		image: '4_bg.jpg',
+		alt: 'Карта Королевской улицы',
+		width: 550,
+		height: 300,
+	};
+	const places = [
+		{
+			room: 14,
+			title: 'Замок святой инквизиции',
+			description: 'Обитель инквизиции',
+			number: 1,
+			image: '4_castle.gif',
+			x: 58,
+			y: 36,
+			width: 134,
+			height: 170,
+		},
+		{
+			room: 29,
+			title: 'Бутик',
+			description: 'Особые товары',
+			number: 2,
+			image: '4_trade.gif',
+			x: 289,
+			y: 134,
+			width: 63,
+			height: 75,
+		},
+		{
+			room: 8,
+			title: 'Больница',
+			description: 'Восстановление здоровья',
+			number: 3,
+			image: '4_shop.gif',
+			x: 221,
+			y: 134,
+			width: 59,
+			height: 78,
+		},
+	];
+	const exits = [
+		{
+			room: 103,
+			title: 'Торговая площадь',
+			image: '4_right.gif',
+			x: 493,
+			y: 215,
+			width: 27,
+			height: 24,
+			direction: 'right',
+		},
+	];
+	const decorations = [
+		{
+			title: 'Домик знахаря',
+			image: '4_bkm.gif',
+			x: 61,
+			y: 192,
+			width: 70,
+			height: 77,
+		},
+		{
+			title: 'Храм',
+			image: '4_church.gif',
+			x: 358,
+			y: 4,
+			width: 139,
+			height: 206,
+		},
+		{
+			title: 'Проход закрыт',
+			image: '4_left.gif',
+			x: 24,
+			y: 205,
+			width: 26,
+			height: 24,
+		},
+		{
+			title: 'Проход закрыт',
+			image: '4_bottom.gif',
+			x: 145,
+			y: 234,
+			width: 17,
+			height: 19,
+		},
+	];
 </script>

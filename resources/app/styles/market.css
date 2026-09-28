@@ -1,0 +1,6 @@
+.service-item-actions {
+	display: grid;
+	gap: var(--space-10);
+	width: 100%;
+	min-width: 0;
+}

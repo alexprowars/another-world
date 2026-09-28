@@ -1,0 +1,8 @@
+.prison-reason p {
+	margin: var(--space-8) 0 0;
+	color: var(--paper-danger);
+	font-size: 13px;
+	line-height: 1.6;
+	white-space: pre-line;
+	overflow-wrap: anywhere;
+}

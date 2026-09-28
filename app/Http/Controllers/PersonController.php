@@ -29,7 +29,7 @@ class PersonController extends Controller
 	public function inventory(Request $request)
 	{
 		$type = $request->integer('item_type', 1);
-		$type = $type >= 1 && $type <= 9 ? $type : 1;
+		$type = $type >= 1 && $type <= 8 ? $type : 1;
 
 		if ($request->integer('onset')) {
 			InventoryService::onsetObject($this->user, $request->integer('onset'));
@@ -49,12 +49,11 @@ class PersonController extends Controller
 			return to_route('person.inventory');
 		}
 
-		$items = $type === 9 ? collect() : InventoryService::getInventoryObjects($this->user, $type);
+		$items = InventoryService::getInventoryObjects($this->user, $type);
 
 		return Inertia::render('Person/Inventory', [
 			'item_type' => $type,
 			'items' => InventoryItemResource::collection($items),
-			'sets' => $type === 9 ? UserSet::query()->whereBelongsTo($this->user)->orderByDesc('id')->get(['id', 'name']) : [],
 		]);
 	}
 
@@ -76,8 +75,14 @@ class PersonController extends Controller
 		return to_route('person.inventory', ['item_type' => $data['item_type']]);
 	}
 
-	public function sets(Request $request): RedirectResponse
+	public function sets(Request $request): Response|RedirectResponse
 	{
+		if ($request->isMethod('get')) {
+			return Inertia::render('Person/Sets', [
+				'sets' => UserSet::query()->whereBelongsTo($this->user)->orderByDesc('id')->get(['id', 'name']),
+			]);
+		}
+
 		$data = $request->validate([
 			'action' => ['required', 'in:save,wear,delete'],
 			'name' => ['exclude_unless:action,save', 'required', 'string', 'max:255', 'regex:/^[А-Яа-яЁёa-zA-Z0-9_!~.@ \-]+$/u'],
@@ -104,10 +109,10 @@ class PersonController extends Controller
 					break;
 			}
 		} catch (Exception $e) {
-			return to_route('person.inventory', ['item_type' => 9])->withErrors(['set' => $e->getMessage()]);
+			return to_route('person.inventory.sets')->withErrors(['set' => $e->getMessage()]);
 		}
 
-		return to_route('person.inventory', ['item_type' => 9]);
+		return to_route('person.inventory.sets');
 	}
 
 	public function settings(Request $request): Response|RedirectResponse

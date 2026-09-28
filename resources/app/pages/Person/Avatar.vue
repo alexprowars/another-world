@@ -1,17 +1,22 @@
 <template>
-	<Head title="Установка образа"/>
+	<Head title="Установка образа" />
 	<ContentBlock title="Бесплатные образы">
-		<div class="text-center text-sm font-bold mb-4">
-			Внимание! Выбрав образ сейчас, Вы более не сможете его сменить!
-		</div>
+		<template #actions>
+			<Link href="/person" class="ui-icon-button" title="К персонажу">
+				<GameIcon name="back" />
+			</Link>
+			<Link href="/person/avatar" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
 
-		<div v-if="user.image" class="text-center font-bold">
-			У вас уже установлен образ. Сменить его вы сможете только в здании администрации.
-		</div>
+		<div class="text-center text-sm font-bold mb-4">Внимание! Выбрав образ сейчас, Вы более не сможете его сменить!</div>
+
+		<div v-if="user.image" class="text-center font-bold">У вас уже установлен образ. Сменить его вы сможете только в здании администрации.</div>
 		<div v-else class="flex gap-4 justify-center">
 			<div v-for="i in page.images">
 				<a href="" @click.prevent="changeImage(i)">
-					<img :src="'/assets/images/avatar/images/' + (user.gender === 'F' ? 2 : 1) + '/' + i + '.png'" alt="">
+					<img :src="'/assets/images/avatar/images/' + (user.gender === 'F' ? 2 : 1) + '/' + i + '.png'" alt="" />
 				</a>
 			</div>
 		</div>
@@ -19,12 +24,12 @@
 </template>
 
 <script setup>
-	import CityHeader from '~/components/CityHeader.vue';
-	import { Head, useForm } from '@inertiajs/vue3';
+	import { Head, Link, useForm } from '@inertiajs/vue3';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import { openConfirmModal } from '~/composables/useModals.js';
 	import ContentBlock from '~/components/ContentBlock.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
 
 	defineProps({
 		page: Object,
@@ -34,16 +39,14 @@
 	const user = computed(() => state.user);
 
 	function changeImage(i) {
-		openConfirmModal(
-			'Подтвердите действие',
-			'Применить это образ?',
-			[{ title: 'Нет' }, {
+		openConfirmModal('Подтвердите действие', 'Применить это образ?', [
+			{ title: 'Нет' },
+			{
 				title: 'Да',
 				handler() {
 					useForm({
-						image: i
-					})
-					.post('/person/avatar');
+						image: i,
+					}).post('/person/avatar');
 				},
 			},
 		]);

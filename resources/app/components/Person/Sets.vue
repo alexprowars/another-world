@@ -1,28 +1,46 @@
 <template>
-	<section class="space-y-4">
-		<h2 class="hitem text-center">Комплекты</h2>
-		<p>Сохраните надетые вещи, чтобы затем надеть весь комплект одним действием.</p>
-		<form class="flex flex-wrap items-end gap-3" @submit.prevent="save">
-			<label class="block">
-				Название комплекта
-				<input v-model.trim="saveForm.name" type="text" maxlength="255" required class="block w-full" placeholder="Имя комплекта">
-			</label>
-			<button type="submit" class="button" :disabled="busy">Сохранить</button>
+	<section class="equipment-sets">
+		<form class="equipment-set-form" @submit.prevent="save">
+			<label for="equipment-set-name">Сохранить текущую экипировку</label>
+			<div class="equipment-set-form-fields">
+				<input
+					class="ui-input ui-input--compact"
+					id="equipment-set-name"
+					v-model.trim="saveForm.name"
+					type="text"
+					maxlength="255"
+					required
+					placeholder="Название комплекта"
+					:disabled="busy"
+				/>
+				<button type="submit" class="ui-button ui-button--compact" :disabled="busy">Сохранить</button>
+			</div>
+			<p>В комплект войдут вещи, которые сейчас надеты на персонажа.</p>
 		</form>
-		<div v-if="Object.keys(saveForm.errors).length" class="text-red-700" role="alert">
+		<div v-if="Object.keys(saveForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
 			<p v-for="(error, field) in saveForm.errors" :key="field">{{ error }}</p>
 		</div>
-		<div v-if="Object.keys(actionForm.errors).length" class="text-red-700" role="alert">
+		<div v-if="Object.keys(actionForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
 			<p v-for="(error, field) in actionForm.errors" :key="field">{{ error }}</p>
 		</div>
-		<ul v-if="sets.length" class="space-y-2">
-			<li v-for="set in sets" :key="set.id" class="flex flex-wrap items-center gap-3 border-b border-slate-300 py-2">
-				<b class="min-w-0 flex-1 break-words">{{ set.name }}</b>
-				<button type="button" class="button" :disabled="busy" @click="act('wear', set.id)">Надеть</button>
-				<button type="button" class="button" :disabled="busy" @click="act('delete', set.id)">Удалить</button>
+		<div class="inventory-section-heading">
+			<h2>Сохранённые комплекты</h2>
+			<span class="person-section-count">{{ sets.length }}</span>
+		</div>
+		<ul v-if="sets.length" class="equipment-set-list">
+			<li v-for="set in sets" :key="set.id" class="equipment-set">
+				<img src="/assets/images/stats/armor.png" class="person-stat-icon" alt="" />
+				<b>{{ set.name }}</b>
+				<div class="equipment-set-actions">
+					<button type="button" class="ui-button ui-button--compact" :disabled="busy" @click="act('wear', set.id)">Надеть</button>
+					<button type="button" class="ui-text-button" :disabled="busy" @click="act('delete', set.id)">Удалить</button>
+				</div>
 			</li>
 		</ul>
-		<p v-else>У вас пока нет сохранённых комплектов.</p>
+		<div v-else class="person-empty-state">
+			<b>Комплектов пока нет</b>
+			<p>Наденьте нужные вещи и сохраните их под своим названием.</p>
+		</div>
 	</section>
 </template>
 

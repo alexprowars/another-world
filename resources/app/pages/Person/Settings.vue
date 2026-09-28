@@ -1,74 +1,162 @@
 <template>
-	<Head title="Настройки"/>
-	<div class="textblock space-y-4">
-		<h2 class="font-bold">Настройки</h2>
+	<Head title="Настройки" />
+	<section class="person-settings">
+		<header class="person-page-heading">
+			<div>
+				<h1>Настройки персонажа</h1>
+				<p>Статус, личная анкета и данные для входа в игру.</p>
+			</div>
+		</header>
 
-		<form @submit.prevent="save(optionsForm)" class="rounded border border-slate-300 p-4 space-y-3">
-			<h3 class="font-bold">Статус</h3>
-			<div v-if="Object.keys(optionsForm.errors).length" class="text-red-600" role="alert">
+		<form class="person-form-panel person-status-form" @submit.prevent="save(optionsForm)">
+			<header class="person-form-heading">
+				<h2>Статус в игре</h2>
+				<p>Как вас видят другие игроки.</p>
+			</header>
+			<div v-if="Object.keys(optionsForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
 				<p v-for="(error, field) in optionsForm.errors" :key="field">{{ error }}</p>
 			</div>
-			<label class="block space-y-1">
-				<span class="block">Ваш статус</span>
-				<select v-model="optionsForm.presence_status" class="w-full rounded border border-slate-300 px-2 py-1">
-					<option v-for="status in [0, 1, 2, 3, 4]" :key="status" :value="status">{{ $t('status.' + status) }}</option>
-				</select>
-			</label>
-			<button type="submit" class="btn btn-primary" :disabled="busy">Применить</button>
+			<div class="person-status-controls">
+				<label class="person-form-field">
+					<span>Ваш статус</span>
+					<select class="ui-input ui-input--compact" v-model="optionsForm.presence_status">
+						<option v-for="status in [0, 1, 2, 3, 4]" :key="status" :value="status">{{ $t('status.' + status) }}</option>
+					</select>
+				</label>
+				<button type="submit" class="ui-button ui-button--compact" :disabled="busy">
+					{{ optionsForm.processing ? 'Сохранение…' : 'Применить' }}
+				</button>
+			</div>
 		</form>
 
-		<form @submit.prevent="save(profileForm)" class="rounded border border-slate-300 p-4 space-y-3">
-			<h3 class="font-bold">Анкета</h3>
-			<div v-if="Object.keys(profileForm.errors).length" class="text-red-600" role="alert">
-				<p v-for="(error, field) in profileForm.errors" :key="field">{{ error }}</p>
-			</div>
-			<label class="block space-y-1">
-				<span class="block">Город</span>
-				<input v-model="profileForm.city" type="text" maxlength="255" autocomplete="address-level2" class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<label class="block space-y-1">
-				<span class="block">Немного о себе</span>
-				<textarea v-model="profileForm.about" rows="6" maxlength="10000" class="w-full rounded border border-slate-300 px-2 py-1"></textarea>
-			</label>
-			<button type="submit" class="btn btn-primary" :disabled="busy">Сохранить анкету</button>
-		</form>
+		<div class="person-settings-forms">
+			<form class="person-form-panel" @submit.prevent="save(profileForm)">
+				<header class="person-form-heading">
+					<h2>Личная анкета</h2>
+					<p>Расскажите о себе другим игрокам.</p>
+				</header>
+				<div v-if="Object.keys(profileForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
+					<p v-for="(error, field) in profileForm.errors" :key="field">{{ error }}</p>
+				</div>
+				<label class="person-form-field">
+					<span>Город</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model="profileForm.city"
+						type="text"
+						maxlength="255"
+						autocomplete="address-level2"
+						:class="{ 'is-invalid': profileForm.errors.city }"
+					/>
+				</label>
+				<label class="person-form-field">
+					<span>Немного о себе</span>
+					<textarea
+						class="ui-input ui-input--compact"
+						v-model="profileForm.about"
+						rows="7"
+						maxlength="10000"
+						:class="{ 'is-invalid': profileForm.errors.about }"
+					></textarea>
+				</label>
+				<footer class="person-form-actions">
+					<button type="submit" class="ui-button ui-button--compact" :disabled="busy">
+						{{ profileForm.processing ? 'Сохранение…' : 'Сохранить анкету' }}
+					</button>
+				</footer>
+			</form>
 
-		<form @submit.prevent="save(passwordForm, true)" class="rounded border border-slate-300 p-4 space-y-3">
-			<h3 class="font-bold">Сменить пароль</h3>
-			<div v-if="Object.keys(passwordForm.errors).length" class="text-red-600" role="alert">
-				<p v-for="(error, field) in passwordForm.errors" :key="field">{{ error }}</p>
-			</div>
-			<label class="block space-y-1">
-				<span class="block">Текущий пароль</span>
-				<input v-model="passwordForm.current_password" type="password" autocomplete="current-password" required class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<label class="block space-y-1">
-				<span class="block">Новый пароль</span>
-				<input v-model="passwordForm.password" type="password" autocomplete="new-password" minlength="6" maxlength="72" required class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<label class="block space-y-1">
-				<span class="block">Подтверждение пароля</span>
-				<input v-model="passwordForm.password_confirmation" type="password" autocomplete="new-password" minlength="6" maxlength="72" required class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<button type="submit" class="btn btn-primary" :disabled="busy">Изменить пароль</button>
-		</form>
+			<form class="person-form-panel" @submit.prevent="save(passwordForm, true)">
+				<header class="person-form-heading">
+					<h2>Смена пароля</h2>
+					<p>Новый пароль — от 6 до 72 символов.</p>
+				</header>
+				<div v-if="Object.keys(passwordForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
+					<p v-for="(error, field) in passwordForm.errors" :key="field">{{ error }}</p>
+				</div>
+				<label class="person-form-field">
+					<span>Текущий пароль</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model="passwordForm.current_password"
+						type="password"
+						autocomplete="current-password"
+						required
+						:class="{ 'is-invalid': passwordForm.errors.current_password }"
+					/>
+				</label>
+				<label class="person-form-field">
+					<span>Новый пароль</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model="passwordForm.password"
+						type="password"
+						autocomplete="new-password"
+						minlength="6"
+						maxlength="72"
+						required
+						:class="{ 'is-invalid': passwordForm.errors.password }"
+					/>
+				</label>
+				<label class="person-form-field">
+					<span>Подтверждение пароля</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model="passwordForm.password_confirmation"
+						type="password"
+						autocomplete="new-password"
+						minlength="6"
+						maxlength="72"
+						required
+						:class="{ 'is-invalid': passwordForm.errors.password_confirmation }"
+					/>
+				</label>
+				<footer class="person-form-actions">
+					<button type="submit" class="ui-button ui-button--compact" :disabled="busy">
+						{{ passwordForm.processing ? 'Сохранение…' : 'Изменить пароль' }}
+					</button>
+				</footer>
+			</form>
 
-		<form @submit.prevent="save(emailForm, true)" class="rounded border border-slate-300 p-4 space-y-3">
-			<h3 class="font-bold">Сменить e-mail</h3>
-			<div v-if="Object.keys(emailForm.errors).length" class="text-red-600" role="alert">
-				<p v-for="(error, field) in emailForm.errors" :key="field">{{ error }}</p>
-			</div>
-			<label class="block space-y-1">
-				<span class="block">Текущий e-mail</span>
-				<input v-model.trim="emailForm.current_email" type="text" autocomplete="email" required class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<label class="block space-y-1">
-				<span class="block">Новый e-mail</span>
-				<input v-model.trim="emailForm.email" type="email" autocomplete="email" maxlength="50" required class="w-full rounded border border-slate-300 px-2 py-1">
-			</label>
-			<button type="submit" class="btn btn-primary" :disabled="busy">Изменить e-mail</button>
-		</form>
-	</div>
+			<form class="person-form-panel" @submit.prevent="save(emailForm, true)">
+				<header class="person-form-heading">
+					<h2>Смена e-mail</h2>
+					<p>Укажите текущий и новый адрес почты.</p>
+				</header>
+				<div v-if="Object.keys(emailForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
+					<p v-for="(error, field) in emailForm.errors" :key="field">{{ error }}</p>
+				</div>
+				<label class="person-form-field">
+					<span>Текущий e-mail</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model.trim="emailForm.current_email"
+						type="text"
+						autocomplete="email"
+						required
+						:class="{ 'is-invalid': emailForm.errors.current_email }"
+					/>
+				</label>
+				<label class="person-form-field">
+					<span>Новый e-mail</span>
+					<input
+						class="ui-input ui-input--compact"
+						v-model.trim="emailForm.email"
+						type="email"
+						autocomplete="email"
+						maxlength="50"
+						required
+						:class="{ 'is-invalid': emailForm.errors.email }"
+					/>
+				</label>
+				<footer class="person-form-actions">
+					<button type="submit" class="ui-button ui-button--compact" :disabled="busy">
+						{{ emailForm.processing ? 'Сохранение…' : 'Изменить e-mail' }}
+					</button>
+				</footer>
+			</form>
+		</div>
+	</section>
 </template>
 
 <script setup>

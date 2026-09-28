@@ -1,0 +1,68 @@
+.game-social .shoutbox {
+	flex: 1;
+	min-height: 0;
+	height: auto;
+	padding: var(--space-10) var(--space-4);
+	font-size: 12px;
+	line-height: 1.8;
+	overflow-wrap: anywhere;
+}
+
+.game-social .shoutbox .chat-messages {
+	margin: var(--space-2) 0;
+	color: var(--shell-text);
+}
+
+.game-social .shoutbox .date1,
+.game-social .shoutbox .date2,
+.game-social .shoutbox .date3 {
+	color: var(--shell-muted);
+	background: transparent;
+	padding: var(--space-2) var(--space-6) var(--space-2) 0;
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	cursor: pointer;
+}
+
+.game-social .shoutbox .date2 {
+	color: var(--chat-mention);
+}
+
+.game-social .shoutbox .date3 {
+	color: var(--chat-own);
+}
+
+.game-social .shoutbox .to,
+.game-social .shoutbox .player,
+.game-social .shoutbox .player a {
+	color: var(--shell-gold);
+	font-weight: 500;
+}
+
+.game-social .shoutbox .private,
+.game-social .shoutbox .private a {
+	color: var(--chat-private);
+}
+
+.game-social .shoutbox .negative {
+	color: var(--chat-negative);
+}
+
+.game-social .shoutbox .chat-empty {
+	height: 100%;
+	min-height: 55px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: var(--space-4);
+	color: var(--shell-text);
+}
+
+.game-social .shoutbox .chat-empty span {
+	font-size: 12px;
+}
+
+.game-social .shoutbox .chat-empty small {
+	font-size: 12px;
+	color: var(--shell-muted);
+}

@@ -1,0 +1,73 @@
+:root {
+	--shell-bg: #161c1e;
+	--shell-glow: #343b3b;
+	--shell-panel: #20292b;
+	--shell-line: #85663d;
+	--shell-gold: #d7b16c;
+	--shell-text: #e8dec5;
+	--shell-muted: #b9b19d;
+	--shell-input: #182022;
+	--shell-input-border: #92764c;
+	--shell-emblem-border: #b38a4f;
+	--shell-platinum: #c7c8c2;
+	--shell-button: #6d201c;
+	--shell-button-text: #f5e4c1;
+	--shell-button-border: #9f7a42;
+	--shell-button-hover: #8b2a25;
+	--shell-popover: #273133;
+	--shell-popover-border: #99794b;
+	--shell-error: #e7a597;
+	--shell-resource-health: #ed7770;
+	--shell-resource-energy: #56afe3;
+	--shell-resource-stamina: #c2a574;
+	--shell-tint-faint: #d7b16c08;
+	--shell-tint-soft: #d7b16c0a;
+	--shell-tint: #d7b16c10;
+	--shell-tint-hover: #d7b16c20;
+	--shell-tint-strong: #d7b16c30;
+	--shell-tint-active: #d7b16c38;
+
+	--paper-bg: #d8c29b;
+	--paper-panel: #e3cfaa;
+	--paper-highlight: #eee0c4;
+	--paper-inset: #cfb58a;
+	--paper-text: #30281f;
+	--paper-muted: #71604b;
+	--paper-heading: #352b20;
+	--paper-border: #a5895b;
+	--paper-link: #73342a;
+	--paper-link-hover: #9d4330;
+	--paper-danger: #8b2620;
+	--paper-success: #397733;
+	--paper-info: #286b9a;
+	--paper-warning: #8a5a19;
+	--paper-scrollbar: #97774d;
+	--paper-stripe: #80603c10;
+	--paper-edge-shade: #76522c2b;
+
+	--resource-health: #ad3832;
+	--resource-energy: #286b9a;
+	--resource-stamina: #68645a;
+
+	--chat-mention: #4e5e38;
+	--chat-own: #725221;
+	--chat-private: #684967;
+	--chat-negative: #7c2822;
+	--shadow-panel: #0003;
+	--shadow-popover: #0008;
+}
+
+.game-social .social-body {
+	--shell-text: var(--paper-text);
+	--shell-muted: var(--paper-muted);
+	--shell-gold: var(--paper-link);
+	--shell-line: var(--paper-border);
+	--shell-input: var(--paper-highlight);
+	--shell-input-border: var(--paper-border);
+	--shell-popover: var(--paper-panel);
+	--shell-popover-border: var(--paper-border);
+	--shell-error: var(--paper-danger);
+	--shell-tint: #80603c10;
+	--shell-tint-hover: #80603c20;
+	--shell-tint-strong: #80603c30;
+}

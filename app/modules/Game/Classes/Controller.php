@@ -71,9 +71,6 @@ class Controller extends PhalconController
 			$this->assets->addJs('js/jquery.toast.min.js');
 			$this->assets->addJs('js/jquery.confirm.min.js');
 			$this->assets->addJs('js/show_inf.js');
-			$this->assets->addJs('js/battle.js');
-			$this->assets->addJs('js/shop.js');
-			$this->assets->addJs('js/main.js');
 
 			$this->assets->addCss('css/jquery-ui.css');
 			$this->assets->addCss('css/jquery.toast.min.css');

@@ -6,10 +6,13 @@ use App\Http\Controller;
 use App\Models\User;
 use App\Models\UserAuthentication;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
 {
@@ -19,6 +22,15 @@ class LoginController extends Controller
 
 	public function index()
 	{
+	}
+
+	public function logout(Request $request): Response
+	{
+		Auth::logout();
+		$request->session()->invalidate();
+		$request->session()->regenerateToken();
+
+		return Inertia::location(route('index'));
 	}
 
 	public function services(string $service): RedirectResponse

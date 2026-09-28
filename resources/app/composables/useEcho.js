@@ -1,7 +1,7 @@
-import Echo from 'laravel-echo'
+import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
-export default function useEcho () {
+export default function useEcho() {
 	if (typeof window === 'undefined') {
 		return null;
 	}

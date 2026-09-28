@@ -1,53 +1,148 @@
 <template>
 	<ContentBlock title="Рынок">
-		<div class="flex flex-wrap">
-			<div class="w-9/12 flex-none xl:w-10/12 pr-4">
-				<p v-if="page.message" class="message bg-red-100 text-red-700 mb-4" v-html="page.message"></p>
-				<p v-for="(error, key) in form.errors" :key="key" class="text-red-700 mb-2">{{ error }}</p>
-				<h3 class="font-bold mb-4">{{ sectionTitle }}</h3>
+		<template #actions>
+			<Link href="/map/change/20" class="ui-icon-button" title="Назад">
+				<GameIcon name="back" />
+			</Link>
+			<Link href="/map?section=100" class="ui-icon-button" title="Продать предметы">
+				<GameIcon name="coins" />
+			</Link>
+			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
 
-				<div v-if="page.items.length" class="shop-items grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-					<SellItem v-for="entry in page.items" :key="page.section + ':' + entry.item.id" :item="entry.item">
+		<p v-if="page.message" class="ui-notice ui-notice--blue" role="status" v-html="page.message"></p>
+		<div v-if="Object.keys(form.errors).length" class="ui-notice ui-notice--red" role="alert">
+			<p v-for="(error, key) in form.errors" :key="key">{{ error }}</p>
+		</div>
+		<nav class="ui-tabs ui-tabs--stacked">
+			<Link class="ui-tab" href="/map" :class="{ 'is-active': page.section < 100 }">
+				<GameIcon name="coins" />
+				Купить
+			</Link>
+			<Link class="ui-tab" href="/map?section=100" :class="{ 'is-active': page.section === 100 }">
+				<GameIcon name="transfer" />
+				Выставить предмет
+			</Link>
+			<Link class="ui-tab" href="/map?section=101" :class="{ 'is-active': page.section === 101 }">
+				<GameIcon name="armor" />
+				Мои товары
+			</Link>
+		</nav>
+		<div class="storefront-layout" :class="{ 'storefront-layout--inventory': page.section >= 100 }">
+			<nav v-if="page.section < 100" class="ui-menu storefront-departments">
+				<Link href="/map" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
+					Новые поступления
+					<GameIcon name="forward" />
+				</Link>
+				<section v-for="group in groups" :key="group.title" class="storefront-department-group">
+					<h2>{{ group.title }}</h2>
+					<div class="ui-menu-list storefront-department-links">
+						<Link
+							v-for="[id, title] in group.sections"
+							:key="id"
+							:href="'/map?section=' + id"
+							class="ui-menu-link"
+							:class="{ 'is-active': page.section === id }"
+						>
+							{{ title }}
+						</Link>
+					</div>
+				</section>
+			</nav>
+			<section class="storefront-catalog">
+				<header class="storefront-catalog-header">
+					<h2>
+						{{ sectionTitle }}
+						<span class="ui-badge">{{ page.items.length }}</span>
+					</h2>
+				</header>
+				<p class="storefront-description">
+					{{
+						page.section === 100
+							? 'Укажите цену в золоте и выставьте предмет на продажу.'
+							: page.section === 101
+								? 'Здесь собраны ваши предложения. Предмет можно снять с продажи.'
+								: 'Снаряжение и припасы от других игроков. Все покупки оплачиваются золотом.'
+					}}
+				</p>
+				<div v-if="page.items.length" class="storefront-grid">
+					<CatalogItem v-for="entry in page.items" :key="page.section + ':' + entry.item.id" :item="entry.item" :player="user" inventory-item>
+						<template v-if="page.section !== 100" #details>
+							<p class="service-item-note">
+								Продавец:
+								<strong>{{ entry.seller }}</strong>
+								<span v-if="entry.is_own" class="ui-badge">Ваш товар</span>
+							</p>
+						</template>
+						<template v-if="page.section !== 100" #price>
+							<div class="storefront-item-price">
+								<span>Цена продавца</span>
+								<strong>
+									<img src="/assets/images/currencies/gold.png" alt="" />
+									{{ entry.price }}
+									<small>зол.</small>
+								</strong>
+							</div>
+						</template>
 						<template #actions>
-							<form v-if="page.section === 100" class="mt-2" @submit.prevent="sell(entry)">
-								<label class="text-xs">
-									Цена, зол.
-									<input v-model="prices[entry.item.id]" type="text" inputmode="decimal" required maxlength="13" class="w-full" :placeholder="String(entry.min_price)">
+							<form v-if="page.section === 100" class="service-item-actions" @submit.prevent="sell(entry)">
+								<label class="service-field">
+									<span>Цена, зол.</span>
+									<input
+										class="ui-input"
+										v-model="prices[entry.item.id]"
+										type="text"
+										inputmode="decimal"
+										required
+										maxlength="13"
+										:placeholder="String(entry.min_price)"
+										:disabled="form.processing"
+									/>
 								</label>
-								<div class="text-xs">Минимум: {{ entry.min_price }} зол.</div>
-								<button type="submit" class="button mt-2" :disabled="form.processing">Выставить</button>
+								<p class="service-hint">Минимум: {{ entry.min_price }} зол.</p>
+								<button type="submit" class="ui-button" :disabled="form.processing">Выставить на продажу</button>
 							</form>
-							<button v-else type="button" class="button mt-2" :disabled="form.processing" @click="confirmAction(entry)">
+							<button
+								v-else
+								type="button"
+								class="ui-button"
+								:class="{ 'ui-button--secondary': entry.is_own }"
+								:disabled="form.processing"
+								@click="confirmAction(entry)"
+							>
 								{{ entry.is_own ? 'Снять с продажи' : 'Купить' }}
 							</button>
 						</template>
-						<template v-if="page.section !== 100" #details>
-							<div>Цена продавца: <b>{{ entry.price }} зол.</b></div>
-							<div>Продавец: <b>{{ entry.seller }}</b></div>
-						</template>
-					</SellItem>
+					</CatalogItem>
 				</div>
-				<p v-else>{{ page.section === 100 ? 'Нет вещей для продажи.' : 'В этом разделе нет товаров.' }}</p>
-			</div>
-			<div class="w-3/12 flex-none xl:w-2/12">
-				<div class="shopnav">
-					<Link href="/map?section=100"><img src="/assets/images/images/shop_sale.gif" alt="Продать предметы"></Link>
-					<Link :href="'/map?section=' + page.section"><img src="/assets/images/images/refresh.gif" alt="Обновить"></Link>
-					<Link href="/map/change/20"><img src="/assets/images/images/back.gif" alt="Вернуться"></Link>
+				<div v-else class="ui-empty" role="status">
+					<GameIcon name="armor" />
+					<h3>
+						{{
+							page.section === 100
+								? 'Нет вещей для продажи'
+								: page.section === 101
+									? 'У вас пока нет товаров на рынке'
+									: 'В этом разделе пока нет товаров'
+						}}
+					</h3>
+					<p>
+						{{
+							page.section === 100
+								? 'Здесь появятся предметы из инвентаря, которые можно продать.'
+								: 'Выберите другой раздел или загляните позже.'
+						}}
+					</p>
 				</div>
-				<div class="shopotdels text-center">
-					<Link href="/map" class="block">Новые поступления</Link>
-					<Link href="/map?section=100" class="block">Выставить предмет</Link>
-					<Link href="/map?section=101" class="block">Мои товары</Link>
-				</div>
-				<div v-for="group in groups" :key="group.title" class="shopotdels text-center">
-					<b>{{ group.title }}</b>
-					<div class="grid grid-cols-2 gap-1 mt-1">
-						<Link v-for="[id, title] in group.sections" :key="id" :href="'/map?section=' + id" :class="{ 'font-bold': page.section === id }">{{ title }}</Link>
-					</div>
-				</div>
-			</div>
+			</section>
 		</div>
+
+		<template #footer>
+			<GameIcon name="book" />
+			<span>Наведите на изображение предмета или нажмите на него, чтобы посмотреть характеристики.</span>
+		</template>
 	</ContentBlock>
 </template>
 
@@ -55,18 +150,58 @@
 	import { computed, reactive } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
-	import SellItem from '~/components/City/Shop/SellItem.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
+	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
+	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
 	const props = defineProps({ page: Object });
+	const state = useState();
+	const user = computed(() => state.user);
 	const prices = reactive({});
 	const form = useForm({ action: '', id: null, price: null });
 	const groups = [
 		{ title: 'Оружие', sections: [[1, 'Оружие']] },
-		{ title: 'Амуниция', sections: [[8, 'Шлемы'], [2, 'Доспехи'], [25, 'Штаны'], [10, 'Нарукавники'], [9, 'Перчатки'], [5, 'Щиты'], [7, 'Пояса'], [6, 'Обувь'], [11, 'Рубахи']] },
-		{ title: 'Ювелирные украшения', sections: [[4, 'Ожерелья'], [3, 'Кольца'], [24, 'Серьги']] },
-		{ title: 'Магия', sections: [[12, 'Свитки'], [16, 'Зелья']] },
-		{ title: 'Прочее', sections: [[14, 'Эликсиры'], [21, 'Документы'], [18, 'Инструменты'], [19, 'Ресурсы'], [20, 'Драгоценные камни'], [26, 'Магические предметы']] },
+		{
+			title: 'Амуниция',
+			sections: [
+				[8, 'Шлемы'],
+				[2, 'Доспехи'],
+				[25, 'Штаны'],
+				[10, 'Нарукавники'],
+				[9, 'Перчатки'],
+				[5, 'Щиты'],
+				[7, 'Пояса'],
+				[6, 'Обувь'],
+				[11, 'Рубахи'],
+			],
+		},
+		{
+			title: 'Ювелирные украшения',
+			sections: [
+				[4, 'Ожерелья'],
+				[3, 'Кольца'],
+				[24, 'Серьги'],
+			],
+		},
+		{
+			title: 'Магия',
+			sections: [
+				[12, 'Свитки'],
+				[16, 'Зелья'],
+			],
+		},
+		{
+			title: 'Прочее',
+			sections: [
+				[14, 'Эликсиры'],
+				[21, 'Документы'],
+				[18, 'Инструменты'],
+				[19, 'Ресурсы'],
+				[20, 'Драгоценные камни'],
+				[26, 'Магические предметы'],
+			],
+		},
 	];
 	const sectionTitle = computed(() => {
 		if (props.page.section === 100) return 'Выставить предмет на продажу';
@@ -90,7 +225,12 @@
 	function confirmAction(entry) {
 		openConfirmModal('Подтвердите действие', entry.is_own ? 'Снять предмет с продажи?' : 'Купить предмет за ' + entry.price + ' зол.?', [
 			{ title: 'Нет' },
-			{ title: 'Да', handler() { submit(entry.is_own ? 'withdraw' : 'buy', entry.id); } },
+			{
+				title: 'Да',
+				handler() {
+					submit(entry.is_own ? 'withdraw' : 'buy', entry.id);
+				},
+			},
 		]);
 	}
 </script>

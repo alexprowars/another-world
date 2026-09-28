@@ -1,57 +1,60 @@
 <template>
-	<div id="chatList" class="scrollbox">
-		<div class="refresh">
-			<a href="javascript:;" onclick="loadChatList()">
-				<img src="/assets/images/refresh.png" align="absmiddle" width="16" height="16" title="Обновить список игроков">
-			</a>
-			<input type="checkbox" value="1" title="Автоматическое обновление списка игроков" v-model.number="autoreload">
+	<div class="online-panel">
+		<div class="online-heading">
+			<span class="online-indicator"></span>
+			<h2>Игроки онлайн</h2>
+			<span class="online-count">{{ users.length }}</span>
+			<label class="sr-only" for="player-sort">Сортировка игроков</label>
+			<select id="player-sort" v-model="sort" class="online-sort" title="Сортировка игроков">
+				<option value="name">А–Я</option>
+				<option value="level">Ур. ↓</option>
+			</select>
 		</div>
-
-		<div class="actions">
-			<div class="text-left">В игре: 0 | <a href="" @click.prevent="toggleShow">{{ $t('rooms.' + user.room) }}</a> ({{ show === 1 ? 'мир' : 'комната' }})</div>
-			<div class="text-xs-center">
-				<a href="?sort=1" :class="{ active: false }">а-я</a> |
-				<a href="?sort=2" :class="{ active: false }">я-а</a> |
-				<a href="?sort=3" :class="{ active: false }">0-10</a> |
-				<a href="?sort=4" :class="{ active: false }">10-0</a>
-			</div>
+		<div class="online-list">
+			<p v-if="error" class="online-empty" role="alert">{{ error }}</p>
+			<p v-else-if="loading && !users.length" class="online-empty" role="status">Загрузка игроков…</p>
+			<template v-else>
+				<OnlineUser v-for="item in visibleUsers" :key="item.id" :user="item" @player="emit('player', $event)" @private="emit('private', $event)" />
+				<p v-if="!visibleUsers.length" class="online-empty">Пока никого нет</p>
+			</template>
 		</div>
-
-		<OnlineUser v-for="item in users" :user="item" :key="item.id"/>
 	</div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-	import useState from '~/composables/useState.js';
-	import OnlineUser from '~/components/Layout/OnlineUser.vue';
+	import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+	import OnlineUser from './OnlineUser.vue';
 	import { useHttp } from '@inertiajs/vue3';
 
-	const state = useState();
-	const user = computed(() => state.user);
-
-	const autoreload = ref(0);
-	const show = ref(1);
+	const emit = defineEmits(['player', 'private']);
 	const users = ref([]);
+	const sort = ref('name');
+	const loading = ref(false);
+	const error = ref('');
+	let refreshTimer;
+	const visibleUsers = computed(() =>
+		users.value.toSorted((a, b) => (sort.value === 'level' ? (Number(b.level) || 0) - (Number(a.level) || 0) : a.name.localeCompare(b.name, 'ru'))),
+	);
 
-	function toggleShow() {
-		if (show.value === 1) {
-			show.value = 2;
-		} else {
-			show.value = 1;
-		}
-	}
+	defineExpose({ refresh: loadChatList, loading });
 
 	onMounted(() => {
 		loadChatList();
-
-		setInterval(loadChatList, 60000);
+		refreshTimer = setInterval(loadChatList, 60000);
 	});
+	onBeforeUnmount(() => clearInterval(refreshTimer));
 
-	async function loadChatList () {
-		const result = await useHttp()
-			.get('/chat/online');
-
-		users.value = result.users;
+	async function loadChatList() {
+		if (loading.value) return;
+		loading.value = true;
+		error.value = '';
+		try {
+			const result = await useHttp().get('/chat/online');
+			users.value = result.users;
+		} catch {
+			error.value = 'Не удалось обновить список. Попробуйте ещё раз.';
+		} finally {
+			loading.value = false;
+		}
 	}
 </script>

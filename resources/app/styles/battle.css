@@ -20,7 +20,7 @@
 
 .battle-layout__center {
 	flex: 1 1 auto;
-	padding: 0 10px;
+	padding: 0 var(--space-10);
 	text-align: center;
 	display: flex;
 	flex-direction: column;
@@ -31,12 +31,12 @@
 	border-bottom: 1px solid #000;
 	font-size: 16px;
 	font-weight: normal;
-	padding: 2px;
+	padding: var(--space-2);
 	text-align: center;
 }
 
 .battle-form__content {
-	padding: 2px;
+	padding: var(--space-2);
 	text-align: center;
 }
 
@@ -53,7 +53,7 @@
 	border: 1px solid #8d7651;
 	box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
 	left: 50%;
-	padding: 4px;
+	padding: var(--space-4);
 	position: absolute;
 	top: 28px;
 	transform: translateX(-50%);
@@ -99,7 +99,7 @@
 	width: 120px;
 	display: flex;
 	justify-content: center;
-	padding-top: 12px;
+	padding-top: var(--space-12);
 }
 
 .battle-impact-form__column--impact {

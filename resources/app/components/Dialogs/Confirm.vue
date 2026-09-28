@@ -1,42 +1,33 @@
 <template>
 	<div class="confirm-box">
-		<div v-if="title" class="dialog-title" v-html="title"></div>
 		<div class="dialog-text" v-html="content"></div>
 		<div class="dialog-buttons">
-			<button v-for="button in buttons" type="button" class="btn" :class="button.class || ''" @click.stop="handle(button.handler)" v-html="button.title"></button>
+			<button
+				v-for="(button, index) in buttons"
+				:key="index"
+				type="button"
+				class="ui-button ui-button--compact dialog-button"
+				:class="[button.class, { 'ui-button--secondary': buttons.length > 1 && typeof button.handler !== 'function' }]"
+				@click.stop="handle(button.handler)"
+				v-html="button.title"
+			></button>
 		</div>
 	</div>
 </template>
 
 <script setup>
-	const props = defineProps({
-		title: {
-			type: String,
-			default: '',
-		},
-		content: {
-			type: String,
-			default: '',
-		},
-		buttons: {
-			title: Object,
-			default: () => {
-				return {
-					ok: {
-						title: 'ok'
-					}
-				}
-			}
-		}
-	})
+	defineProps({
+		content: { type: String, default: '' },
+		buttons: { type: Array, default: () => [{ title: 'Понятно' }] },
+	});
 
-	const emit = defineEmits(['close'])
+	const emit = defineEmits(['close']);
 
-	function handle (action) {
+	function handle(action) {
 		if (typeof action === 'function') {
-			action()
+			action();
 		}
 
-		emit('close')
+		emit('close');
 	}
 </script>

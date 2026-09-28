@@ -1,0 +1,142 @@
+.service-status svg {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+}
+
+.service-columns {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	align-items: start;
+	gap: var(--space-24);
+}
+
+.service-list {
+	display: grid;
+	gap: var(--space-12);
+	margin: 0;
+	padding-left: var(--space-20);
+	font-size: 13px;
+	line-height: 1.7;
+}
+
+ol.service-list {
+	list-style: decimal;
+}
+
+ul.service-list {
+	list-style: disc;
+}
+
+.service-list li::marker {
+	color: var(--paper-link);
+	font-weight: 600;
+}
+
+.service-prose {
+	margin: 0;
+	font-size: 13px;
+	line-height: 1.7;
+	white-space: pre-line;
+	overflow-wrap: anywhere;
+}
+
+.service-status {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+	margin: 0;
+	color: var(--paper-link);
+	font-size: 13px;
+}
+
+.administration-images {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+	gap: var(--space-16);
+}
+
+.administration-image {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-14);
+	min-width: 0;
+	padding: var(--space-14);
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-highlight);
+}
+
+.administration-image.is-selected {
+	border-color: var(--paper-link);
+	box-shadow: inset 0 0 0 1px var(--paper-link);
+}
+
+.administration-image-preview {
+	display: grid;
+	place-items: center;
+	flex: 1;
+	min-width: 0;
+}
+
+.administration-image img {
+	max-width: 100%;
+	height: auto;
+	max-height: 260px;
+	object-fit: contain;
+}
+
+.administration-tribe {
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-highlight);
+}
+
+.administration-tribe summary {
+	display: flex;
+	align-items: center;
+	gap: var(--space-10);
+	padding: var(--space-16) var(--space-18);
+	color: var(--paper-heading);
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	list-style: none;
+}
+
+.administration-tribe summary::-webkit-details-marker {
+	display: none;
+}
+
+.administration-tribe summary span {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.administration-tribe summary img {
+	width: 24px;
+	height: 14px;
+	object-fit: contain;
+}
+
+.administration-tribe summary svg {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	color: var(--paper-link);
+}
+
+.administration-tribe[open] summary {
+	border-bottom: 1px solid var(--paper-border);
+}
+
+.administration-tribe[open] summary svg {
+	transform: rotate(180deg);
+}
+
+@container (max-width: 760px) {
+	.service-columns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

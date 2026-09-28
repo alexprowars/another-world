@@ -3,7 +3,7 @@
 		<h2 class="mb-3 font-bold">Особенности</h2>
 		<ul class="space-y-2">
 			<li v-if="person.zodiac" class="flex items-center gap-2">
-				<img :src="'/assets/images/zodiac/' + person.zodiac.id + '.gif'" :alt="person.zodiac.name">
+				<img :src="'/assets/images/zodiac/' + person.zodiac.id + '.gif'" :alt="person.zodiac.name" />
 				{{ person.zodiac.name }}
 			</li>
 			<li v-if="person.admin">Администратор Another World</li>

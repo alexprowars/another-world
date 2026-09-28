@@ -1,90 +1,197 @@
 <template>
-	<Head title="Администрация"/>
+	<Head title="Администрация" />
 	<ContentBlock title="Администрация">
-		<div class="mb-4 flex justify-end gap-1">
-			<Link :href="'/map?section=' + page.section"><img src="/assets/images/images/refresh.gif" alt="Обновить"></Link>
-			<Link href="/map/change/14"><img src="/assets/images/images/back.gif" alt="Вернуться"></Link>
-		</div>
+		<template #actions>
+			<Link href="/map/change/14" class="ui-icon-button" title="Назад">
+				<GameIcon name="back" />
+			</Link>
+			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
 
-		<p class="mb-4">У вас: <b>{{ user.credits }} пл.</b></p>
-		<nav class="mb-4 flex flex-wrap gap-4 border-b pb-2">
-			<Link v-for="(title, index) in sections" :key="index" :href="'/map?section=' + (index + 1)" :class="{ 'font-bold': page.section === index + 1 }">{{ title }}</Link>
+		<nav class="ui-tabs ui-tabs--stacked">
+			<Link
+				class="ui-tab"
+				v-for="(title, index) in sections"
+				:key="index"
+				:href="'/map?section=' + (index + 1)"
+				:class="{ 'is-active': page.section === index + 1 }"
+			>
+				<GameIcon :name="['clan', 'justice', 'character', 'book'][index]" />
+				{{ title }}
+			</Link>
 		</nav>
-
-		<div v-if="page.section === 1" class="space-y-4">
-			<h3 class="text-center font-bold">Регистратура кланов</h3>
-			<p>Добро пожаловать в отдел регистрации кланов! Для создания клана ознакомьтесь с правилами регистрации.</p>
-			<h4 class="font-bold">Правила регистрации клана</h4>
-			<ol class="list-decimal space-y-2 pl-6">
-				<li>Для регистрации клана необходимо уплатить пошлину в размере <b>300 пл.</b></li>
-				<li>Глава клана должен достигнуть <b>{{ page.min_level }} уровня</b> и пройти проверку у инквизиторов.</li>
-				<li>Глава клана должен предоставить значок клана (24 × 14 пикселей, прозрачный GIF) и историю клана для информационного отдела.</li>
-				<li>Склонность для клана покупается отдельно.</li>
-			</ol>
-			<h4 class="font-bold">Порядок регистрации клана</h4>
-			<ol class="list-decimal space-y-2 pl-6">
-				<li>Игроки с общими интересами собираются в группу.</li>
-				<li>Выбирается лидер, который будет управлять кланом.</li>
-				<li>Заявка рассматривается отделом регистрации кланов.</li>
-				<li>При положительном результате глава клана проходит проверку у инквизиторов.</li>
-				<li>Глава клана оплачивает пошлину за регистрацию.</li>
-				<li>После успешного прохождения проверки клан открывается и вносится в государственный реестр.</li>
-			</ol>
-		</div>
-
-		<div v-else-if="page.section === 2" class="space-y-4">
-			<h3 class="font-bold">Заявка на проверку у инквизиторов</h3>
-			<p>Здесь вы можете подать заявку на проверку. Обычно ожидание занимает около 24 часов. Если во время проверки вы будете в игре, вам придёт сообщение о результате.</p>
-			<p>Стоимость подачи заявки: <b>{{ page.request_price }} пл.</b> Минимальный уровень: <b>{{ page.min_level }}</b>.</p>
-			<form @submit.prevent="sendRequest">
-				<button type="submit" class="button" :disabled="requestForm.processing">
-					{{ page.has_request ? 'Убрать свою заявку' : 'Подать заявку на проверку' }}
-				</button>
-				<p v-if="page.has_request" class="mt-2 text-sm">При отзыве заявки плата не возвращается.</p>
-				<p v-if="requestForm.errors.action" class="mt-2 text-red-700">{{ requestForm.errors.action }}</p>
-			</form>
-
-			<h4 class="font-bold">Последние 15 заявок</h4>
-			<table v-if="page.requests.length" class="table w-full">
-				<thead><tr><th>#</th><th>Игрок</th><th>Состояние</th></tr></thead>
-				<tbody>
-					<tr v-for="entry in page.requests" :key="entry.id">
-						<td>{{ entry.id }}</td>
-						<td>{{ entry.user }}</td>
-						<td>{{ statuses[entry.status] ?? 'Неизвестно' }}</td>
-					</tr>
-				</tbody>
-			</table>
-			<p v-else>Заявок пока нет.</p>
-		</div>
-
-		<div v-else-if="page.section === 3" class="space-y-4">
-			<p>Добро пожаловать в отдел выбора образа! Стоимость образа — <b>{{ page.image_price }} пл.</b></p>
-			<p>Стоимость добавления собственного оригинального образа — <b>300 пл.</b> Обращайтесь к администрации.</p>
-			<p v-if="imageForm.errors.image" class="text-red-700">{{ imageForm.errors.image }}</p>
-			<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-				<button v-for="image in page.images" :key="image" type="button" class="flex flex-col items-center gap-2 disabled:opacity-50" :disabled="imageForm.processing || user.image === imagePath(image)" @click="buyImage(image)">
-					<img :src="'/assets/images/avatar/' + imagePath(image)" :alt="'Образ №' + image" loading="lazy">
-					<span>{{ user.image === imagePath(image) ? 'Установлен' : 'Купить' }}</span>
-				</button>
+		<div v-if="page.section === 1" class="service-section">
+			<header class="service-heading">
+				<h2>Регистратура кланов</h2>
+				<p>Соберите союзников и ознакомьтесь с условиями регистрации своего клана.</p>
+			</header>
+			<div class="service-terms">
+				<div>
+					<span>Регистрационная пошлина</span>
+					<strong>300 пл.</strong>
+				</div>
+				<div>
+					<span>Уровень главы клана</span>
+					<strong>{{ page.min_level }}</strong>
+				</div>
+				<div>
+					<span>Допуск</span>
+					<strong>Проверка инквизиторов</strong>
+				</div>
+			</div>
+			<div class="service-columns">
+				<section class="ui-panel service-panel">
+					<header class="service-panel-heading">
+						<GameIcon name="clan" />
+						<h2>Правила регистрации</h2>
+					</header>
+					<div class="service-panel-body">
+						<ul class="service-list">
+							<li>Глава клана оплачивает пошлину, достигает {{ page.min_level }} уровня и проходит проверку у инквизиторов.</li>
+							<li>Подготовьте значок клана: 24 × 14 пикселей, прозрачный GIF.</li>
+							<li>Предоставьте историю клана для информационного отдела.</li>
+							<li>Склонность для клана покупается отдельно.</li>
+						</ul>
+					</div>
+				</section>
+				<section class="ui-panel service-panel">
+					<header class="service-panel-heading">
+						<GameIcon name="work" />
+						<h2>Порядок регистрации</h2>
+					</header>
+					<div class="service-panel-body">
+						<ol class="service-list">
+							<li>Соберите игроков с общими интересами и выберите главу клана.</li>
+							<li>Подайте заявку в отдел регистрации кланов.</li>
+							<li>После одобрения заявки глава проходит проверку у инквизиторов.</li>
+							<li>Оплатите регистрационную пошлину.</li>
+							<li>После проверки клан открывается и вносится в государственный реестр.</li>
+						</ol>
+					</div>
+				</section>
 			</div>
 		</div>
-
-		<div v-else class="space-y-4">
-			<p>Добро пожаловать в Государственный архив кланов. Здесь вы можете просмотреть записи о кланах и информацию о них.</p>
-			<details v-for="(tribe, index) in page.tribes" :key="tribe.id" class="border-b pb-3">
-				<summary class="cursor-pointer font-bold">
-					{{ index + 1 }}.
-					<img :src="'/assets/images/tribe/' + tribe.id + '.gif'" :alt="tribe.short" class="inline-block">
-					{{ tribe.short }} — {{ tribe.name }}
+		<div v-else-if="page.section === 2" class="service-split">
+			<section class="ui-panel service-panel">
+				<header class="service-panel-heading">
+					<GameIcon name="justice" />
+					<h2>Проверка инквизиторов</h2>
+				</header>
+				<div class="service-panel-body">
+					<p class="service-hint">Обычно рассмотрение занимает около 24 часов. Если вы будете в игре, сообщение о результате придёт в чат.</p>
+					<dl class="service-facts">
+						<div>
+							<dt>Стоимость заявки</dt>
+							<dd>{{ page.request_price }} пл.</dd>
+						</div>
+						<div>
+							<dt>Минимальный уровень</dt>
+							<dd>{{ page.min_level }}</dd>
+						</div>
+					</dl>
+					<p v-if="page.has_request" class="service-status">
+						<GameIcon name="hourglass" />
+						Заявка подана
+					</p>
+					<form class="service-form" @submit.prevent="sendRequest">
+						<button type="submit" class="ui-button" :class="{ 'ui-button--secondary': page.has_request }" :disabled="requestForm.processing">
+							{{ page.has_request ? 'Отозвать заявку' : 'Подать заявку' }}
+						</button>
+						<p v-if="page.has_request" class="service-hint">При отзыве заявки плата не возвращается.</p>
+						<p v-for="(error, field) in requestForm.errors" :key="field" class="service-error" role="alert">{{ error }}</p>
+					</form>
+				</div>
+			</section>
+			<section class="service-section">
+				<header class="service-heading">
+					<h2>Последние заявки</h2>
+					<p>Последние 15 обращений игроков.</p>
+				</header>
+				<div v-if="page.requests.length" class="ui-table-wrap service-table-wrap">
+					<table class="ui-table service-table">
+						<thead>
+							<tr>
+								<th>№</th>
+								<th>Игрок</th>
+								<th>Состояние</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="entry in page.requests" :key="entry.id">
+								<td>{{ entry.id }}</td>
+								<td>{{ entry.user }}</td>
+								<td>
+									<span class="ui-badge">{{ statuses[entry.status] ?? 'Неизвестно' }}</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div v-else class="ui-empty" role="status">
+					<GameIcon name="work" />
+					<h3>Заявок пока нет</h3>
+					<p>Здесь появятся обращения на проверку.</p>
+				</div>
+			</section>
+		</div>
+		<div v-else-if="page.section === 3" class="service-section">
+			<header class="service-heading">
+				<h2>Выберите образ</h2>
+				<p>Новый облик персонажа стоит {{ page.image_price }} пл.</p>
+			</header>
+			<div class="ui-notice ui-notice--blue ui-notice--with-icon">
+				<GameIcon name="character" />
+				<p>
+					Добавление собственного оригинального образа —
+					<strong>300 пл.</strong>
+					Обратитесь к администрации.
+				</p>
+			</div>
+			<div v-if="Object.keys(imageForm.errors).length" class="ui-notice ui-notice--red" role="alert">
+				<p v-for="(error, field) in imageForm.errors" :key="field">{{ error }}</p>
+			</div>
+			<div v-if="page.images.length" class="administration-images">
+				<article v-for="image in page.images" :key="image" class="administration-image" :class="{ 'is-selected': user.image === imagePath(image) }">
+					<div class="administration-image-preview">
+						<img :src="'/assets/images/avatar/' + imagePath(image)" :alt="'Образ №' + image" loading="lazy" />
+					</div>
+					<button type="button" class="ui-button" :disabled="imageForm.processing || user.image === imagePath(image)" @click="buyImage(image)">
+						{{ user.image === imagePath(image) ? 'Установлен' : 'Купить · ' + page.image_price + ' пл.' }}
+					</button>
+				</article>
+			</div>
+			<div v-else class="ui-empty" role="status">
+				<GameIcon name="character" />
+				<h3>Нет доступных образов</h3>
+				<p>Загляните в отдел позже.</p>
+			</div>
+		</div>
+		<div v-else class="service-section">
+			<header class="service-heading">
+				<h2>Государственный архив кланов</h2>
+				<p>Истории и уставы зарегистрированных объединений.</p>
+			</header>
+			<details v-for="tribe in page.tribes" :key="tribe.id" class="administration-tribe">
+				<summary>
+					<img :src="'/assets/images/tribe/' + tribe.id + '.gif'" :alt="tribe.short" />
+					<span>{{ tribe.short }} — {{ tribe.name }}</span>
+					<GameIcon name="chevron" />
 				</summary>
-				<p class="mt-3 whitespace-pre-line">{{ tribe.about || 'Описание клана пока не добавлено.' }}</p>
-				<template v-if="tribe.laws">
-					<h4 class="mt-3 font-bold">Устав клана</h4>
-					<p class="whitespace-pre-line">{{ tribe.laws }}</p>
-				</template>
+				<div class="service-panel-body">
+					<p class="service-prose">{{ tribe.about || 'Описание клана пока не добавлено.' }}</p>
+					<template v-if="tribe.laws">
+						<h3>Устав клана</h3>
+						<p class="service-prose">{{ tribe.laws }}</p>
+					</template>
+				</div>
 			</details>
-			<p v-if="!page.tribes.length">Зарегистрированных кланов пока нет.</p>
+			<div v-if="!page.tribes.length" class="ui-empty" role="status">
+				<GameIcon name="clan" />
+				<h3>Кланы пока не зарегистрированы</h3>
+				<p>После регистрации сведения о кланах появятся в архиве.</p>
+			</div>
 		</div>
 	</ContentBlock>
 </template>
@@ -93,6 +200,7 @@
 	import { computed } from 'vue';
 	import { Head, Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 

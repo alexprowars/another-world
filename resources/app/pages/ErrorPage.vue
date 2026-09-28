@@ -13,5 +13,5 @@
 
 	defineProps({
 		page: Object,
-	})
+	});
 </script>

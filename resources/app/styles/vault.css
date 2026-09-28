@@ -1,0 +1,132 @@
+.vault-layout {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr) 240px;
+	align-items: start;
+	gap: var(--space-18);
+}
+
+.vault-actions {
+	display: grid;
+	gap: var(--space-18);
+	min-width: 0;
+}
+
+.vault-layout--busy {
+	grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.vault-compass {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-6);
+}
+
+.vault-direction {
+	display: grid;
+	justify-items: center;
+	gap: var(--space-6);
+	min-width: 0;
+	padding: var(--space-8) var(--space-2);
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-panel);
+	color: var(--paper-link);
+	font-size: 9px;
+	cursor: pointer;
+}
+
+.vault-direction svg,
+.vault-compass-center svg {
+	width: 22px;
+	height: 22px;
+}
+
+.vault-direction:hover:not(:disabled),
+.vault-direction:focus-visible:not(:disabled) {
+	background: var(--paper-inset);
+	border-color: var(--paper-link);
+}
+
+.vault-direction:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.vault-direction--top {
+	grid-area: 1 / 2;
+}
+
+.vault-direction--top svg {
+	transform: rotate(-90deg);
+}
+
+.vault-direction--left {
+	grid-area: 2 / 1;
+}
+
+.vault-direction--left svg {
+	transform: rotate(180deg);
+}
+
+.vault-direction--right {
+	grid-area: 2 / 3;
+}
+
+.vault-direction--bottom {
+	grid-area: 3 / 2;
+}
+
+.vault-direction--bottom svg {
+	transform: rotate(90deg);
+}
+
+.vault-compass-center {
+	display: grid;
+	place-items: center;
+	grid-area: 2 / 2;
+	color: var(--paper-muted);
+}
+
+.vault-description {
+	display: block;
+	font-size: 13px;
+	line-height: 1.7;
+	overflow-wrap: anywhere;
+	overflow-x: auto;
+}
+
+.vault-description img {
+	max-width: 100%;
+	height: auto;
+}
+
+.vault-captcha {
+	max-width: 100%;
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+}
+
+@container (max-width: 1000px) {
+	.vault-layout {
+		grid-template-columns: 240px minmax(0, 1fr);
+	}
+
+	.vault-actions {
+		grid-column: 1 / -1;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: start;
+	}
+}
+
+@container (max-width: 560px) {
+	.vault-layout,
+	.vault-actions {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.vault-compass {
+		width: 200px;
+		max-width: 100%;
+		margin-inline: auto;
+	}
+}

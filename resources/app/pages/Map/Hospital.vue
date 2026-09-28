@@ -1,61 +1,109 @@
 <template>
 	<ContentBlock title="Больница">
-		<div class="w-full text-right">
-			<Link href="/map"><img src='/assets/images/images/refresh.gif' alt='Обновить'></Link>
-			<Link v-if="!user.r_date" href="/map/change/8"><img src='/assets/images/images/back.gif' alt='Вернуться'></Link>
+		<template #actions>
+			<button v-if="user.r_date" type="button" class="ui-icon-button" disabled title="Возвращение доступно после окончания лечения">
+				<GameIcon name="back" />
+			</button>
+			<Link v-else href="/map/change/8" class="ui-icon-button" title="Назад">
+				<GameIcon name="back" />
+			</Link>
+			<Link href="/map" class="ui-icon-button" title="Обновить">
+				<GameIcon name="refresh" />
+			</Link>
+		</template>
+
+		<div class="hospital">
+			<section class="hospital-recovery">
+				<header class="hospital-heading">
+					<div class="hospital-emblem"><GameIcon :name="user.r_date ? 'hourglass' : 'health'" /></div>
+					<div>
+						<h2>{{ user.r_date ? 'Лечение идёт' : page.time > 0 ? 'Восстановление здоровья' : 'Лечение не требуется' }}</h2>
+						<p v-if="user.r_date">Отдыхайте. Лекари позаботятся о вашем здоровье.</p>
+						<p v-else-if="page.time > 0">Восстановите здоровье перед следующим сражением.</p>
+						<p v-else>Ваше здоровье полностью восстановлено. Вы готовы к новым сражениям.</p>
+					</div>
+				</header>
+
+				<div class="hospital-health">
+					<span class="hospital-label">Уровень жизни</span>
+					<HpLine :current="user.hp_now" :max="user.hp_max" color="g_line" />
+				</div>
+
+				<div v-if="user.r_date" class="hospital-treatment">
+					<div>
+						<span class="hospital-label">До окончания лечения</span>
+						<Timer :key="user.r_date" :value="user.r_date" :callback="onTimeout" class="hospital-countdown" />
+					</div>
+					<p class="hospital-hint">После лечения вы вернётесь в общий зал.</p>
+				</div>
+				<div v-else-if="page.time > 0" class="hospital-treatment">
+					<div>
+						<span class="hospital-label">Длительность лечения</span>
+						<strong class="hospital-duration">
+							<GameIcon name="hourglass" />
+							{{ $formatTime(page.time) }}
+						</strong>
+					</div>
+					<button type="button" class="ui-button" :disabled="processing" @click="healAction">
+						<GameIcon name="health" />
+						{{ healForm.processing ? 'Начинаем лечение…' : 'Подлечиться' }}
+					</button>
+				</div>
+			</section>
+
+			<section v-if="user.injury" class="hospital-injury">
+				<div class="hospital-injury-copy">
+					<h3>
+						<GameIcon name="health" />
+						Лечение травмы
+					</h3>
+					<p>В больнице можно вылечить травму. Стоимость выше, чем у лекарей.</p>
+				</div>
+				<div class="hospital-injury-action">
+					<span class="hospital-price">
+						<GameIcon name="coins" />
+						<strong>200 зол.</strong>
+					</span>
+					<button type="button" class="ui-button" :disabled="processing || user.gold < 200" @click="injuryAction">
+						{{ injuryForm.processing ? 'Лечим травму…' : 'Вылечить травму' }}
+					</button>
+					<p v-if="user.gold < 200" class="hospital-hint hospital-hint--error">Недостаточно золота</p>
+				</div>
+			</section>
 		</div>
 
-		<table border=0 cellspacing=0 cellpadding=5 width=100% bordercolor="silver">
-			<tr>
-				<td align=center>
-					<div v-if="!user.r_date && page.time > 0">
-						Вы можете подлечиться в нашей больнице.<br>
-						Уровень жизни: <b><u>{{ user.hp_now }}</u></b> ед. из <b><u>{{ user.hp_max }}</u></b> ед.<br>
-						Курс лечения займёт займёт: <b>{{ $formatTime(page.time) }}</b>
-						<br><br>
-						<Link href="" @click.prevent="healAction()" class="btn btn-primary">Подлечиться</Link>
-					</div>
-					<div v-else-if="!user.r_date && page.time === 0">
-						<b>Извините, но у нас Вам делать нечего, Вы абсолютно здоровы!</b>
-					</div>
-					<div v-else-if="user.r_date && page.time > 0">
-						<div class="mr-2">Ещё лечиться:</div>
-						<Timer :value="user.r_date" class="font-bold" :callback="onTimeout"/>
-					</div>
-					<div v-if="user.injury">
-						<br><br>Вы можете вылечить свои травмы у нас, конечно маленько дороже чем у лекарей.<br><br>
-						<a href="" @click.prevent="injuryAction()" class="btn btn-primary">Вылечить травму за 200 зол.</a>
-					</div>
-				</td>
-			</tr>
-		</table>
+		<template #footer>
+			<GameIcon name="health" />
+			<span>{{ user.r_date ? 'Покинуть больницу можно после окончания лечения.' : 'Чем меньше здоровья осталось, тем дольше займёт лечение.' }}</span>
+		</template>
 	</ContentBlock>
 </template>
 
 <script setup>
-	import ContentBlock from '~/components/ContentBlock.vue';
-	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
-	import { Link, router } from '@inertiajs/vue3';
+	import { Link, router, useForm } from '@inertiajs/vue3';
+	import ContentBlock from '~/components/ContentBlock.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
+	import HpLine from '~/components/Person/HpLine.vue';
 	import Timer from '~/components/Timer.vue';
+	import useState from '~/composables/useState.js';
 
-	defineProps({
-		page: Object,
-	});
+	defineProps({ page: Object });
 
 	const state = useState();
 	const user = computed(() => state.user);
+	const healForm = useForm({ heal: 'Y' });
+	const injuryForm = useForm({ injury: 'Y' });
+	const processing = computed(() => healForm.processing || injuryForm.processing);
 
 	function healAction() {
-		router.post('', {
-			heal: 'Y',
-		});
+		if (processing.value) return;
+		healForm.post('/map', { preserveScroll: true });
 	}
 
 	function injuryAction() {
-		router.post('', {
-			injury: 'Y',
-		});
+		if (processing.value) return;
+		injuryForm.post('/map', { preserveScroll: true });
 	}
 
 	function onTimeout() {

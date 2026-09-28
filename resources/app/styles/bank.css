@@ -1,0 +1,43 @@
+.service-result {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-12);
+	padding: var(--space-14);
+	border-block: 1px solid var(--paper-border);
+	background: var(--paper-stripe);
+	font-size: 13px;
+}
+
+.service-result strong {
+	color: var(--paper-link);
+}
+
+.bank-exchange-rate,
+.bank-exchange-rate > span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: var(--space-10);
+}
+
+.bank-exchange-rate {
+	gap: var(--space-16);
+	padding: var(--space-12) 0;
+	color: var(--paper-heading);
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.bank-exchange-rate img {
+	width: 26px;
+	height: 26px;
+	object-fit: contain;
+}
+
+.bank-exchange-rate > svg {
+	width: 22px;
+	height: 22px;
+	color: var(--paper-muted);
+}

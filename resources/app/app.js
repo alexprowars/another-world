@@ -10,7 +10,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import en from 'dayjs/locale/en';
 import ru from 'dayjs/locale/ru';
-import { createVfm } from 'vue-final-modal';
+import { createModal } from '@kolirt/vue-modal';
 import GameLayout from '~/layouts/Game.vue';
 import { createState, StateSymbol } from '~/composables/useState.js';
 import FloatingVue from 'floating-vue';
@@ -27,7 +27,7 @@ dayjs.extend(relativeTime);
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-	title: (title) => (title ? `${title} - ${appName}` : appName),
+	title: title => (title ? `${title} - ${appName}` : appName),
 	layout: () => {
 		return [GameLayout];
 	},
@@ -36,7 +36,7 @@ createInertiaApp({
 			return {
 				headers: {
 					...options.headers,
-					'Locale': i18n.global.locale.value,
+					Locale: i18n.global.locale.value,
 				},
 			};
 		},
@@ -52,17 +52,17 @@ createInertiaApp({
 		app.use(FloatingVue);
 
 		app.config.globalProperties.$formatDate = (value, format) => {
-			return dayjs(value).tz().format(format)
+			return dayjs(value).tz().format(format);
 		};
 
 		app.config.globalProperties.$formatTime = time;
 
 		app.use(toastPlugin);
 
-		app.use(createVfm());
+		app.use(createModal({ groups: { default: {} } }));
 
-		app.config.errorHandler = (error) => {
+		app.config.errorHandler = error => {
 			console.error(error);
-		}
-	}
+		};
+	},
 });

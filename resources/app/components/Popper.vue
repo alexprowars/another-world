@@ -1,8 +1,8 @@
 <template>
 	<Tooltip v-bind="attrs" placement="top" :triggers="['hover', 'focus', 'touch']" :popper-triggers="['hover']" :aria-id="ariaId">
-		<slot/>
+		<slot />
 		<template #popper="props">
-			<slot name="content" v-bind="props"/>
+			<slot name="content" v-bind="props" />
 		</template>
 	</Tooltip>
 </template>
@@ -12,5 +12,5 @@
 	import { useAttrs, useId } from 'vue';
 
 	const attrs = useAttrs();
-	const ariaId = useId()
+	const ariaId = useId();
 </script>

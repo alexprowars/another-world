@@ -30,7 +30,7 @@ class ChatService
 		$data = [
 			'id' => null,
 			'date' => now()->utc()->toAtomString(),
-			'user' => $from,
+			'user' => $from !== '' ? $from : 'Система',
 			'tou' => [$user->name],
 			'toi' => [$user->id],
 			'text' => $message,

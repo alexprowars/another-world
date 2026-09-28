@@ -6,9 +6,11 @@
 				<b v-else class="date1">{{ $formatDate(item['date'], 'DD MMM HH:mm:ss') }}</b>
 
 				<span v-if="item.user && item.enemy" class="inline-flex" v-html="hitSchema(item.side, item.hits, item.enemy_blocks)"></span>
-				<span v-html="renderComment($formatDate(item['date'], 'DD MMM HH:mm:ss'), item.user, item.side, item.hits, item.damage, item.enemy, item.comment)"></span>
+				<span
+					v-html="renderComment($formatDate(item['date'], 'DD MMM HH:mm:ss'), item.user, item.side, item.hits, item.damage, item.enemy, item.comment)"
+				></span>
 			</div>
-			<hr>
+			<hr />
 		</div>
 	</div>
 </template>
@@ -43,7 +45,7 @@
 			const blocked = block?.[0] === i || block?.[1] === i || block?.[2] === i;
 			const kicked = kick?.[0] === i || kick?.[1] === i;
 			const prefix = side === 0 ? 3 : 4;
-			const suffix = blocked ? (kicked ? 3 : 1) : (kicked ? 2 : 0);
+			const suffix = blocked ? (kicked ? 3 : 1) : kicked ? 2 : 0;
 
 			result += `<img src="/assets/images/battle/log/${prefix}${suffix}.gif" title="${imgHint[i]}">`;
 		}

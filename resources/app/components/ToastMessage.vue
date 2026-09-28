@@ -16,5 +16,5 @@
 
 	defineOptions({
 		inheritAttrs: false,
-	})
+	});
 </script>

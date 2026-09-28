@@ -1,53 +1,44 @@
 <template>
-	<div class="textblock">
-		<p v-if="page.message" class="message mb-4 bg-red-100 text-red-700">{{ page.message }}</p>
+	<section class="person-development">
+		<header class="person-page-heading">
+			<div>
+				<h1>Развитие персонажа</h1>
+				<p>Усильте характеристики за свободные очки.</p>
+			</div>
+			<div class="person-points">
+				<span>Свободные очки</span>
+				<b>{{ user.updates }}</b>
+			</div>
+		</header>
 
-		<div class="flex flex-wrap">
-			<div class="w-full text-center">
-				<div class="bg-[#930407] p-0.5 font-bold text-white">
-					Физические параметры [<u>{{ user.updates }}</u>]
+		<p v-if="page?.message" class="ui-notice ui-notice--blue ui-notice--compact">{{ page.message }}</p>
+		<p v-if="!user.updates" class="person-page-hint">Все очки распределены. Новые очки появятся при повышении уровня.</p>
+
+		<div class="person-upgrade-list">
+			<div v-for="stat in stats" :key="stat" class="person-upgrade-row">
+				<img :src="'/assets/images/stats/' + stat + '.png'" class="person-stat-icon" alt="" />
+				<div class="person-upgrade-description">
+					<h2>{{ $t('stats.' + stat) }}</h2>
+					<p>{{ $t('stats-info.' + stat) }}</p>
 				</div>
+				<b class="person-upgrade-value">{{ user['s_' + stat] || 0 }}</b>
+				<button
+					type="button"
+					class="ui-button ui-button--compact"
+					:disabled="!user.updates || processing"
+					:title="'Увеличить: ' + $t('stats.' + stat)"
+					@click="updateStat(stat)"
+				>
+					+1
+				</button>
 			</div>
 		</div>
-		<table class="w-full">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Параметр</th>
-					<th class="text-center">Текущая прокачка</th>
-					<th class="text-center">Действие</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="stat in ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence']">
-					<td class="align-middle">
-						<img src="/assets/images/help.gif" class="text" v-tooltip="{ content: '<b>' + $t('stats.' + stat) + '</b><br>' + $t('stats-info.' + stat), html: true }">
-					</td>
-					<td class="w-1/3 text-left align-middle">
-						{{ $t('stats.' + stat) }}
-					</td>
-					<td class="w-1/3 text-center align-middle">
-						<b>{{ user[stat] || 0 }}</b> очков
-					</td>
-					<td class="w-1/3 text-center align-middle">
-						<template v-if="user.updates">
-							<button class="px-3 py-1.5 text-xs rounded bg-green-600 text-white hover:bg-green-700" @click.prevent="updateStat(stat)">
-								прокачать
-							</button>
-						</template>
-						<template v-else>
-							нет очков
-						</template>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+	</section>
 </template>
 
 <script setup>
 	import useState from '~/composables/useState.js';
-	import { computed } from 'vue';
+	import { computed, ref } from 'vue';
 	import { openConfirmModal } from '~/composables/useModals.js';
 	import { router } from '@inertiajs/vue3';
 	import { useI18n } from 'vue-i18n';
@@ -55,28 +46,40 @@
 	import PersonLayout from '~/layouts/Person.vue';
 
 	defineOptions({
-		layout: [GameLayout, PersonLayout]
+		layout: [GameLayout, PersonLayout],
 	});
 
-	defineProps({
-		page: Object
-	});
+	defineProps({ page: Object });
 
 	const { t } = useI18n();
-
 	const state = useState();
 	const user = computed(() => state.user);
+	const processing = ref(false);
+	const stats = ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence'];
 
 	function updateStat(stat) {
-		openConfirmModal(
-			'Подтвердите действие',
-			'Увеличить физический параметр ' + t('stats.' + stat) + '?',
-			[{ title: 'Нет' }, {
-				title: 'Да',
+		if (!user.value.updates || processing.value) return;
+
+		openConfirmModal('Увеличить характеристику', 'Потратить 1 очко на параметр «' + t('stats.' + stat) + '»?', [
+			{ title: 'Отмена' },
+			{
+				title: 'Увеличить',
 				handler() {
-					router.post('/person/updates', {
-						update: stat,
-					});
+					if (processing.value) return;
+
+					router.post(
+						'/person/updates',
+						{ update: stat },
+						{
+							preserveScroll: true,
+							onStart: () => {
+								processing.value = true;
+							},
+							onFinish: () => {
+								processing.value = false;
+							},
+						},
+					);
 				},
 			},
 		]);

@@ -1,21 +1,22 @@
 <template>
-	<CityHeader :title="title"/>
-	<div class="textblock">
-		<div v-if="page.flash.message" class="p-4 mb-4 bg-red-100 text-red-600 text-center" v-html="page.flash.message"></div>
-
-		<slot/>
-	</div>
+	<section class="location-card">
+		<CityHeader :title="title">
+			<template v-if="$slots.actions" #actions><slot name="actions" /></template>
+		</CityHeader>
+		<div class="location-card-body">
+			<div v-if="page.flash.message" class="ui-notice ui-notice--blue" role="alert" v-html="page.flash.message"></div>
+			<slot />
+		</div>
+		<footer v-if="$slots.footer" class="location-card-footer"><slot name="footer" /></footer>
+	</section>
 </template>
 
 <script setup>
-	import CityHeader from '~/components/CityHeader.vue';
 	import { usePage } from '@inertiajs/vue3';
+	import CityHeader from '~/components/CityHeader.vue';
 
 	defineProps({
-		title: {
-			type: String,
-			default: '',
-		}
+		title: { type: String, default: '' },
 	});
 
 	const page = usePage();

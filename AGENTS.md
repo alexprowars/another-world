@@ -11,6 +11,8 @@
 
 - Database: MySQL in normal environments, SQLite in-memory for tests via `phpunit.xml`
 - Build assets: `npm run build`
+- Format frontend files: `npm run format -- <file-or-directory>` (for example, `npm run format -- resources/app`)
+- Check frontend formatting: `npm run format:check -- <file-or-directory>`
 - Run tests: `composer test`
 - Run static analysis: `composer analyse`
 - When sandboxing is enabled, run PHPStan without parallel processing by adding `--debug` (for example, `composer analyse -- --debug`), because the parallel runner requires a local TCP socket.
@@ -24,7 +26,11 @@ Use the Composer scripts where available because they encode the project's expec
 - PHP classes use PascalCase; methods and variables use camelCase; constants use UPPER_SNAKE_CASE.
 - Database tables and columns use snake_case. Table names are plural; foreign keys are singular model name plus `_id`.
 - Blade view filenames use snake_case.
+- Format PHP code according to PSR-12, with one exception: use tabs for indentation instead of spaces.
 - PHP and Blade files use tabs for indentation. Follow `.editorconfig` for other file types.
+- Do not write CSS in `.vue` files or add `<style>` blocks to Vue components. Put CSS in separate files under `resources/app/styles` and import them through `resources/app/app.css`.
+- Do not use `aria-*` attributes in markup.
+- Do not add visible outlines to inputs, textareas, selects, or buttons, including their focus states. Keep the shared `outline: none` reset in `resources/app/styles/base.css` to suppress the browser's default focus outline; do not remove it or add component-level outline styles.
 - Do not use variable interpolation in PHP strings. Use single-quoted strings and explicit concatenation instead.
 - Do not add redundant casts when a value already has the required type.
 - Use `empty()` and `!empty()` to check whether an array is empty instead of comparing it with `[]`.

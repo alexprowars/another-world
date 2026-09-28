@@ -1,0 +1,565 @@
+.arena-tabs {
+	margin-bottom: var(--space-24);
+}
+
+.arena-countdown svg {
+	width: 17px;
+	height: 17px;
+	flex-shrink: 0;
+}
+
+.arena-content {
+	display: grid;
+	gap: 28px;
+}
+
+.arena-section,
+.arena-form-body {
+	display: grid;
+	gap: var(--space-16);
+	min-width: 0;
+}
+
+.arena-section-heading,
+.arena-offer-heading,
+.arena-team-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-8) var(--space-16);
+}
+
+.arena-section-heading h2 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 700 18px/1.3 var(--font-interface);
+}
+
+.arena-count,
+.arena-status,
+.arena-team-heading > span {
+	color: var(--paper-muted);
+	font-size: 12px;
+	font-weight: 400;
+}
+
+.arena-count {
+	margin-left: var(--space-6);
+}
+
+.arena-form {
+	container-type: inline-size;
+}
+
+.arena-offer-heading {
+	padding: var(--space-12) var(--space-16);
+	border-bottom: 1px solid var(--paper-border);
+	border-radius: 2px 2px 0 0;
+	background: var(--paper-inset);
+}
+
+.arena-offer-body {
+	padding: var(--space-18);
+}
+
+.arena-form-grid,
+.arena-teams {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-16);
+}
+
+.arena-field {
+	display: grid;
+	align-content: start;
+	gap: var(--space-8);
+	min-width: 0;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.arena-form-options,
+.arena-actions,
+.arena-offer-details {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--space-10) var(--space-20);
+}
+
+.arena-checkbox {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-8);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.arena-checkbox input {
+	width: 16px;
+	height: 16px;
+	accent-color: var(--paper-link);
+}
+
+.arena-hint {
+	margin: 0;
+	color: var(--paper-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.arena-form-body > .ui-button {
+	justify-self: start;
+}
+
+.arena-offer-heading h3 {
+	margin: 0;
+	color: var(--paper-heading);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.arena-countdown {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+.arena-countdown strong {
+	color: var(--paper-link);
+	font-variant-numeric: tabular-nums;
+}
+
+.arena-team {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-12);
+	min-width: 0;
+	padding: var(--space-14);
+	border: 1px solid var(--paper-border);
+	background: var(--paper-stripe);
+}
+
+.arena-team-heading h4 {
+	margin: 0;
+	color: var(--paper-muted);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.arena-members {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-8) var(--space-16);
+	min-width: 0;
+}
+
+.arena-members .personName {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--space-4);
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	padding: 0;
+	background: none;
+	color: var(--paper-muted);
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+.arena-members .personName::before,
+.arena-members .personName::after {
+	display: none;
+}
+
+.arena-members .personName a {
+	min-width: 0;
+	color: var(--paper-link);
+	font-weight: 600;
+}
+
+.arena-members .personName a:hover {
+	color: var(--paper-link-hover);
+}
+
+.arena-team > .ui-button {
+	align-self: start;
+	margin-top: auto;
+}
+
+.arena-offer-details {
+	margin-top: var(--space-16);
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+.arena-offer-details strong {
+	color: var(--paper-text);
+	font-weight: 600;
+}
+
+.arena-offer-comment {
+	margin: var(--space-14) 0 0;
+	padding-left: var(--space-10);
+	border-left: 2px solid var(--paper-border);
+	color: var(--paper-link);
+	font-size: 13px;
+	line-height: 1.5;
+	overflow-wrap: anywhere;
+}
+
+.arena-offer-footer {
+	padding: var(--space-14) var(--space-18);
+	border-top: 1px solid var(--paper-border);
+	background: var(--paper-stripe);
+}
+
+.arena-form-body > .ui-notice {
+	margin-bottom: 0;
+}
+
+@container (max-width: 560px) {
+	.arena-tabs {
+		gap: var(--space-6);
+	}
+
+	.arena-offers .ui-tab {
+		flex: 1 1 auto;
+		gap: var(--space-6);
+		padding: var(--space-10);
+		font-size: 12px;
+	}
+
+	.arena-teams {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.arena-offer-body,
+	.arena-offer-footer {
+		padding: var(--space-14);
+	}
+
+	.arena-actions {
+		align-items: stretch;
+		gap: var(--space-8);
+	}
+
+	.arena-actions > .ui-button {
+		flex: 1 1 auto;
+	}
+}
+
+@container (max-width: 460px) {
+	.arena-form-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.arena-lobby {
+	container-type: inline-size;
+	padding: var(--space-10);
+}
+
+.arena-lobby-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-16);
+	margin-bottom: 22px;
+	padding-bottom: var(--space-20);
+	border-bottom: 1px solid var(--paper-border);
+}
+
+.arena-lobby-heading h1 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 700 24px/1.2 var(--font-interface);
+}
+
+.arena-lobby-heading p,
+.arena-lobby-hospital p {
+	margin: var(--space-8) 0 0;
+	color: var(--paper-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.arena-lobby-rooms {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-16);
+}
+
+.arena-lobby-room {
+	display: flex;
+	flex-direction: column;
+}
+
+.arena-lobby-room-heading {
+	display: flex;
+	align-items: center;
+	gap: var(--space-14);
+	padding: var(--space-20) var(--space-20) 0;
+}
+
+.arena-lobby h2 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 600 17px/1.3 var(--font-interface);
+}
+
+.arena-lobby-room-heading > div:last-child {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.arena-lobby-level {
+	display: block;
+	margin-top: var(--space-6);
+	color: var(--paper-muted);
+	font-size: 11px;
+}
+
+.arena-lobby-description {
+	flex: 1;
+	margin: var(--space-14) var(--space-20) var(--space-20);
+	color: var(--paper-muted);
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.arena-lobby-room-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-14);
+	padding: var(--space-14) var(--space-20);
+	border-top: 1px solid var(--paper-border);
+	border-radius: 0 0 3px 3px;
+	background: var(--paper-stripe);
+}
+
+.arena-lobby-population {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-6);
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+.arena-lobby-population svg {
+	width: 16px;
+	height: 16px;
+}
+
+.arena-lobby-population--occupied {
+	color: var(--paper-success);
+}
+
+.arena-lobby-population strong {
+	font-variant-numeric: tabular-nums;
+}
+
+.arena-lobby-hospital {
+	display: flex;
+	align-items: center;
+	gap: var(--space-14);
+	margin-top: var(--space-18);
+	padding: var(--space-18) var(--space-20);
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-stripe);
+}
+
+.arena-lobby-hospital .ui-emblem {
+	color: var(--resource-health);
+}
+
+.arena-lobby-hospital-copy {
+	flex: 1;
+	min-width: 0;
+}
+
+@container (max-width: 640px) {
+	.arena-lobby-rooms {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.arena-lobby-hospital {
+		flex-wrap: wrap;
+	}
+
+	.arena-lobby-hospital .ui-button {
+		width: 100%;
+	}
+}
+
+.training-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
+	align-items: start;
+	gap: var(--space-24);
+}
+
+.training-roster {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.training-opponent {
+	display: flex;
+	align-items: center;
+	gap: var(--space-14);
+	padding: var(--space-18);
+}
+
+.training-opponent + .training-opponent {
+	border-top: 1px solid var(--paper-border);
+}
+
+.training-opponent:nth-child(even) {
+	background: var(--paper-stripe);
+}
+
+.training-opponent-info {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.training-opponent-label,
+.training-opponent-level {
+	display: block;
+	color: var(--paper-muted);
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.training-opponent-info h3 {
+	margin: var(--space-4) 0;
+	color: var(--paper-heading);
+	font: 600 16px/1.4 var(--font-interface);
+}
+
+.training-opponent > .ui-button {
+	flex-shrink: 0;
+}
+
+.training-guide {
+	min-width: 0;
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-stripe);
+}
+
+.training-guide-heading {
+	display: flex;
+	align-items: center;
+	gap: var(--space-10);
+	padding: var(--space-16) var(--space-18);
+	border-bottom: 1px solid var(--paper-border);
+	background: var(--paper-inset);
+	border-radius: 3px 3px 0 0;
+}
+
+.training-guide-heading svg,
+.training-guide-tip svg {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	color: var(--paper-link);
+}
+
+.training-guide-heading h2 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 600 16px/1.3 var(--font-interface);
+}
+
+.training-steps {
+	display: grid;
+	gap: var(--space-20);
+	margin: 0;
+	padding: var(--space-20) var(--space-18);
+	list-style: none;
+	counter-reset: training-step;
+}
+
+.training-steps li {
+	position: relative;
+	padding-left: 40px;
+	counter-increment: training-step;
+}
+
+.training-steps li::before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-highlight);
+	color: var(--paper-link);
+	font-size: 12px;
+	font-weight: 700;
+	content: counter(training-step);
+}
+
+.training-steps h3 {
+	margin: var(--space-2) 0 var(--space-6);
+	color: var(--paper-heading);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.training-steps p,
+.training-guide-tip p {
+	margin: 0;
+	color: var(--paper-muted);
+	font-size: 12px;
+	line-height: 1.7;
+}
+
+.training-guide-tip {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-10);
+	padding: var(--space-16) var(--space-18);
+	border-top: 1px solid var(--paper-border);
+}
+
+.training-guide-tip svg {
+	margin-top: var(--space-2);
+}
+
+.training-return {
+	margin-top: var(--space-20);
+}
+
+@container (max-width: 800px) {
+	.training-layout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@container (max-width: 460px) {
+	.training-opponent {
+		flex-wrap: wrap;
+		padding: var(--space-14);
+	}
+
+	.training-opponent > .ui-button {
+		width: 100%;
+	}
+}

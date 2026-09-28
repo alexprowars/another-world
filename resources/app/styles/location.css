@@ -1,0 +1,323 @@
+.game-stage-content:has(> .location-card) {
+	min-width: 0;
+}
+
+.location-card {
+	container-type: inline-size;
+	margin: var(--space-8);
+	border: 1px solid var(--shell-line);
+	border-radius: 5px;
+	background: var(--paper-panel);
+	color: var(--paper-text);
+	box-shadow: 0 4px 14px var(--shadow-panel);
+}
+
+.location-card-header {
+	display: flex;
+	align-items: center;
+	gap: var(--space-12);
+	min-height: 46px;
+	padding: var(--space-6) var(--space-16);
+	border-bottom: 3px double var(--shell-line);
+	border-radius: 4px 4px 0 0;
+	background: linear-gradient(110deg, var(--shell-panel), var(--shell-bg));
+	color: var(--shell-text);
+}
+
+.location-card-heading {
+	flex: 1;
+	min-width: 0;
+	margin: 0;
+	color: var(--shell-text);
+	font: 700 18px/1.25 var(--font-interface);
+}
+
+.location-card-actions {
+	display: flex;
+	flex-shrink: 0;
+	gap: var(--space-8);
+}
+
+.location-card-body {
+	padding: var(--space-24);
+	background: linear-gradient(90deg, var(--paper-stripe), transparent 20%, transparent 80%, var(--paper-stripe));
+}
+
+.location-card-footer {
+	display: flex;
+	align-items: center;
+	gap: var(--space-10);
+	padding: var(--space-14) var(--space-24);
+	border-top: 1px solid var(--paper-border);
+	color: var(--paper-muted);
+	background: var(--paper-stripe);
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.location-card-footer svg {
+	width: 17px;
+	height: 17px;
+	flex-shrink: 0;
+}
+
+.works-board-heading {
+	margin-bottom: 22px;
+}
+
+.works-board-heading h2,
+.works-active h2 {
+	margin: 0;
+	color: var(--paper-heading);
+	font: 700 24px/1.2 var(--font-interface);
+}
+
+.works-group {
+	overflow: hidden;
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-highlight);
+}
+
+.works-group + .works-group {
+	margin-top: var(--space-18);
+}
+
+.works-group-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-10) var(--space-20);
+	padding: var(--space-12) var(--space-16);
+	border-bottom: 1px solid var(--paper-border);
+	background: var(--paper-inset);
+}
+
+.works-group-heading h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--space-10);
+	margin: 0;
+	color: var(--paper-heading);
+	font: 700 17px/1.3 var(--font-interface);
+}
+
+.works-group-heading svg,
+.works-stat-value svg {
+	width: 17px;
+	height: 17px;
+	flex-shrink: 0;
+}
+
+.works-requirements {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-6) var(--space-16);
+	color: var(--paper-text);
+	font-size: 11px;
+}
+
+.works-requirements > span {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-6);
+}
+
+.works-requirements svg {
+	width: 14px;
+	height: 14px;
+	color: var(--paper-muted);
+}
+
+.works-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.works-entry {
+	display: grid;
+	grid-template-columns: minmax(140px, 1fr) minmax(125px, 0.5fr) minmax(90px, 0.4fr) auto;
+	align-items: center;
+	gap: var(--space-20);
+	padding: var(--space-18) var(--space-16);
+}
+
+.works-entry + .works-entry {
+	border-top: 1px solid var(--paper-border);
+}
+
+.works-entry:nth-child(even) {
+	background: var(--paper-stripe);
+}
+
+.works-entry-title {
+	display: flex;
+	align-items: center;
+	gap: var(--space-12);
+	min-width: 0;
+}
+
+.works-entry-number {
+	color: var(--paper-muted);
+	font: 18px/1 var(--font-interface);
+}
+
+.works-entry-title h4 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.works-entry-stat {
+	display: grid;
+	gap: var(--space-6);
+}
+
+.works-stat-label {
+	color: var(--paper-muted);
+	font-size: 10px;
+}
+
+.works-stat-value {
+	display: flex;
+	align-items: center;
+	gap: var(--space-6);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+
+.works-stat-value svg {
+	color: var(--paper-muted);
+}
+
+.works-reward,
+.works-reward svg {
+	color: var(--paper-link);
+}
+
+.works-active {
+	padding: var(--space-24) 0 var(--space-32);
+	text-align: center;
+}
+
+.works-active-seal {
+	display: grid;
+	place-items: center;
+	width: 64px;
+	height: 64px;
+	margin: 0 auto var(--space-20);
+	border: 3px double var(--paper-border);
+	border-radius: 50%;
+	background: var(--paper-highlight);
+	color: var(--paper-link);
+}
+
+.works-active-seal svg {
+	width: 28px;
+	height: 28px;
+}
+
+.works-active-description {
+	margin: var(--space-10) 0 var(--space-24);
+	color: var(--paper-muted);
+	font-size: 13px;
+}
+
+.works-active-details {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: var(--space-24) 48px;
+	max-width: 560px;
+	margin: auto;
+	padding: var(--space-24);
+	border-block: 1px solid var(--paper-border);
+	background: var(--paper-stripe);
+}
+
+.works-active-stat > span {
+	color: var(--paper-muted);
+	font-size: 11px;
+}
+
+.works-countdown,
+.works-active-reward {
+	margin-top: var(--space-8);
+	color: var(--paper-link);
+	font: 700 28px/1.2 var(--font-interface);
+	font-variant-numeric: tabular-nums;
+}
+
+.works-countdown {
+	font-family: ui-monospace, 'Menlo', 'Consolas', monospace;
+}
+
+.works-active-reward {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-8);
+}
+
+.works-active-reward svg {
+	width: 24px;
+	height: 24px;
+}
+
+.works-active-reward small {
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.works-empty {
+	margin: 0;
+	padding: var(--space-24) var(--space-16);
+	color: var(--paper-muted);
+	font-size: 13px;
+	text-align: center;
+}
+
+@container (max-width: 700px) {
+	.location-card-body {
+		padding: var(--space-18) var(--space-14);
+	}
+
+	.location-card-footer {
+		padding: var(--space-12) var(--space-14);
+	}
+
+	.works-entry {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+		gap: var(--space-14);
+	}
+
+	.works-entry-title {
+		grid-column: 1 / -1;
+	}
+}
+
+@container (max-width: 460px) {
+	.location-card-header {
+		gap: var(--space-8);
+		padding-inline: var(--space-12);
+	}
+
+	.location-card-heading {
+		font-size: 16px;
+	}
+
+	.location-card-actions {
+		gap: var(--space-6);
+	}
+
+	.works-entry {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.works-entry .ui-button {
+		grid-column: 1 / -1;
+	}
+}

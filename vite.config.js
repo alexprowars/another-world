@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
+import svgLoader from 'vite-svg-loader';
 import inertia from '@inertiajs/vite';
 import { resolve } from 'path';
 
@@ -21,6 +22,7 @@ export default defineConfig({
 			//refresh: true,
 		}),
 		tailwindcss(),
+		svgLoader(),
 		vue({
 			template: {
 				transformAssetUrls: {
@@ -28,8 +30,8 @@ export default defineConfig({
 					includeAbsolute: false,
 				},
 				compilerOptions: {
-					whitespace: 'preserve'
-				}
+					whitespace: 'preserve',
+				},
 			},
 		}),
 		inertia({
