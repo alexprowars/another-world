@@ -11,7 +11,8 @@ export default {
 			pauseOnHover: false,
 			pauseOnFocusLoss: false,
 			dangerouslyHTMLString: true,
-			theme: 'auto',
+			theme: 'light',
+			transition: toast.TRANSITIONS.SLIDE,
 		});
 
 		router.on('flash', event => {

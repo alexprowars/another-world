@@ -1,10 +1,10 @@
 <template>
-	<div>
+	<div class="battle-member" :class="{ 'battle-member--finished': user.finished }">
 		<a href="#" @click.prevent="toUser" @contextmenu.prevent="toPrivate">
-			<span style="color: #cfa87a">{{ user.name }} [{{ user.level }}]</span>
+			<span>{{ user.name }} [{{ user.level }}]</span>
 		</a>
-		<span :style="{ color: user.finished ? 'red' : 'black' }">
-			<small>[{{ user.hp }} HP]</small>
+		<span class="battle-member__health">
+			<small>{{ user.hp }} HP</small>
 		</span>
 	</div>
 </template>

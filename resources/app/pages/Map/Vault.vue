@@ -130,12 +130,19 @@
 	import Timer from '~/components/Timer.vue';
 	import useState from '~/composables/useState.js';
 
-	defineProps({ page: Object });
+	defineProps({
+		page: Object
+	});
 
 	const state = useState();
+
 	const user = computed(() => state.user);
 	const busy = computed(() => !!user.value.r_date || !!user.value.r_type);
-	const form = useForm({ captcha: '' });
+
+	const form = useForm({
+		captcha: ''
+	});
+
 	const directions = [
 		{ key: 'top', label: 'Вперёд', position: 'vault-direction--top' },
 		{ key: 'left', label: 'Налево', position: 'vault-direction--left' },
@@ -144,7 +151,10 @@
 	];
 
 	function act(data) {
-		if (form.processing) return;
+		if (form.processing) {
+			return;
+		}
+
 		form.clearErrors();
 		form.transform(() => data).post('/map', { onFinish: () => form.reset() });
 	}

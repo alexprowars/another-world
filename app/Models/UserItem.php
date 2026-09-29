@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int|null $position
+ */
 class UserItem extends Model
 {
 	protected $table = 'users_items';
@@ -22,16 +25,6 @@ class UserItem extends Model
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
-	}
-
-	public function getPosition()
-	{
-		return $this->position;
-	}
-
-	public function setPosition($i)
-	{
-		$this->position = $i;
 	}
 
 	public function getSellPrice(): float

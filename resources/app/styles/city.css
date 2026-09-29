@@ -108,11 +108,6 @@
 	background: var(--shell-tint-hover);
 	box-shadow: inset 0 0 0 1px var(--shell-gold);
 }
-.city-location .city-location-building:focus-visible {
-	outline: 2px solid var(--shell-gold);
-	outline-offset: -2px;
-	border-radius: 3px;
-}
 
 .city-location .city-location-map-number {
 	position: absolute;
@@ -209,11 +204,6 @@
 	border-color: var(--paper-link);
 	background: var(--paper-highlight);
 	color: var(--paper-link);
-}
-.city-location .city-location-place:focus-visible,
-.city-location .city-location-route:focus-visible {
-	outline: 2px solid var(--paper-link);
-	outline-offset: 3px;
 }
 .city-location .city-location-travel {
 	display: grid;

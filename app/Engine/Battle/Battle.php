@@ -3,6 +3,7 @@
 namespace App\Engine\Battle;
 
 use App\Exceptions\Exception;
+use App\Http\Resources\BattleLogResource;
 use App\Models\BattleLog;
 use App\Models\BattleMember;
 use App\Models\Level;
@@ -13,7 +14,7 @@ use App\Services\BattleService;
 use App\Services\ChatService;
 use Illuminate\Support\Facades\DB;
 
-define('PRECESSION', '100000');
+define('PRECESSION', 100000);
 // STATS_VS_MOD - параметр, задающий соотношение между статами и модификаторами. 1 стат = r модификаторов.
 // STATS_VS_HP - параметр, задающий соотношение между статами и хитпоинтами. 1 стат = hp хитпоинтов.
 // DAM_AVE - параметр, задающий соотношение между статами и средним уроном. 1 стат = dam_ave урона.
@@ -377,22 +378,7 @@ class Battle
 			->when($pendingLogId !== null, fn($query) => $query->where('id', '<', $pendingLogId))
 			->get();
 
-		foreach ($lastLogs as $turn) {
-			$json['logs'][] = [
-				'id' => $turn->id,
-				'date' => $turn->date->toAtomString(),
-				'round' => $turn->round,
-				'user' => $turn->member->user->name ?? null,
-				'side' => $turn->member->side,
-				'hits' => $turn->hit,
-				'damage' => $turn->damage,
-				'blocks' => $turn->block,
-				'enemy' => $turn->enemy->user->name ?? null,
-				'enemy_blocks' => $turn->enemy_block,
-				'comment' => $turn->comment_id,
-				'my' => $this->user->is($turn->member->user) || $this->user->is($turn->enemy?->user),
-			];
-		}
+		$json['logs'] = BattleLogResource::collection($lastLogs)->resolve();
 
 		return $json;
 	}

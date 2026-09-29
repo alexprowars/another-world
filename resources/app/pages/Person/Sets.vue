@@ -20,6 +20,11 @@
 	import InventoryNavigation from '~/components/Person/InventoryNavigation.vue';
 	import Sets from '~/components/Person/Sets.vue';
 
-	defineOptions({ layout: [GameLayout, PersonLayout] });
-	defineProps({ page: Object });
+	defineOptions({
+		layout: [GameLayout, PersonLayout]
+	});
+
+	defineProps({
+		page: Object
+	});
 </script>

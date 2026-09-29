@@ -205,15 +205,28 @@
 	import Name from '~/components/Person/Name.vue';
 	import SellItem from '~/components/City/Shop/SellItem.vue';
 
-	const props = defineProps({ page: Object });
-	const moneyForm = useForm({ action: 'deposit', amount: '' });
-	const memberForm = useForm({ action: 'add', name: '', rank: 0 });
+	const props = defineProps({
+		page: Object
+	});
+
+	const moneyForm = useForm({
+		action: 'deposit',
+		amount: ''
+	});
+
+	const memberForm = useForm({
+		action: 'add',
+		name: '',
+		rank: 0
+	});
+
 	const settingsForm = useForm({
 		action: 'settings',
 		about: props.page.tribe?.about ?? '',
 		laws: props.page.tribe?.laws ?? '',
 		url: props.page.tribe?.url ?? '',
 	});
+
 	const busy = computed(() => moneyForm.processing || memberForm.processing || settingsForm.processing);
 	const availableRanks = computed(() => props.page.ranks.filter(rank => rank.id !== 1 && (props.page.permissions.leader || ![2, 3, 5].includes(rank.id))));
 	const website = computed(() => (/^https?:\/\//i.test(props.page.tribe?.url ?? '') ? props.page.tribe.url : null));
@@ -229,20 +242,40 @@
 	}
 
 	function submitMoney() {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		clearErrors();
-		moneyForm.post('/tribe', { preserveScroll: true, onSuccess: () => moneyForm.reset() });
+
+		moneyForm.post('/tribe', {
+			preserveScroll: true,
+			onSuccess: () => moneyForm.reset()
+		});
 	}
 
 	function submitMember() {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		clearErrors();
-		memberForm.post('/tribe', { preserveScroll: true, onSuccess: () => memberForm.reset() });
+
+		memberForm.post('/tribe', {
+			preserveScroll: true,
+			onSuccess: () => memberForm.reset()
+		});
 	}
 
 	function submitSettings() {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		clearErrors();
-		settingsForm.post('/tribe', { preserveScroll: true });
+
+		settingsForm.post('/tribe', {
+			preserveScroll: true
+		});
 	}
 </script>

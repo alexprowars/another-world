@@ -1,16 +1,18 @@
 <template>
-	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	<svg class="game-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 		<path :d="paths[name] || paths.shield" />
 	</svg>
 </template>
 
 <script setup>
-	defineProps({ name: String });
+	defineProps({
+		name: String
+	});
 
 	const paths = {
 		city: 'M2 21V7l3-4 3 4v14M2 8h6M16 21V7l3-4 3 4v14M16 8h6M8 11V9h3v2h2V9h3M10 21v-5a2 2 0 0 1 4 0v5M5 12v2m14-2v2M1 21h22',
 		character: 'M5 10V9a7 7 0 0 1 14 0v1M4 10h16l-1 8-7 4-7-4-1-8ZM12 2v8M4 10l8 3 8-3M12 13v9M8 14v3m8-3v3',
-		shield: 'M12 3 3 6v6c0 5 9 9 9 9s9-4 9-9V6l-9-3ZM9 12l2 2 4-4',
+		shield: 'M5 3h14v7c0 5-3 8-7 11-4-3-7-6-7-11V3Z',
 		clan: 'M5 21V3m0 1h14v13l-7-4-7 4',
 		justice: 'M12 3v17M7 21h10M3 7h18M6 7l-4 8a4 4 0 0 0 8 0L6 7Zm12 0-4 8a4 4 0 0 0 8 0l-4-8Z',
 		armor: 'M8 3 3 6l2 6 2-1-1 10h12l-1-10 2 1 2-6-5-3c0 4-8 4-8 0ZM7 16h10M12 7v9',

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Facades\Vars;
+use App\Models\Effect;
 use App\Models\Level;
 use App\Models\User;
 use App\Services\UserService;
@@ -47,6 +48,7 @@ class UserResource extends JsonResource
 			'level' => $user->level,
 			'level_up' => $up,
 			'slots' => $user->getSlotsInfo(),
+			'statuses' => $this->statuses(),
 			'exp' => $user->exp,
 			'profession' => $user->profession,
 			'gold' => $user->gold,
@@ -100,5 +102,62 @@ class UserResource extends JsonResource
 		}
 
 		return $data;
+	}
+
+	private function statuses(): array
+	{
+		$statuses = [];
+
+		$attributes = [
+			'silence' => ['Чат', 'Запрещено общение в чате'],
+			'injury' => ['Травма', 'Персонаж травмирован'],
+			'invisible' => ['Тень', 'Невидимость'],
+			'attack_protection_until' => ['Защита', 'Защита от нападения'],
+			'magic_protection_until' => ['Защита', 'Защита от магии'],
+			'vampire_protection_until' => ['Защита', 'Защита от вампиров'],
+		];
+
+		foreach ($attributes as $attribute => [$label, $title]) {
+			$until = $this->resource->{$attribute};
+
+			if (!$until?->isFuture()) {
+				continue;
+			}
+
+			$statuses[] = [
+				'id' => $attribute,
+				'label' => $label,
+				'title' => $title,
+				'until' => $until->toAtomString(),
+			];
+		}
+
+		$effects = $this->resource->effects()
+			->whereFuture('date')
+			->orderBy('id')
+			->get();
+
+		foreach ($effects as $effect) {
+			$label = match ($effect->type) {
+				Effect::AURA => 'Аура',
+				Effect::POTION => 'Зелье',
+				Effect::INJURY => 'Травма',
+				Effect::POISON => 'Отравление',
+				default => null,
+			};
+
+			if (!$label) {
+				continue;
+			}
+
+			$statuses[] = [
+				'id' => 'effect_' . $effect->id,
+				'label' => $label,
+				'title' => $label,
+				'until' => $effect->date?->toAtomString(),
+			];
+		}
+
+		return $statuses;
 	}
 }

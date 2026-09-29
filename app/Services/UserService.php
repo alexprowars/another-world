@@ -135,7 +135,7 @@ class UserService
 	public static function getUserRaiting(User $user): int
 	{
 		// Вычисление рейтинга крутизны (цена вещей, статы, процент побед)
-		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->power - 13;
+		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->magic - 13;
 		$b = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
 
 		return (int) round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
@@ -168,8 +168,6 @@ class UserService
 
 		/** @var Effect $effect */
 		foreach ($effects as $effect) {
-			//$user->auraInfo[] = $effect;
-
 			foreach (Vars::getStats() as $stat) {
 				if (isset($effect[$stat])) {
 					$user->{$stat} += $effect[$stat];
@@ -183,8 +181,6 @@ class UserService
 			$user->armor5 += $effect->armor5 ?? 0;
 			$user->min += $effect->min ?? 0;
 			$user->max += $effect->max ?? 0;
-
-			$user->effects++;
 		}
 		// Конец эффектов
 
@@ -198,10 +194,10 @@ class UserService
 		$user->hp_max = $user->vitality * 5 + $user->hp;
 		$user->hp_now = min($user->hp_now, $user->hp_max);
 
-		$user->energy_max = ceil($user->magic * 5 + $user->energy);
+		$user->energy_max = (int) ceil($user->magic * 5 + $user->energy);
 		$user->energy_now = min($user->energy_now, $user->energy_max);
 
-		$user->stamina_max = max(0, ($user->vitality + $effects->sum('battery')) * 20);
+		$user->stamina_max = (int) max(0, ($user->vitality + $effects->sum('battery')) * 20);
 		$user->stamina_now = min($user->stamina_now, $user->stamina_max);
 
 		// Модификаторы зависят от характеристик после применения зелий и штрафов.

@@ -23,20 +23,31 @@
 
 <script setup>
 	import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+	import { useLocalStorage } from '@vueuse/core';
 	import OnlineUser from './OnlineUser.vue';
 	import { useHttp } from '@inertiajs/vue3';
 
 	const emit = defineEmits(['player', 'private']);
 	const users = ref([]);
-	const sort = ref('name');
+	const sort = useLocalStorage('game.chat.sort', 'name', { initOnMounted: true });
 	const loading = ref(false);
 	const error = ref('');
 
 	let refreshTimer;
 
-	const visibleUsers = computed(() =>
-		users.value.toSorted((a, b) => (sort.value === 'level' ? (Number(b.level) || 0) - (Number(a.level) || 0) : a.name.localeCompare(b.name, 'ru'))),
-	);
+	const visibleUsers = computed(() => {
+		return users.value.toSorted((a, b) => {
+			if (sort.value === 'level') {
+				const levelDifference = (Number(b.level) || 0) - (Number(a.level) || 0);
+
+				if (levelDifference !== 0) {
+					return levelDifference;
+				}
+			}
+
+			return a.name.localeCompare(b.name, 'ru');
+		});
+	});
 
 	defineExpose({
 		refresh: loadChatList,

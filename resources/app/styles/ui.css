@@ -33,8 +33,7 @@ a.ui-button {
 	cursor: pointer;
 }
 
-.ui-button:hover:not(:disabled),
-.ui-button:focus-visible:not(:disabled) {
+.ui-button:hover:not(:disabled) {
 	background: var(--shell-button-hover);
 	color: var(--shell-button-text);
 	text-decoration: none;
@@ -55,8 +54,7 @@ a.ui-button--secondary {
 	box-shadow: none;
 }
 
-.ui-button--secondary:hover:not(:disabled),
-.ui-button--secondary:focus-visible:not(:disabled) {
+.ui-button--secondary:hover:not(:disabled) {
 	background: var(--paper-inset);
 	color: var(--paper-link);
 }
@@ -79,8 +77,7 @@ a.ui-button--secondary {
 	cursor: pointer;
 }
 
-.ui-text-button:hover:not(:disabled),
-.ui-text-button:focus-visible:not(:disabled) {
+.ui-text-button:hover:not(:disabled) {
 	color: var(--paper-link-hover);
 	text-decoration: underline;
 }
@@ -101,8 +98,7 @@ a.ui-icon-button {
 	cursor: pointer;
 }
 
-.ui-icon-button:hover:not(:disabled),
-.ui-icon-button:focus-visible:not(:disabled) {
+.ui-icon-button:hover:not(:disabled) {
 	border-color: var(--shell-gold);
 	background: var(--shell-tint-hover);
 	color: var(--shell-text);
@@ -114,8 +110,7 @@ a.ui-icon-button {
 	color: var(--shell-muted);
 }
 
-.ui-icon-button--quiet:hover:not(:disabled),
-.ui-icon-button--quiet:focus-visible:not(:disabled) {
+.ui-icon-button--quiet:hover:not(:disabled) {
 	border-color: transparent;
 }
 
@@ -159,8 +154,7 @@ a.ui-tab {
 	cursor: pointer;
 }
 
-.ui-tab:hover,
-.ui-tab:focus-visible {
+.ui-tab:hover {
 	background: var(--paper-highlight);
 	color: var(--paper-link);
 }
@@ -208,8 +202,7 @@ a.ui-menu-link {
 	text-decoration: none;
 }
 
-.ui-menu-link:hover,
-.ui-menu-link:focus-visible {
+.ui-menu-link:hover {
 	background: var(--paper-highlight);
 	color: var(--paper-link);
 }

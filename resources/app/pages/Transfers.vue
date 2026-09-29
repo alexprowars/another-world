@@ -79,21 +79,46 @@
 	import Name from '~/components/Person/Name.vue';
 	import SellItem from '~/components/City/Shop/SellItem.vue';
 
-	const props = defineProps({ page: Object });
-	const searchForm = useForm({ login: props.page.login });
-	const goldForm = useForm({ action: 'gold', recipient_id: null, amount: '', comment: '' });
-	const itemForm = useForm({ action: 'item', recipient_id: null, item_id: null });
+	const props = defineProps({
+		page: Object
+	});
+
+	const searchForm = useForm({
+		login: props.page.login
+	});
+
+	const goldForm = useForm({
+		action: 'gold',
+		recipient_id: null,
+		amount: '',
+		comment: ''
+	});
+
+	const itemForm = useForm({
+		action: 'item',
+		recipient_id: null,
+		item_id: null
+	});
+
 	const busy = computed(() => searchForm.processing || goldForm.processing || itemForm.processing);
 
 	function findRecipient() {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
+
 		searchForm.get('/transfers');
 	}
 
 	function transferGold() {
-		if (busy.value || !props.page.recipient) return;
+		if (busy.value || !props.page.recipient) {
+			return;
+		}
+
 		goldForm.recipient_id = props.page.recipient.id;
+
 		itemForm.clearErrors();
+
 		goldForm.post('/transfers', {
 			preserveScroll: true,
 			onSuccess: () => goldForm.reset('amount', 'comment'),
@@ -101,10 +126,17 @@
 	}
 
 	function transferItem(item) {
-		if (busy.value || !props.page.recipient) return;
+		if (busy.value || !props.page.recipient) {
+			return;
+		}
+
 		itemForm.recipient_id = props.page.recipient.id;
 		itemForm.item_id = item.id;
+
 		goldForm.clearErrors();
-		itemForm.post('/transfers', { preserveScroll: true });
+
+		itemForm.post('/transfers', {
+			preserveScroll: true
+		});
 	}
 </script>

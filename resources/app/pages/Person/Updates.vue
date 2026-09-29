@@ -49,7 +49,9 @@
 		layout: [GameLayout, PersonLayout],
 	});
 
-	defineProps({ page: Object });
+	defineProps({
+		page: Object
+	});
 
 	const { t } = useI18n();
 	const state = useState();
@@ -58,14 +60,18 @@
 	const stats = ['strength', 'dexterity', 'agility', 'vitality', 'magic', 'intelligence'];
 
 	function updateStat(stat) {
-		if (!user.value.updates || processing.value) return;
+		if (!user.value.updates || processing.value) {
+			return;
+		}
 
 		openConfirmModal('Увеличить характеристику', 'Потратить 1 очко на параметр «' + t('stats.' + stat) + '»?', [
 			{ title: 'Отмена' },
 			{
 				title: 'Увеличить',
 				handler() {
-					if (processing.value) return;
+					if (processing.value) {
+						return;
+					}
 
 					router.post(
 						'/person/updates',

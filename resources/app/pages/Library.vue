@@ -165,13 +165,22 @@
 	import ItemCard from '~/components/Library/ItemCard.vue';
 	import Modifiers from '~/components/Library/Modifiers.vue';
 
-	const props = defineProps({ page: { type: Object, required: true } });
+	const props = defineProps({
+		page: {
+			type: Object,
+			required: true
+		}
+	});
+
 	const search = ref('');
 	const isCatalog = computed(() => Array.isArray(props.page.items));
 	const activeGroup = computed(() => props.page.groups.find(group => group.sections.some(section => section.id === props.page.section))?.title);
+
 	const filteredItems = computed(() => {
 		const query = search.value.trim().toLocaleLowerCase('ru');
-		return (props.page.items ?? []).filter(entry => entry.item.title.toLocaleLowerCase('ru').includes(query));
+
+		return (props.page.items ?? [])
+			.filter(entry => entry.item.title.toLocaleLowerCase('ru').includes(query));
 	});
 
 	watch(

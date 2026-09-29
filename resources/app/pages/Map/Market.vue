@@ -155,11 +155,21 @@
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
-	const props = defineProps({ page: Object });
+	const props = defineProps({
+		page: Object
+	});
+
 	const state = useState();
 	const user = computed(() => state.user);
+
 	const prices = reactive({});
-	const form = useForm({ action: '', id: null, price: null });
+
+	const form = useForm({
+		action: '',
+		id: null,
+		price: null
+	});
+
 	const groups = [
 		{ title: 'Оружие', sections: [[1, 'Оружие']] },
 		{
@@ -204,18 +214,32 @@
 		},
 	];
 	const sectionTitle = computed(() => {
-		if (props.page.section === 100) return 'Выставить предмет на продажу';
-		if (props.page.section === 101) return 'Мои товары';
-		return groups.flatMap(group => group.sections).find(([id]) => id === props.page.section)?.[1] || 'Новые поступления';
+		if (props.page.section === 100) {
+			return 'Выставить предмет на продажу';
+		}
+
+		if (props.page.section === 101) {
+			return 'Мои товары';
+		}
+
+		return groups.flatMap(group => group.sections)
+			.find(([id]) => id === props.page.section)?.[1] || 'Новые поступления';
 	});
 
 	function submit(action, id, price = null) {
-		if (form.processing) return;
+		if (form.processing) {
+			return;
+		}
+
 		form.action = action;
 		form.id = id;
 		form.price = price;
+
 		form.clearErrors();
-		form.post('/map?section=' + props.page.section, { preserveScroll: true });
+
+		form.post('/map?section=' + props.page.section, {
+			preserveScroll: true
+		});
 	}
 
 	function sell(entry) {

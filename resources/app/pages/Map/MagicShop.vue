@@ -13,7 +13,12 @@
 <script setup>
 	import Storefront from '~/components/City/Shop/Storefront.vue';
 
-	defineProps({ page: { type: Object, required: true } });
+	defineProps({
+		page: {
+			type: Object,
+			required: true
+		}
+	});
 
 	const departments = [
 		{

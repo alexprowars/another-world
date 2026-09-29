@@ -13,7 +13,9 @@
 <script setup>
 	import CityLocation from '~/components/City/CityLocation.vue';
 
-	defineProps({ page: Object });
+	defineProps({
+		page: Object
+	});
 
 	const map = {
 		image: 'street1.jpg',

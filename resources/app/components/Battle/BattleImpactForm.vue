@@ -2,62 +2,61 @@
 	<div class="battle-impact-form text-center">
 		<div class="battle-impact-form__header">
 			<div class="battle-impact-form__column battle-impact-form__column--impact">
-				<b>
-					<small>
-						<a href="#" @click.prevent="randomFill('impact')">Атака</a>
-						&nbsp;(
-						<span id="colImp">{{ impactsLeft }}</span>
-						)
-					</small>
-				</b>
+				<button type="button" class="battle-impact-form__heading" title="Выбрать случайные зоны атаки" @click="randomFill('impact')">
+					<GameIcon name="swords" /> Атака <span id="colImp">{{ impactsLeft }}</span>
+				</button>
 			</div>
 			<div class="battle-impact-form__column battle-impact-form__column--block">
-				<b>
-					<small>
-						<a href="#" @click.prevent="randomFill('block')">Защита</a>
-						(
-						<span id="colbl">{{ blocksLeft }}</span>
-						)
-					</small>
-				</b>
+				<button type="button" class="battle-impact-form__heading" title="Выбрать случайные зоны защиты" @click="randomFill('block')">
+					<GameIcon name="shield" /> Защита <span id="colbl">{{ blocksLeft }}</span>
+				</button>
 			</div>
 		</div>
 		<div class="battle-impact-form__body">
 			<div class="battle-impact-form__column battle-impact-form__column--impact">
 				<div class="battle-impact-form__areas">
-					<div
+					<button
 						v-for="area in areas"
+						:key="area.key"
+						type="button"
 						class="battle-impact-form__area"
+						:class="{ 'is-selected': selectedImpacts[area.key] }"
+						:title="area.title + (selectedImpacts[area.key] ? ' — выбрано' : '')"
 						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
 						@click="toggleImpact(area.key)"
 					>
 						<img :src="`/assets/images/battle/impact_action_${selectedImpacts[area.key] ? 'true' : 'false'}.gif`" alt="" />
-					</div>
+					</button>
 				</div>
 			</div>
 			<div class="battle-impact-form__column battle-impact-form__column--block">
 				<div class="battle-impact-form__areas">
-					<div
+					<button
 						v-for="area in areas"
+						:key="area.key"
+						type="button"
 						class="battle-impact-form__area"
+						:class="{ 'is-selected': selectedBlocks[area.key] }"
+						:title="area.title + (selectedBlocks[area.key] ? ' — выбрано' : '')"
 						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
 						@click="toggleBlock(area.key)"
 					>
 						<img :src="`/assets/images/battle/block_action_${selectedBlocks[area.key] ? 'true' : 'false'}.gif`" alt="" />
-					</div>
+					</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="text-center">
+	<div class="battle-auto">
 		<input type="checkbox" name="auto" id="autofight" :checked="auto" @change="$emit('update:auto', $event.target.checked)" />
-		<label for="autofight">- автоматический ход, если выбран удар и блок</label>
+		<label for="autofight">Автоматический ход после выбора удара и блока</label>
 	</div>
 </template>
 
 <script setup>
 	import { computed, reactive, watch } from 'vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
 
 	const props = defineProps({
 		blocksCount: {
@@ -77,11 +76,11 @@
 	const emit = defineEmits(['update:auto', 'complete']);
 
 	const areas = [
-		{ key: 'head', height: 27, background: '/assets/images/battle/f_head.gif' },
-		{ key: 'case', height: 25, background: '/assets/images/battle/f_grud.gif' },
-		{ key: 'stomach', height: 24, background: '/assets/images/battle/f_zhiv.gif' },
-		{ key: 'belt', height: 27, background: '/assets/images/battle/f_poyas.gif' },
-		{ key: 'legs', height: 27, background: '/assets/images/battle/f_nogi.gif' },
+		{ key: 'head', title: 'Голова', height: 27, background: '/assets/images/battle/f_head.gif' },
+		{ key: 'case', title: 'Грудь', height: 25, background: '/assets/images/battle/f_grud.gif' },
+		{ key: 'stomach', title: 'Живот', height: 24, background: '/assets/images/battle/f_zhiv.gif' },
+		{ key: 'belt', title: 'Пах', height: 27, background: '/assets/images/battle/f_poyas.gif' },
+		{ key: 'legs', title: 'Ноги', height: 27, background: '/assets/images/battle/f_nogi.gif' },
 	];
 
 	const selectedImpacts = reactive(emptySelection());

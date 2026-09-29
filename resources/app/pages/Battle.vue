@@ -1,31 +1,41 @@
 <template>
-	<div class="max-w-[1000px] m-auto">
+	<div class="battle-page">
 		<div v-if="data" class="battle battle-layout">
 			<div class="battle-layout__fighter battle-layout__fighter--left">
 				<BattleFighter v-if="data?.user" :fighter="data.user" :current="true" />
 			</div>
 
 			<div class="battle-layout__center">
-				<div class="impackForm">
-					<div class="battle-form__title">Бой</div>
+				<div class="battle-form">
+					<header class="battle-form__title">
+						<h1><GameIcon name="swords" /> Бой</h1>
+						<span>{{ isFinished ? 'Завершён' : 'Раунд ' + data.round }}</span>
+					</header>
 					<div class="battle-form__content">
-						<div v-if="message" id="msg" class="text-center text-red-600 font-bold">
+						<div v-if="message" id="msg" class="ui-notice ui-notice--red battle-message">
 							{{ message }}
 						</div>
 
-						<div class="flex flex-col items-center gap-2 m-4 mt-2">
-							<div v-if="data.action === 'finishBattle'" class="text-red-600 font-bold">
-								<div>
-									Ваш бой окончен.
+						<div class="battle-form__selection">
+							<div v-if="data.action === 'finishBattle'" class="battle-status" :class="{ 'battle-status--win': data.result === 'win' }">
+								<GameIcon name="swords" />
+								<p class="battle-status__label">Ваш бой окончен</p>
+								<h2>
 									<template v-if="data.result === 'win'">Победа за вами!</template>
 									<template v-if="data.result === 'draw'">Ничья!</template>
 									<template v-if="data.result === 'lose'">Вы проиграли!</template>
-								</div>
+								</h2>
 								<Link href="/person" class="ui-button ui-button--compact">Вернуться</Link>
 							</div>
-							<div v-if="data.action === 'waitImpact'" class="text-red-600 font-bold">Ожидаем хода противника...</div>
-							<div v-if="data.action === 'userDead'" class="text-red-600 font-bold">
-								Для вас бой окончен, подождите пока остальные игроки закончат поединок
+							<div v-if="data.action === 'waitImpact'" class="battle-status">
+								<GameIcon name="hourglass" />
+								<h2>Ход противника</h2>
+								<p>Ваш ход сделан. Ожидаем ответа противника…</p>
+							</div>
+							<div v-if="data.action === 'userDead'" class="battle-status">
+								<GameIcon name="shield" />
+								<h2>Для вас бой окончен</h2>
+								<p>Дождитесь, пока остальные игроки закончат поединок.</p>
 							</div>
 
 							<template v-if="data.action === 'impactForm' && !isFinished">
@@ -37,7 +47,7 @@
 									@complete="gofight"
 								/>
 								<BattleAbilities :abilities="data.abilities || null" @use="useAbility" />
-								<div v-if="magicItems.length" class="flex flex-wrap justify-center gap-2">
+								<div v-if="magicItems.length" class="battle-magic">
 									<button v-for="item in magicItems" :key="item.id" type="button" class="ui-button ui-button--compact" @click="useMagic(item)">
 										{{ item.title }}
 									</button>
@@ -45,31 +55,35 @@
 							</template>
 						</div>
 
-						<div v-show="loading" class="mt-3">
-							<img src="/assets/images/refresh.gif" alt="" />
+						<div v-show="loading" class="battle-loading">
+							<GameIcon name="refresh" /> Обновляем бой…
 						</div>
 
-						<div v-show="!isFinished" class="text-center mt-4">
-							До тайм-аута:
-							<b>{{ timeoutText }}</b>
-							<hr color="e2e0e0" />
+						<div v-show="!isFinished" class="battle-timer">
+							<GameIcon name="hourglass" />
+							<span>До тайм-аута</span>
+							<strong>{{ timeoutText || '—' }}</strong>
 						</div>
 
-						<div v-if="!isFinished" class="flex flex-wrap justify-center gap-4">
+						<div v-if="!isFinished" class="battle-actions">
 							<div class="text-center">
-								<input type="button" value="Ударить" class="ui-button ui-button--compact" @click="gofight" />
+								<button type="button" class="ui-button" :disabled="loading || data.action !== 'impactForm'" @click="gofight">
+									<GameIcon name="swords" /> Ударить
+								</button>
 							</div>
 							<div v-if="data.opponents.length > 1" class="text-center battle-change">
-								<input type="button" value="Сменить" class="ui-button ui-button--compact" @click="toggleEnemyList" />
+								<button type="button" class="ui-button ui-button--secondary" @click="toggleEnemyList">Сменить</button>
 								<div v-if="showEnemyList" id="oMen" class="battle-change__menu">
 									<div class="battle-change__title">Выберите противника:</div>
 									<div v-for="opponent in data.opponents" :key="opponent.id" class="battle-change__item">
-										<a class="menuItem" href="" @click.prevent="selectEnemy(opponent.id)">{{ opponent.name }}</a>
+										<button type="button" class="battle-change__option" @click="selectEnemy(opponent.id)">{{ opponent.name }}</button>
 									</div>
 								</div>
 							</div>
 							<div v-show="!loading" class="text-center" id="refresh_b">
-								<input type="button" value="Обновить" class="ui-button ui-button--compact" @click="loaderRefresh" />
+								<button type="button" class="ui-button ui-button--secondary" @click="loaderRefresh">
+									<GameIcon name="refresh" /> Обновить
+								</button>
 							</div>
 						</div>
 					</div>
@@ -79,37 +93,36 @@
 
 				<div v-show="!isFinished" id="centerInfo" class="battle-info">
 					<div class="battle-info__item">
-						Нанесено урона:
-						<u>{{ data.damage }}</u>
-						HP
+						<span>Нанесено урона</span>
+						<strong>{{ data.damage }} <small>HP</small></strong>
 					</div>
 					<div class="battle-info__item">
-						Тайм-аут:
-						<u>{{ data.timeout / 60 }}</u>
-						мин.
+						<span>Тайм-аут</span>
+						<strong>{{ data.timeout / 60 }} <small>мин.</small></strong>
 					</div>
 				</div>
 
-				<div v-show="!isFinished" class="text-center mt-4">
-					<b>
-						Полный лог боя
-						<a :href="'/logs/' + page.id" target="_blank">тут</a>
-					</b>
-					<hr color="e2e0e0" />
-				</div>
+				<a class="battle-log-link" :href="'/battle/log/' + page.id" target="_blank">
+					<GameIcon name="book" /> Полный журнал боя <GameIcon name="forward" />
+				</a>
 			</div>
 
 			<div class="battle-layout__fighter battle-layout__fighter--right">
 				<BattleFighter v-if="data?.opponent && !isFinished" :fighter="data.opponent" />
 				<div v-else class="battle-no-enemy">
-					<b v-if="showNoEnemy">Нет противника в зоне досягаемости...</b>
-					<br v-if="showNoEnemy" />
+					<p v-if="showNoEnemy">Нет противника в зоне досягаемости…</p>
 					<img src="/assets/images/battle/1.gif" width="210" :height="showNoEnemy ? 277 : 230" alt="" />
 				</div>
 			</div>
 		</div>
 
-		<BattleLogs :logs="logs" />
+		<section v-if="logs.length" class="battle-journal">
+			<header class="battle-journal__heading">
+				<h2><GameIcon name="book" /> Ход поединка</h2>
+				<span>События по раундам</span>
+			</header>
+			<BattleLogs :logs="logs" />
+		</section>
 	</div>
 </template>
 
@@ -122,6 +135,7 @@
 	import BattleLogs from '~/components/Battle/BattleLogs.vue';
 	import BattleAbilities from '~/components/Battle/BattleAbilities.vue';
 	import BattleUsers from '~/components/Battle/BattleUsers.vue';
+	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import UseMagic from '~/components/Dialogs/UseMagic.vue';
 	import { openPopupModal } from '~/composables/useModals.js';
 

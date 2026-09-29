@@ -6,6 +6,7 @@ use App\Http\Middleware\RedirectToGame;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/info/{id?}', [Controllers\InfoController::class, 'index'])->whereNumber('id')->name('info');
+Route::get('/battle/log/{id}', [Controllers\BattleLogController::class, 'index'])->whereNumber('id')->name('battle.log');
 
 Route::middleware([RedirectToGame::class])->group(function () {
 	Route::get('/', [Controllers\IndexController::class, 'index'])->middleware([CheckReferral::class])->name('index');

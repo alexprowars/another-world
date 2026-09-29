@@ -323,13 +323,8 @@
 }
 
 .chat-resizer:hover::after,
-.chat-resizer:focus-visible::after,
 .is-resizing-chat .chat-resizer::after {
 	background: var(--shell-gold);
-}
-
-.chat-resizer:focus-visible {
-	outline: none;
 }
 
 .game-shell.is-resizing-chat,

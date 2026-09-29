@@ -110,18 +110,57 @@
 				</div>
 			</dl>
 		</div>
+		<dl v-if="statuses.length" class="person-stat-list person-statuses">
+			<div v-for="status in statuses" :key="status.id" :title="status.title">
+				<dt>{{ status.label }}</dt>
+				<dd>{{ $formatTime(status.secondsLeft, ':', true) }}</dd>
+			</div>
+		</dl>
 	</div>
 </template>
 
 <script setup>
 	import { computed } from 'vue';
 	import { Link } from '@inertiajs/vue3';
+	import { useNow } from '@vueuse/core';
 	import Popper from '~/components/Popper.vue';
 
-	const props = defineProps({ player: Object });
+	const props = defineProps({
+		player: Object
+	});
+
+	const now = useNow({
+		interval: 1000
+	});
+
+	const statuses = computed(() => {
+		return props.player.statuses
+			.map(status => ({
+				...status,
+				secondsLeft: Math.ceil((Date.parse(status.until) - now.value.getTime()) / 1000),
+			}))
+			.filter(status => status.secondsLeft > 0);
+	});
+
 	const remainingExp = computed(() => (props.player.level_up ? Math.max(0, props.player.level_up.exp - props.player.exp) : null));
-	const stats = [{ key: 'strength' }, { key: 'dexterity' }, { key: 'agility' }, { key: 'vitality' }, { key: 'magic' }, { key: 'intelligence' }];
-	const armorParts = ['Броня головы', 'Броня груди', 'Броня живота', 'Броня пояса', 'Броня ног'];
+
+	const stats = [
+		{ key: 'strength' },
+		{ key: 'dexterity' },
+		{ key: 'agility' },
+		{ key: 'vitality' },
+		{ key: 'magic' },
+		{ key: 'intelligence' }
+	];
+
+	const armorParts = [
+		'Броня головы',
+		'Броня груди',
+		'Броня живота',
+		'Броня пояса',
+		'Броня ног'
+	];
+
 	const combatStats = [
 		{ key: 'krit', label: 'Крит' },
 		{ key: 'mkrit', label: 'Мощность крита' },

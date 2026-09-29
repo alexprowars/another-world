@@ -10,15 +10,12 @@ class BattleLog extends Model
 	public $timestamps = false;
 	protected $table = 'battles_logs';
 
-	protected function casts(): array
-	{
-		return [
-			'date' => 'immutable_datetime',
-			'hit' => 'array',
-			'block' => 'array',
-			'enemy_block' => 'array',
-		];
-	}
+	protected $casts = [
+		'date' => 'immutable_datetime',
+		'hit' => 'array',
+		'block' => 'array',
+		'enemy_block' => 'array',
+	];
 
 	/** @return BelongsTo<Battle, $this> */
 	public function battle(): BelongsTo

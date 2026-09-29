@@ -87,14 +87,23 @@
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
 
-	defineProps({ page: Object });
+	defineProps({
+		page: Object
+	});
 
 	const state = useState();
+
 	const user = computed(() => state.user);
-	const form = useForm({ fight: null });
+
+	const form = useForm({
+		fight: null
+	});
 
 	function fightTo(id) {
-		if (form.processing) return;
+		if (form.processing) {
+			return;
+		}
+
 		form.fight = id;
 		form.clearErrors();
 		form.post('', { preserveScroll: true });

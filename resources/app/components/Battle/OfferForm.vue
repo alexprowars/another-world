@@ -63,7 +63,13 @@
 <script setup>
 	import { useForm } from '@inertiajs/vue3';
 
-	const props = defineProps({ battleType: { type: Number, required: true } });
+	const props = defineProps({
+		battleType: {
+			type: Number,
+			required: true
+		}
+	});
+
 	const form = useForm({
 		action: 'create',
 		battle_type: props.battleType,
@@ -79,7 +85,13 @@
 	const emit = defineEmits(['close']);
 
 	function submit() {
-		if (form.processing) return;
-		form.post('/battle', { preserveScroll: true, onSuccess: () => emit('close') });
+		if (form.processing) {
+			return;
+		}
+
+		form.post('/battle', {
+			preserveScroll: true,
+			onSuccess: () => emit('close')
+		});
 	}
 </script>

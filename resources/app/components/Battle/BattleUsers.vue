@@ -1,11 +1,11 @@
 <template>
-	<div v-if="users.left?.length && users.right?.length" class="text-center mb-3 flex justify-center w-full" id="usersContent">
-		<div class="w-1/2 align-top">
-			<div><b>Союзники</b></div>
+	<div v-if="users.left?.length && users.right?.length" class="battle-teams" id="usersContent">
+		<div class="battle-teams__side">
+			<h2>Союзники</h2>
 			<BattleUserLink v-for="user in users.left" :key="user.id" :user="user" />
 		</div>
-		<div class="w-1/2 align-top">
-			<div><b>Противники</b></div>
+		<div class="battle-teams__side">
+			<h2>Противники</h2>
 			<BattleUserLink v-for="user in users.right" :key="user.id" :user="user" />
 		</div>
 	</div>

@@ -21,12 +21,10 @@ class ChatMessageResource extends JsonResource
 		}
 
 		if (preg_match_all('/для \[(.*?)]/iu', $message, $match)) {
-			$users = array_map('trim', $match[1]);
-
-			if (!empty($users)) {
-				$users = array_unique(array_merge($users, $users));
-			}
+			$users = array_merge($users, array_map('trim', $match[1]));
 		}
+
+		$users = array_values(array_unique($users));
 
 		$message = preg_replace('/(приватно|для) \[.*?]/iu', '', $message);
 

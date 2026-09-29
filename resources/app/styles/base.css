@@ -3,6 +3,7 @@
 }
 
 * {
+	outline: none;
 	scrollbar-width: thin;
 	scrollbar-color: var(--paper-scrollbar) transparent;
 }
@@ -18,13 +19,6 @@ a {
 	color: #000;
 }
 
-input:focus,
-textarea:focus,
-select:focus,
-button:focus {
-	outline: none;
-}
-
 small {
 	font-size: 12px;
 }
@@ -32,6 +26,11 @@ small {
 img {
 	max-width: initial;
 	display: inline-block;
+}
+
+.game-icon {
+	flex-shrink: 0;
+	aspect-ratio: 1;
 }
 
 .v-popper__popper.v-popper--theme-tooltip .v-popper__inner {

@@ -1,5 +1,5 @@
 <template>
-	<ItemPopover :item="item" class="inline" :style="{ width: width + 'px', height: height + 'px' }">
+	<ItemPopover :item="item" class="person-view-slot" :style="{ width: width + 'px', height: height + 'px' }">
 		<img :src="image" :class="{ 'cursor-pointer': isEdit }" :width="width" :height="height" :alt="title" @click.prevent="unsetItem()" />
 
 		<template #empty>

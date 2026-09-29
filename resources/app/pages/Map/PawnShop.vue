@@ -94,10 +94,17 @@
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
-	const props = defineProps({ page: Object });
+	const props = defineProps({
+		page: Object
+	});
+
 	const state = useState();
 	const user = computed(() => state.user);
-	const form = useForm({ action: '', id: null });
+
+	const form = useForm({
+		action: '',
+		id: null
+	});
 
 	function currency(entry) {
 		return entry.item.price_type === 1 ? 'пл.' : 'зол.';

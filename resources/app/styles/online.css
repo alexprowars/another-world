@@ -122,12 +122,10 @@
 	margin-left: auto;
 }
 
-.online-panel .online-user-action:hover,
-.online-panel .online-user-action:focus-visible {
+.online-panel .online-user-action:hover {
 	background: var(--shell-tint-hover);
 }
 
-.online-panel .online-user-name:hover,
-.online-panel .online-user-name:focus-visible {
+.online-panel .online-user-name:hover {
 	color: var(--shell-gold);
 }

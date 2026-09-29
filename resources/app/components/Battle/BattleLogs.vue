@@ -1,11 +1,11 @@
 <template>
 	<div id="logsContent" class="mt-4 text-sm">
-		<div v-for="items in grouped" class="flex flex-col gap-2">
-			<div v-for="item in items">
+		<div v-for="items in grouped" :key="items[0].round" class="flex flex-col gap-2">
+			<div v-for="item in items" :key="item.id" class="battle-log-entry">
 				<b v-if="item.my" class="date2">{{ $formatDate(item['date'], 'DD MMM HH:mm:ss') }}</b>
 				<b v-else class="date1">{{ $formatDate(item['date'], 'DD MMM HH:mm:ss') }}</b>
 
-				<span v-if="item.user && item.enemy" class="inline-flex" v-html="hitSchema(item.side, item.hits, item.enemy_blocks)"></span>
+				<span v-if="item.user && item.enemy" class="battle-log-entry__schema inline-flex" v-html="hitSchema(item.side, item.hits, item.enemy_blocks)"></span>
 				<span
 					v-html="renderComment($formatDate(item['date'], 'DD MMM HH:mm:ss'), item.user, item.side, item.hits, item.damage, item.enemy, item.comment)"
 				></span>
@@ -18,6 +18,7 @@
 <script setup>
 	import { computed } from 'vue';
 	import _groupBy from 'lodash-es/groupBy';
+	import escape from 'lodash-es/escape';
 
 	const props = defineProps({
 		logs: {
@@ -54,6 +55,9 @@
 	}
 
 	function renderComment(dates, attacker, side, hitType, attackerDamage, defender, cm) {
+		attacker = escape(attacker ?? '');
+		defender = escape(defender ?? '');
+
 		let showStr = '';
 		let showStr2 = '';
 		let showStr5 = '';
@@ -63,14 +67,14 @@
 
 		switch (parseInt(side)) {
 			case 0:
-				attacker = `<b style="color: #CFA87A">${attacker}</b>`;
-				defender = `<b style="color: #142F98">${defender}</b>`;
-				finalText = '<b style="color: #CFA87A">';
+				attacker = `<b class="battle-log-side--0">${attacker}</b>`;
+				defender = `<b class="battle-log-side--1">${defender}</b>`;
+				finalText = '<b class="battle-log-side--0">';
 				break;
 			case 1:
-				attacker = `<b style="color: #142F98">${attacker}</b>`;
-				defender = `<b style="color: #CFA87A">${defender}</b>`;
-				finalText = '<b style="color: #142F98">';
+				attacker = `<b class="battle-log-side--1">${attacker}</b>`;
+				defender = `<b class="battle-log-side--0">${defender}</b>`;
+				finalText = '<b class="battle-log-side--1">';
 				break;
 		}
 
@@ -78,7 +82,7 @@
 		showStr2 = hitText(statKick[1], true);
 		showStr5 = hitText(statKick[1], false);
 
-		const damage = cm >= 21 && cm <= 30 ? `<b style="color: red">-${attackerDamage}</b>` : `<b>-${attackerDamage}</b>`;
+		const damage = cm >= 21 && cm <= 30 ? `<b class="battle-log-critical">-${attackerDamage}</b>` : `<b>-${attackerDamage}</b>`;
 		const comments = [];
 
 		comments[1] = `${attacker} ударил ${showStr}${showStr2}, хотя ${defender} пытался уйти от удара: ${damage}`;

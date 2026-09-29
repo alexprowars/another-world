@@ -88,22 +88,41 @@
 	import Timer from '~/components/Timer.vue';
 	import useState from '~/composables/useState.js';
 
-	defineProps({ page: Object });
+	defineProps({
+		page: Object
+	});
 
 	const state = useState();
 	const user = computed(() => state.user);
-	const healForm = useForm({ heal: 'Y' });
-	const injuryForm = useForm({ injury: 'Y' });
+
+	const healForm = useForm({
+		heal: 'Y'
+	});
+
+	const injuryForm = useForm({
+		injury: 'Y'
+	});
+
 	const processing = computed(() => healForm.processing || injuryForm.processing);
 
 	function healAction() {
-		if (processing.value) return;
-		healForm.post('/map', { preserveScroll: true });
+		if (processing.value) {
+			return;
+		}
+
+		healForm.post('/map', {
+			preserveScroll: true
+		});
 	}
 
 	function injuryAction() {
-		if (processing.value) return;
-		injuryForm.post('/map', { preserveScroll: true });
+		if (processing.value) {
+			return;
+		}
+
+		injuryForm.post('/map', {
+			preserveScroll: true
+		});
 	}
 
 	function onTimeout() {

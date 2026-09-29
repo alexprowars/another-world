@@ -165,17 +165,44 @@
 	import GameLayout from '~/layouts/Game.vue';
 	import PersonLayout from '~/layouts/Person.vue';
 
-	defineOptions({ layout: [GameLayout, PersonLayout] });
-	const props = defineProps({ page: Object });
+	defineOptions({
+		layout: [GameLayout, PersonLayout]
+	});
 
-	const optionsForm = useForm({ action: 'options', presence_status: props.page.options.presence_status });
-	const profileForm = useForm({ action: 'profile', city: props.page.city ?? '', about: props.page.about ?? '' });
-	const passwordForm = useForm({ action: 'password', current_password: '', password: '', password_confirmation: '' });
-	const emailForm = useForm({ action: 'email', current_email: '', email: '' });
+	const props = defineProps({
+		page: Object
+	});
+
+	const optionsForm = useForm({
+		action: 'options',
+		presence_status: props.page.options.presence_status
+	});
+
+	const profileForm = useForm({
+		action: 'profile',
+		city: props.page.city ?? '',
+		about: props.page.about ?? ''
+	});
+
+	const passwordForm = useForm({
+		action: 'password',
+		current_password: '',
+		password: '',
+		password_confirmation: ''
+	});
+
+	const emailForm = useForm({
+		action: 'email',
+		current_email: '',
+		email: ''
+	});
+
 	const busy = computed(() => optionsForm.processing || profileForm.processing || passwordForm.processing || emailForm.processing);
 
 	function save(form, reset = false) {
-		if (busy.value) return;
+		if (busy.value) {
+			return;
+		}
 
 		form.post('/person/settings', {
 			preserveScroll: true,

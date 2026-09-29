@@ -21,9 +21,6 @@ class User extends Authenticatable implements HasMedia
 	use SoftDeletes;
 	use InteractsWithMedia;
 
-	private $auraInfo = array();
-	public $effects = 0;
-
 	protected $calculated = false;
 	public $hp = 0;
 	public $energy = 0;
@@ -224,75 +221,9 @@ class User extends Authenticatable implements HasMedia
 				$i = 4;
 			}
 
-			$object->setPosition($i);
+			$object->position = $i;
 
 			$result['slot_' . $i] = new UserSlotItemResource($object);
-		}
-
-		return $result;
-	}
-
-	public function renderUserStatus()
-	{
-		$result = "";
-
-		if ($this->m_time > time() || $this->sign > time() || $this->travma > time() || $this->invisible > time() || $this->immun > time() || $this->ma_time > time() || $this->ch_time > time() || $this->effects) {
-			$result .= "<tr><td colspan='2'><hr /></td></tr>";
-
-			// Молчанка
-			if ($this->m_time > time()) {
-				$result .= "<tr><td><a class=ch title='Запрещено общение в чате'><small>Чат:</small></a></td><td width=63><b><small>" . pretty_time($this->m_time) . "</small></b></td></tr>";
-			}
-
-			// Ускорение
-			if ($this->sign > time()) {
-				$result .= "<tr><td><a class=ch title='На персонажа действует ускорение'><small>Ускорение:</small></a></td><td width=63><b><small>" . pretty_time($this->sign) . "</small></b></td></tr>";
-			}
-
-			// Травма
-			if ($this->travma > time()) {
-				$result .= "<tr><td><a class=ch title='Персонаж травмирован'><small>Травма:</small></a></td><td width=63><b><small>" . pretty_time($this->travma) . "</small></b></td></tr>";
-			}
-
-			// Грамота
-			if ($this->invisible > time()) {
-				$result .= "<tr><td><a class=ch title='Тень'><small>Тень:</small></a></td><td width=63><b><small>" . pretty_time($this->invisible) . "</small></b></td></tr>";
-			}
-
-			//Защита от нападения
-			if ($this->immun > time()) {
-				$result .= "<tr><td><a class=ch title='Защита от нападения'><small>Защита:</small></a></td><td width=63><b><small>" . pretty_time($this->immun) . "</small></b></td></tr>";
-			}
-
-			//Защита от нападения магией
-			if ($this->ma_time > time()) {
-				$result .= "<tr><td><a class=ch title='Защита от магии'><small>Защита:</small></a></td><td width=63><b><small>" . pretty_time($this->ma_time) . "</small></b></td></tr>";
-			}
-
-			//Защита от вампиров
-			if ($this->ch_time > time()) {
-				$result .= "<tr><td><a class=ch title='Защита от вампиров'><small>Защита:</small></a></td><td width=63><b><small>" . pretty_time($this->ch_time) . "</small></b></td></tr>";
-			}
-
-			foreach ($this->auraInfo as $aura) {
-				$type = '';
-
-				switch ($aura['type']) {
-					case 1:
-						$type = "Аура";
-						break;
-					case 2:
-						$type = "Зелье";
-						break;
-					case 3:
-						$type = "Травма";
-						break;
-				}
-
-				if ($type != '') {
-					$result .= "<tr><td><small>" . $type . ":</small></td><td width=63><b><small>" . pretty_time($aura['time']) . "</small></b></td></tr>\n";
-				}
-			}
 		}
 
 		return $result;

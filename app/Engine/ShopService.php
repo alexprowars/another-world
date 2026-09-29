@@ -31,7 +31,7 @@ class ShopService
 		if ($item->item->credits > 0) {
 			$price = $item->item->credits;
 
-			if ($user->vip == 1) {
+			if ($user->vip?->isFuture()) {
 				$price = $item->item->getVipPrice();
 			}
 
@@ -43,7 +43,7 @@ class ShopService
 		} else {
 			$price = $item->item->gold;
 
-			if ($user->vip == 1) {
+			if ($user->vip?->isFuture()) {
 				$price = $item->item->getVipPrice();
 			}
 

@@ -2,52 +2,56 @@
 	<div v-if="!priem || priem.id === 0">
 		<img width="40" height="25" src="/assets/images/battle/abilities/clear.gif" title="Пустой слот приёма" alt="" />
 	</div>
-	<Popper v-else placement="top">
+	<Popper v-else placement="top" popper-class="battle-ability-popper">
 		<img
-			:style="priem.w === 1 ? '' : 'cursor: pointer;'"
+			:class="{ 'cursor-pointer': priem.w === 0 }"
 			width="40"
 			height="25"
 			:src="`/assets/images/battle/abilities/${priem.id}${priem.w === 1 ? 'n' : ''}.gif`"
-			:title="priem.w === 1 ? '' : 'Нажмите для использования'"
-			alt=""
+			:alt="priem.n"
 			@click="use"
 		/>
 
 		<template #content>
-			<div class="w-[200px]">
-				<div class="text-blue-600 font-bold">{{ priem.n }}</div>
-				<div class="text-xs">
-					<span class="text-red-600">
-						Мин. треб:
-						<br />
-					</span>
-					<span>
-						Блокирование: {{ priem.b }}
-						<br />
-						Удар: {{ priem.h }}
-						<br />
-						Крит: {{ priem.k }}
-						<br />
-						Парирование: {{ priem.p }}
-						<br />
-						Урон: {{ priem.d }}
-						<br />
-						Магия: {{ priem.m }}
-						<br />
-					</span>
-					<span class="text-red-600">
-						Описание:
-						<br />
-					</span>
-					<span>{{ priem.a }}</span>
+			<article class="battle-ability-tooltip">
+				<header class="battle-ability-tooltip__heading">
+					<h3>{{ priem.n }}</h3>
+					<span>Боевой приём</span>
+				</header>
+				<div class="battle-ability-tooltip__body">
+					<section>
+						<h4>Минимальные требования</h4>
+						<dl class="battle-ability-tooltip__requirements">
+							<div v-for="requirement in requirements" :key="requirement.key">
+								<dt>{{ requirement.label }}</dt>
+								<dd>{{ priem[requirement.key] }}</dd>
+							</div>
+						</dl>
+					</section>
+					<section v-if="priem.a">
+						<h4>Описание</h4>
+						<p>{{ priem.a }}</p>
+					</section>
 				</div>
-			</div>
+				<footer class="battle-ability-tooltip__footer" :class="{ 'is-unavailable': priem.w !== 0 }">
+					{{ priem.w === 0 ? 'Нажмите на приём, чтобы использовать' : 'Приём сейчас недоступен' }}
+				</footer>
+			</article>
 		</template>
 	</Popper>
 </template>
 
 <script setup>
 	import Popper from '~/components/Popper.vue';
+
+	const requirements = [
+		{ key: 'b', label: 'Блокирование' },
+		{ key: 'h', label: 'Удар' },
+		{ key: 'k', label: 'Крит' },
+		{ key: 'p', label: 'Парирование' },
+		{ key: 'd', label: 'Урон' },
+		{ key: 'm', label: 'Магия' },
+	];
 
 	const props = defineProps({
 		priem: {

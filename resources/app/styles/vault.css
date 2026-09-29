@@ -41,8 +41,7 @@
 	height: 22px;
 }
 
-.vault-direction:hover:not(:disabled),
-.vault-direction:focus-visible:not(:disabled) {
+.vault-direction:hover:not(:disabled) {
 	background: var(--paper-inset);
 	border-color: var(--paper-link);
 }

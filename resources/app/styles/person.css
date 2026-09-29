@@ -254,8 +254,7 @@
 	color: var(--paper-link);
 }
 
-.person-attribute-value:hover,
-.person-attribute-value:focus-visible {
+.person-attribute-value:hover {
 	color: var(--paper-link);
 }
 
@@ -283,8 +282,7 @@
 	font-size: 12px;
 }
 
-.person-layout .person-free-stats:hover,
-.person-layout .person-free-stats:focus-visible {
+.person-layout .person-free-stats:hover {
 	background: var(--shell-button-hover);
 	border-color: var(--shell-button-border);
 	color: var(--shell-button-text);
@@ -297,7 +295,8 @@
 	color: var(--paper-danger);
 }
 
-.person-combat {
+.person-combat,
+.person-stat-list.person-statuses {
 	margin-top: var(--space-10);
 	padding-top: var(--space-8);
 	border-top: 1px solid var(--paper-border);
@@ -692,8 +691,7 @@
 	cursor: help;
 }
 
-.inventory-item-image:hover,
-.inventory-item-image:focus-visible {
+.inventory-item-image:hover {
 	border-color: var(--paper-link);
 	background: var(--paper-highlight);
 }

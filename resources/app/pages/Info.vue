@@ -36,6 +36,11 @@
 	import Statistics from '~/components/Info/Statistics.vue';
 	import Stats from '~/components/Info/Stats.vue';
 
-	defineOptions({ layout: [] });
-	defineProps({ page: Object });
+	defineOptions({
+		layout: []
+	});
+
+	defineProps({
+		page: Object
+	});
 </script>

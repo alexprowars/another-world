@@ -86,7 +86,7 @@ class ChatController extends Controller
 
 				ChatService::insertInChat(
 					null,
-					'<u><b>Комментатор</b></u> запретил общение  персонажу <u><b>' . $user->nickname . '</b></u> за флуд, сроком 10 минут!',
+					'<u><b>Комментатор</b></u> запретил общение  персонажу <u><b>' . $user->name . '</b></u> за флуд, сроком 10 минут!',
 					false
 				);
 			}
@@ -113,12 +113,10 @@ class ChatController extends Controller
 
 		if (preg_match_all('/для \[(.*?)]/iu', $message, $match)) {
 			$message = preg_replace("/для \[(.*?)]/u", '', $message);
-			$users = array_map('trim', $match[1]);
-
-			if (!empty($users)) {
-				$users = array_unique(array_merge($users, $users));
-			}
+			$users = array_merge($users, array_map('trim', $match[1]));
 		}
+
+		$users = array_values(array_unique($users));
 
 		$stopwords = __('main.stopwords');
 
@@ -142,7 +140,7 @@ class ChatController extends Controller
 
 				ChatService::insertInChat(
 					null,
-					'Модератор ' . $user->nickname . ' разрешил общение пользовател(ю/ям) ' . $recipients->pluck('nickname')->implode(', ') . '.',
+					'Модератор ' . $user->name . ' разрешил общение пользовател(ю/ям) ' . $recipients->pluck('name')->implode(', ') . '.',
 					false
 				);
 			} else {
@@ -162,7 +160,7 @@ class ChatController extends Controller
 
 				ChatService::insertInChat(
 					null,
-					'Модератор ' . $user->nickname . ' запретил общение пользовател(ю/ям) ' . $recipients->pluck('nickname')->implode(', ') . ' на ' . $time . ' минут.',
+					'Модератор ' . $user->name . ' запретил общение пользовател(ю/ям) ' . $recipients->pluck('name')->implode(', ') . ' на ' . $time . ' минут.',
 					false
 				);
 
@@ -193,70 +191,13 @@ class ChatController extends Controller
 
 	public function online()
 	{
-		/*
-		$cookie = [];
-
-		if (!$this->cookies->has($this->config->cookie->prefix . "_chat_sort")) {
-			$cookie['chat_sort'] = 1;
-		}
-		if (!$this->cookies->has($this->config->cookie->prefix . "_chat_show")) {
-			$cookie['chat_show'] = 1;
-		}
-
-		$sort = $this->cookies->get($this->config->cookie->prefix . "_chat_sort")->getValue();
-
-		if ($this->request->hasQuery('sort')) {
-			$sort = $this->request->get('sort', 'int');
-
-			$cookie['chat_sort'] = $sort;
-		}
-
-		$show = $this->cookies->get($this->config->cookie->prefix . "_chat_show")->getValue();
-
-		if ($this->request->hasQuery('show')) {
-			$show = $this->request->get('show', 'int');
-
-			$cookie['chat_show'] = $show;
-		}
-
-		if (count($cookie)) {
-			foreach ($cookie as $key => $value) {
-				$this->cookies->set($this->config->cookie->prefix . "_" . $key, $value);
-			}
-
-			$this->cookies->send();
-		}*/
-
-		$show = 1;
-		$sort = 1;
-
 		$users = User::query()
 			->with(['tribe'])
 			->whereNot('rank', 60)
-			->where('online', '<', now()->addMinutes(5));
+			->where('online', '<', now()->addMinutes(5))
+			->get();
 
-		switch ($sort) {
-			case 2:
-				$users->orderByDesc('name');
-				break;
-			case 3:
-				$users->orderBy('level');
-				break;
-			case 4:
-				$users->orderByDesc('level');
-				break;
-			default:
-				$users->orderBy('name');
-				break;
-		}
-
-		if ($show == 2) {
-			$users->where('room', auth()->user()->room);
-		}
-
-		$userList = array();
-
-		$users = $users->get();
+		$userList = [];
 
 		foreach ($users as $user) {
 			$pl = [
@@ -268,8 +209,8 @@ class ChatController extends Controller
 				'battle' => $user->battle,
 				'profession' => $user->profession,
 				'status' => $user->status,
-				'travma' => $user->travma?->utc()->toAtomString(),
-				'silence' => $user->travma?->utc()->toAtomString(),
+				'travma' => $user->injury?->isFuture() ? $user->injury->utc()->toAtomString() : null,
+				'silence' => $user->silence?->isFuture() ? $user->silence->utc()->toAtomString() : null,
 			];
 
 			if ($user->invisible?->isFuture()) {
@@ -289,8 +230,6 @@ class ChatController extends Controller
 		}
 
 		return response()->json([
-			'sort'	=> $sort,
-			'show'	=> $show,
 			'users'	=> $userList,
 		]);
 	}

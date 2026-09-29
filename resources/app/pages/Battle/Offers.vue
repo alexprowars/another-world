@@ -111,15 +111,23 @@
 	import OfferForm from '~/components/Battle/OfferForm.vue';
 	import { openConfirmModal, openPopupModal } from '~/composables/useModals.js';
 
-	const props = defineProps({ page: Object });
+	const props = defineProps({
+		page: Object
+	});
+
 	const types = [
 		{ id: 1, title: 'PvP', icon: 'swords' },
 		{ id: 2, title: 'Групповые', icon: 'users' },
 		{ id: 3, title: 'Хаотические', icon: 'shuffle' },
 	];
-	const actionForm = useForm({ action: '' });
+
+	const actionForm = useForm({
+		action: ''
+	});
+
 	const refreshing = ref(false);
 	const offerModalOpen = ref(false);
+
 	let refreshTimer;
 
 	onMounted(() => {
@@ -128,8 +136,12 @@
 	onBeforeUnmount(() => clearInterval(refreshTimer));
 
 	async function createOffer() {
-		if (offerModalOpen.value || refreshing.value || actionForm.processing) return;
+		if (offerModalOpen.value || refreshing.value || actionForm.processing) {
+			return;
+		}
+
 		offerModalOpen.value = true;
+
 		try {
 			await openPopupModal(OfferForm, {
 				title: 'Новая заявка · ' + types.find(type => type.id === props.page.battleType).title,
@@ -141,8 +153,12 @@
 	}
 
 	function refresh() {
-		if (refreshing.value || actionForm.processing || offerModalOpen.value) return;
+		if (refreshing.value || actionForm.processing || offerModalOpen.value) {
+			return;
+		}
+
 		refreshing.value = true;
+
 		router.reload({
 			onFinish: () => {
 				refreshing.value = false;
@@ -151,7 +167,10 @@
 	}
 
 	function act(action, extra = {}) {
-		if (actionForm.processing) return;
+		if (actionForm.processing) {
+			return;
+		}
+
 		actionForm.action = action;
 		actionForm.transform(data => ({ ...data, battle_type: props.page.battleType, ...extra })).post('/battle', { preserveScroll: true });
 	}

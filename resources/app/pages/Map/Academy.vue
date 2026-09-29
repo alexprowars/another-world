@@ -31,31 +31,14 @@
 				<p>Освойте ремесло, которое откроет новые возможности в мире игры.</p>
 			</header>
 			<div v-if="page.professions.length" class="academy-professions">
-				<article v-for="item in page.professions" :key="item.id" class="ui-panel service-panel academy-profession">
-					<header class="service-panel-heading">
-						<GameIcon name="book" />
-						<h2>{{ item.title }}</h2>
-					</header>
-					<div class="service-panel-body">
-						<dl class="service-facts">
-							<div>
-								<dt>Уровень</dt>
-								<dd>{{ item.level }}</dd>
-							</div>
-							<div>
-								<dt>Срок обучения</dt>
-								<dd>{{ $formatTime(item.duration) }}</dd>
-							</div>
-							<div>
-								<dt>Стоимость</dt>
-								<dd>{{ item.price }} зол.</dd>
-							</div>
-						</dl>
-						<button type="button" class="ui-button" :disabled="form.processing" @click="learn(item)">
-							{{ form.processing && form.learn === item.id ? 'Начинаем обучение…' : 'Обучаться' }}
-						</button>
-					</div>
-				</article>
+				<ProfessionCard
+					v-for="item in page.professions"
+					:key="item.id"
+					:profession="item"
+					:processing="form.processing"
+					:learning="form.processing && form.learn === item.id"
+					@learn="learn(item)"
+				/>
 			</div>
 			<div v-else class="ui-empty" role="status">
 				<GameIcon name="book" />
@@ -73,6 +56,7 @@
 
 <script setup>
 	import ContentBlock from '~/components/ContentBlock.vue';
+	import ProfessionCard from '~/components/Academy/ProfessionCard.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
@@ -85,11 +69,17 @@
 	});
 
 	const state = useState();
+
 	const user = computed(() => state.user);
-	const form = useForm({ learn: null });
+	const form = useForm({
+		learn: null
+	});
 
 	function learn(item) {
-		if (form.processing) return;
+		if (form.processing) {
+			return;
+		}
+
 		openConfirmModal('Подтвердите действие', 'Вы действительно хотите получить данную профессию?', [
 			{
 				title: 'Нет',
@@ -97,7 +87,10 @@
 			{
 				title: 'Да',
 				handler() {
-					if (form.processing) return;
+					if (form.processing) {
+						return;
+					}
+
 					form.learn = item.id;
 					form.post('/map', { preserveScroll: true });
 				},

@@ -19,7 +19,7 @@ class UserSlotItemResource extends JsonResource
 			'type' => $this->resource->type,
 			'title' => $this->resource->title,
 			'can_use' => MagicService::canUse($this->resource),
-			'position' => $this->resource->getPosition(),
+			'position' => $this->resource->position,
 			'min' => $this->resource->min,
 			'max' => $this->resource->max,
 			'wearout' => $this->resource->wearout,

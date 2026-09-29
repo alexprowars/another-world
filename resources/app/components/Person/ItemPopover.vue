@@ -3,6 +3,7 @@
 		ref="tooltip"
 		placement="right-start"
 		popper-class="item-info-popper"
+		:arrow-padding="6"
 		:triggers="['hover', 'focus', 'touch']"
 		:popper-triggers="[]"
 		:delay="{ show: 150, hide: 180 }"
@@ -22,6 +23,10 @@
 	import { Tooltip } from 'floating-vue';
 	import ItemInfo from './ItemInfo.vue';
 
-	defineProps({ item: Object, player: Object });
+	defineProps({
+		item: Object,
+		player: Object
+	});
+
 	const tooltip = useTemplateRef('tooltip');
 </script>

@@ -16,8 +16,10 @@ class ShopItemResource extends JsonResource
 		$item = $this->resource->item;
 		$user = auth()->user();
 
+		$price = $item->gold;
+
 		if ($user?->tutorial == 3 and $item->id == 817) {
-			$item->price = 0;
+			$price = 0;
 		}
 
 		return [
@@ -28,7 +30,7 @@ class ShopItemResource extends JsonResource
 				'id' => $item->id,
 				'code' => $item->code,
 				'title' => $item->title,
-				'price' => $item->gold,
+				'price' => $price,
 				'price_vip' => $item->getVipPrice(),
 				'credits' => $item->credits,
 				'type' => $item->type,
