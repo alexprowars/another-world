@@ -137,10 +137,10 @@ class Vault
 			]);
 
 			$message = $gem
-				? 'Поздравляем! Вы добыли драгоценный камень в кол-ве <b><u>1 ед</u></b>!'
-				: 'Вы добыли руду в кол-ве <b><u>1 ед</u></b>!';
+				? 'Поздравляем! Вы добыли драгоценный камень в кол-ве 1 ед!'
+				: 'Вы добыли руду в кол-ве 1 ед!';
 
-			DB::afterCommit(fn() => ChatService::sendSystemMessage($user, '', $message));
+			ChatService::sendSystemMessage($message, [$user]);
 		}
 	}
 

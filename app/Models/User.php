@@ -83,6 +83,10 @@ class User extends Authenticatable implements HasMedia
 
 		self::retrieved(function (self $user) {
 			foreach (Vars::getStats() as $stat) {
+				if (!$user->hasAttribute('s_' . $stat)) {
+					continue;
+				}
+
 				$user->{$stat} = $user->{'s_' . $stat};
 			}
 		});

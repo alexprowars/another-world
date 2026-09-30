@@ -3,10 +3,7 @@
 namespace App\Services;
 
 use App\Engine\LogsService;
-use App\Events\ChatPrivateMessage;
 use App\Exceptions\Exception;
-use App\Http\Resources\ChatMessageResource;
-use App\Models\Chat;
 use App\Models\MarketItem;
 use App\Models\User;
 use App\Models\UserItem;
@@ -114,16 +111,10 @@ class MarketService
 			LogsService::addItemLog($buyer, 'купил', $description, 'рынок');
 			LogsService::addItemLog($seller, 'продал', $description, 'рынок');
 
-			$message = Chat::create([
-				'message' => 'Ваш предмет <b>' . e($item->title) . '</b> куплен на рынке игроком <b>' . e($buyer->name) . '</b> за ' . $listing->price . ' зол.',
-				'recipients' => [$seller->id],
-				'private' => true,
-				'date' => now(),
-			]);
-
-			DB::afterCommit(function () use ($seller, $message) {
-				event(new ChatPrivateMessage($seller->id, ChatMessageResource::make($message)->resolve()));
-			});
+			ChatService::sendSystemMessage(
+				'Ваш предмет ' . $item->title . ' куплен на рынке игроком ' . $buyer->name . ' за ' . $listing->price . ' зол.',
+				[$seller],
+			);
 
 			return $listing;
 		}, 3);

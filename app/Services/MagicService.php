@@ -153,18 +153,18 @@ class MagicService
 				$participant->fresh()->calculate();
 			}
 
-			DB::afterCommit(function () use ($target, $targetBattleId, $message, $slots) {
+			$redirect = $target->battle_id && $target->battle_id !== $targetBattleId ? route('battle') : null;
+
+			if ($target->prison?->isFuture()) {
+				$redirect = route('map');
+			}
+
+			ChatService::sendSystemMessage($message, [$target], $redirect);
+
+			DB::afterCommit(function () use ($slots) {
 				foreach ($slots as $slot) {
 					$slot->clearCache();
 				}
-
-				$redirect = $target->battle_id && $target->battle_id !== $targetBattleId ? route('battle') : null;
-
-				if ($target->prison?->isFuture()) {
-					$redirect = route('map');
-				}
-
-				ChatService::insertInChat($target, e($message), true, $redirect);
 			});
 
 			return $message;

@@ -89,77 +89,196 @@ export const smiles = [
 	'arbuz',
 ];
 
-export function reformatMessage(message) {
-	let j = 0;
+const smileNames = new Set(smiles);
 
-	smiles.every(smile => {
-		while (message.indexOf(':' + smile + ':') >= 0) {
-			message = message.replace(':' + smile + ':', '<img src="/assets/images/smile/' + smile + '.gif" alt="' + smile + '">');
+export function reformatMessage(body) {
+	const escaped = body
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;')
+		.replace(/\r?\n/g, '<br>');
+	let count = 0;
 
-			if (++j >= 3) {
-				break;
-			}
+	return escaped.replace(/:([a-z0-9_]+):/g, (match, smile) => {
+		if (!smileNames.has(smile) || count >= 3) {
+			return match;
 		}
 
-		return j < 3;
-	});
+		count += 1;
 
-	return message;
+		return '<img src="/assets/images/smile/' + smile + '.gif" alt="' + smile + '">';
+	});
 }
 
-export default function useChat() {
-	const messages = ref([]);
+export default function useChat(user) {
+	const items = ref([]);
 	const unread = ref(0);
+	const loading = ref(false);
+	const loadError = ref('');
+	const seenMessageIds = new Set();
 
-	const sortedMessages = computed(() => {
-		return messages.value.sort((a, b) => (a['time'] < b['time'] ? -1 : 1));
+	let loaded = false;
+	let loadPromise = null;
+	let syncPromise = null;
+	let syncAgain = false;
+	let lastSyncedId = 0;
+	let generation = 0;
+
+	const messages = computed(() => {
+		return items.value
+			.toSorted((a, b) => {
+				if (typeof a.id === 'number' && typeof b.id === 'number') {
+					return a.id - b.id;
+				}
+
+				return Date.parse(a.created_at) - Date.parse(b.created_at) || String(a.id).localeCompare(String(b.id));
+			})
+			.map(message => {
+				const my = message.sender?.id === user.value?.id;
+
+				return {
+					...message,
+					my,
+					me: !my && message.recipients.some(recipient => recipient.id === user.value?.id),
+				};
+			});
 	});
 
 	async function sendMessage(message) {
-		if (message.length === 0) {
-			return;
-		}
+		const result = await useHttp({ message }).post('/chat/send', {
+			onError(errors) {
+				throw new Error(errors.message || 'Проверьте текст сообщения.');
+			},
+			onHttpException(response) {
+				const payload = JSON.parse(response.data);
 
-		await useHttp({ message }).post('/chat/send');
+				if (payload.id) {
+					addMessage(payload);
+				}
+
+				throw new Error(payload.body || payload.message || 'Сообщение не отправлено.');
+			},
+		});
+
+		addMessage(result);
 	}
 
 	async function loadMessages() {
-		if (messages.value.length) {
+		if (loaded) {
 			return;
 		}
 
-		try {
-			messages.value = await useHttp().get('/chat/last');
-		} catch (error) {
-			console.error(error);
+		if (loadPromise) {
+			return loadPromise;
 		}
 
-		clearUnread();
+		loading.value = true;
+		loadError.value = '';
+
+		const requestGeneration = generation;
+
+		loadPromise = (async () => {
+			try {
+				const result = await useHttp().get('/chat/last');
+
+				lastSyncedId = Math.max(lastSyncedId, result.at(-1)?.id || 0);
+
+				if (requestGeneration === generation) {
+					result.forEach(message => addMessage(message, false));
+				}
+
+				loaded = true;
+			} catch {
+				loadError.value = 'Не удалось загрузить сообщения.';
+			} finally {
+				loading.value = false;
+				loadPromise = null;
+			}
+		})();
+
+		return loadPromise;
+	}
+
+	async function syncMessages() {
+		if (syncPromise) {
+			syncAgain = true;
+
+			return syncPromise;
+		}
+
+		syncPromise = (async () => {
+			try {
+				do {
+					syncAgain = false;
+
+					const needsCatchUp = loaded || loadPromise !== null;
+
+					await loadMessages();
+
+					if (!loaded) {
+						return;
+					}
+
+					if (needsCatchUp) {
+						let result;
+
+						do {
+							const requestGeneration = generation;
+
+							result = await useHttp({ after_id: lastSyncedId }).get('/chat/last');
+
+							if (requestGeneration === generation) {
+								result.forEach(message => addMessage(message));
+							}
+
+							lastSyncedId = Math.max(lastSyncedId, result.at(-1)?.id || 0);
+						} while (result.length === 100);
+					}
+				} while (syncAgain);
+
+				loadError.value = '';
+			} catch {
+				loadError.value = 'Не удалось обновить сообщения.';
+			} finally {
+				syncPromise = null;
+			}
+		})();
+
+		return syncPromise;
 	}
 
 	function clear() {
-		setMessages([]);
+		generation += 1;
+
+		lastSyncedId = items.value.reduce((lastId, item) => {
+			return typeof item.id === 'number' ? Math.max(lastId, item.id) : lastId;
+		}, lastSyncedId);
+
+		items.value = [];
+
 		clearUnread();
 	}
 
-	function addMessage(message) {
-		message = { ...message, text: reformatMessage(message['text']) };
+	function addMessage(message, countUnread = true) {
+		if (seenMessageIds.has(message.id)) {
+			return false;
+		}
 
-		messages.value.push(message);
-		unread.value += 1;
-	}
+		seenMessageIds.add(message.id);
+		items.value.push(message);
 
-	function setMessages(items) {
-		messages.value = items.map(message => ({ ...message, text: reformatMessage(message['text']) }));
+		if (countUnread && message.sender?.id !== user.value?.id) {
+			unread.value += 1;
+		}
+
+		return true;
 	}
 
 	function clearUnread() {
 		unread.value = 0;
 	}
 
-	function incrementUnread() {
-		unread.value += 1;
-	}
-
-	return { messages, unread, sortedMessages, sendMessage, loadMessages, clear, addMessage, setMessages, clearUnread, incrementUnread };
+	return { messages, unread, loading, loadError, sendMessage, loadMessages, syncMessages, clear, addMessage, clearUnread };
 }

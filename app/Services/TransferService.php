@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\ChatPrivateMessage;
 use App\Exceptions\Exception;
-use App\Http\Resources\ChatMessageResource;
-use App\Models\Chat;
 use App\Models\LogTransfer;
 use App\Models\User;
 use App\Models\UserItem;
@@ -80,7 +77,7 @@ class TransferService
 				'ip' => $ip,
 			]);
 
-			self::notify($recipient, '<b>' . e($sender->name) . '</b> передал Вам предмет <b>' . e($item->title) . '</b>.');
+			self::notify($recipient, $sender->name . ' передал Вам предмет ' . $item->title . '.');
 
 			return $transfer;
 		}, 3);
@@ -116,7 +113,7 @@ class TransferService
 				'ip' => $ip,
 			]);
 
-			self::notify($recipient, 'Персонаж <b>' . e($sender->name) . '</b> передал Вам <b>' . $amount . '</b> зол.');
+			self::notify($recipient, 'Персонаж ' . $sender->name . ' передал Вам ' . $amount . ' зол.');
 
 			return $transfer;
 		}, 3);
@@ -146,15 +143,6 @@ class TransferService
 
 	private static function notify(User $recipient, string $text): void
 	{
-		$message = Chat::create([
-			'message' => $text,
-			'recipients' => [$recipient->id],
-			'private' => true,
-			'date' => now(),
-		]);
-
-		DB::afterCommit(function () use ($recipient, $message) {
-			event(new ChatPrivateMessage($recipient->id, ChatMessageResource::make($message)->resolve()));
-		});
+		ChatService::sendSystemMessage($text, [$recipient]);
 	}
 }

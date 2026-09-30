@@ -133,7 +133,11 @@ class SmithyService
 
 			$message = 'Модернизация <b>' . e($item->title) . '</b> прошла успешно. Урон: ' . $item->min . '–' . $item->max . '. Максимальная долговечность уменьшилась на 20.';
 
-			DB::afterCommit(fn () => ChatService::sendSystemMessage($user, '', $message));
+			ChatService::sendSystemMessage(
+				'Модернизация ' . $item->title . ' прошла успешно. Урон: ' . $item->min . '–' . $item->max
+					. '. Максимальная долговечность уменьшилась на 20.',
+				[$user],
+			);
 
 			return $message;
 		});

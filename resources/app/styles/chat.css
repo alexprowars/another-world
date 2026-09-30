@@ -66,3 +66,8 @@
 	font-size: 12px;
 	color: var(--shell-muted);
 }
+
+.game-social .chat-load-error {
+	color: var(--chat-negative);
+	font-size: 12px;
+}

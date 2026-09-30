@@ -519,7 +519,7 @@ class BattleService
 			]);
 
 			if (isset($opponent)) {
-				ChatService::insertInChat($opponent, '<b>' . e($user->name) . '</b> принял Вашу заявку!');
+				ChatService::sendSystemMessage($user->name . ' принял Вашу заявку!', [$opponent]);
 			}
 		});
 	}
@@ -583,7 +583,7 @@ class BattleService
 			}
 
 			if ($opponent) {
-				ChatService::insertInChat($opponent->user, '<b>' . e($user->name) . '</b> отказал в поединке!');
+				ChatService::sendSystemMessage($user->name . ' отказал в поединке!', [$opponent->user]);
 			}
 		});
 	}
@@ -638,7 +638,7 @@ class BattleService
 				$battle->members()->delete();
 				$battle->delete();
 
-				ChatService::insertInChat($user, 'Ваш бой не может начаться, т.к. группа не набрана!');
+				ChatService::sendSystemMessage('Ваш бой не может начаться, т.к. группа не набрана!', [$user]);
 
 				return false;
 			}
@@ -671,7 +671,10 @@ class BattleService
 					InventoryService::unsetAllObject($member->user);
 				}
 
-				ChatService::insertInChat($member->user, 'Часы показывали <U>' . $now->format('d.m.y H:i') . '</U>, когда Ваш бой начался!');
+				ChatService::sendSystemMessage(
+					'Часы показывали ' . $now->format('d.m.y H:i') . ', когда Ваш бой начался!',
+					[$member->user],
+				);
 			}
 
 			return true;
@@ -714,7 +717,7 @@ class BattleService
 			'agility' => $agility,
 		]);
 
-		$message = '<b>' . e($enemy->name) . '</b> получает в бою ';
+		$message = $enemy->name . ' получает в бою ';
 
 		if ($level == 1) {
 			$message .= 'лёгкую травму';
@@ -726,10 +729,10 @@ class BattleService
 			$message .= 'неизлечимую травму';
 		}
 
-		$message .= ' <b style="color: red">' . $param['name'] . '</b> от <b>' . e($user->name)
-			. '</b>, которая очень сильно повлияла на параметр <b>' . __('stats.' . $param['param']) . '</b>';
+		$message .= ' ' . $param['name'] . ' от ' . $user->name
+			. ', которая очень сильно повлияла на параметр ' . __('stats.' . $param['param']);
 
-		ChatService::insertInChat($enemy, $message);
+		ChatService::sendSystemMessage($message, [$enemy]);
 
 		return true;
 	}

@@ -327,8 +327,8 @@
 	background: var(--shell-gold);
 }
 
-.game-shell.is-resizing-chat,
-.game-shell.is-resizing-chat * {
+.game-shell:has(.game-social.is-resizing-chat),
+.game-shell:has(.game-social.is-resizing-chat) * {
 	cursor: ns-resize !important;
 	user-select: none;
 }

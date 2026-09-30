@@ -13,6 +13,7 @@
 			<img src="/assets/images/images/inf.png" alt="Профиль" />
 		</Link>
 		<div class="online-user-statuses">
+			<img v-if="user.status" :src="'/assets/images/chat/status' + user.status + '.gif'" :title="$t('status.' + user.status)" :alt="$t('status.' + user.status)" />
 			<img v-if="user.profession" :src="'/assets/images/guild/' + user.profession + '.png'" :title="$t('profession.' + user.profession)" :alt="$t('profession.' + user.profession)"/>
 			<img v-if="user.silence" src="/assets/images/chat/molch.gif" :title="'Молчанка до ' + $formatDate(user.silence, 'DD MMM HH:mm:ss')" alt="Молчанка"/>
 			<a v-if="user.battle" :href="'/battle/log/' + user.battle" target="_blank" class="online-user-action" title="В бою — открыть журнал">

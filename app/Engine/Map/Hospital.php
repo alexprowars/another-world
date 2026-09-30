@@ -36,7 +36,7 @@ class Hospital
 				'room' => 1,
 			]);
 
-			ChatService::sendSystemMessage($user, '', 'Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>');
+			ChatService::sendSystemMessage('Лечение окончено! Вы транспортированы в помещение: Общий зал', [$user]);
 
 			return to_route('map');
 		}
@@ -79,7 +79,7 @@ class Hospital
 				'hp_now' => $user->hp_max,
 			]);
 
-			ChatService::sendSystemMessage($user, '', 'Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>');
+			ChatService::sendSystemMessage('Лечение окончено! Вы транспортированы в помещение: Общий зал', [$user]);
 		}
 
 		$hp = $user->hp_max - round($remainingSeconds * ($user->hp_max / UserService::getHospitalHealingTime($user)));

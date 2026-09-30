@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\ChatPrivateMessage;
 use App\Exceptions\Exception;
-use App\Http\Resources\ChatMessageResource;
-use App\Models\Chat;
 use App\Models\Tribe;
 use App\Models\User;
 use Closure;
@@ -86,7 +83,7 @@ class TribeService
 				$member->update(['tribe_id' => $tribe->id, 'tribe_rank' => 0]);
 				$tribe->decrement('moneys', $price);
 				$message = 'Принят в клан персонаж ' . $member->name . ' за ' . $price . ' зол.';
-				self::notify($member, 'Персонаж <b>' . e($account->name) . '</b> принял Вас в клан <b>' . e($tribe->name) . '</b>.');
+				self::notify($member, 'Персонаж ' . $account->name . ' принял Вас в клан ' . $tribe->name . '.');
 			} else {
 				if ($member->tribe_id !== $tribe->id) {
 					throw new Exception('Персонаж не состоит в вашем клане!');
@@ -105,13 +102,13 @@ class TribeService
 						self::checkInquisition($member);
 						$member->update(['tribe_id' => null, 'tribe_rank' => 0]);
 						$message = 'Исключён из клана персонаж ' . $member->name . '.';
-						self::notify($member, 'Персонаж <b>' . e($account->name) . '</b> исключил Вас из клана <b>' . e($tribe->name) . '</b>.');
+						self::notify($member, 'Персонаж ' . $account->name . ' исключил Вас из клана ' . $tribe->name . '.');
 						break;
 					case 'transfer':
 						$account->update(['tribe_rank' => 0]);
 						$member->update(['tribe_rank' => self::LEADER]);
 						$message = 'Полномочия главы клана переданы персонажу ' . $member->name . '.';
-						self::notify($member, 'Персонаж <b>' . e($account->name) . '</b> передал Вам полномочия главы клана <b>' . e($tribe->name) . '</b>.');
+						self::notify($member, 'Персонаж ' . $account->name . ' передал Вам полномочия главы клана ' . $tribe->name . '.');
 						break;
 					case 'rank':
 						if (!array_key_exists($rank, self::RANKS) || $rank === self::LEADER) {
@@ -210,15 +207,6 @@ class TribeService
 
 	private static function notify(User $recipient, string $text): void
 	{
-		$message = Chat::create([
-			'message' => $text,
-			'recipients' => [$recipient->id],
-			'private' => true,
-			'date' => now(),
-		]);
-
-		DB::afterCommit(function () use ($recipient, $message) {
-			event(new ChatPrivateMessage($recipient->id, ChatMessageResource::make($message)->resolve()));
-		});
+		ChatService::sendSystemMessage($text, [$recipient]);
 	}
 }

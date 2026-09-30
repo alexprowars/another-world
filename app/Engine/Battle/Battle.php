@@ -563,24 +563,29 @@ class Battle
 		}
 
 		if ($type == 1) {
-			ChatService::insertInChat($this->user, 'К сожалению ваш бой закончился ничьёй. Попытайтесь снова. Нанесено урона: <b><u>' . $this->fighter->damage . ' HP</u></b>.');
+			$message = 'К сожалению ваш бой закончился ничьёй. Попытайтесь снова. Нанесено урона: ' . $this->fighter->damage . ' HP.';
 		} elseif ($type == 2) {
-			ChatService::insertInChat($this->user, 'Ваш бой закончен, Вы проиграли. Нанесено урона: <b><u>' . $this->fighter->damage . ' HP</u></b>.');
-		} elseif ($type == 3) {
-			ChatService::insertInChat($this->user, 'Вы одержали победу! Нанесено урона: <b><u>' . $this->fighter->damage . ' HP</u></b>. Получено опыта: <b><u>' . $addexp . '</u></b>.' . ($addmoney > 0 ? ' Получена награда: <b><u>' . $addmoney . '</u> золота</b>.' : ''));
+			$message = 'Ваш бой закончен, Вы проиграли. Нанесено урона: ' . $this->fighter->damage . ' HP.';
+		} else {
+			$message = 'Вы одержали победу! Нанесено урона: ' . $this->fighter->damage . ' HP. Получено опыта: ' . $addexp . '.';
+
+			if ($addmoney > 0) {
+				$message .= ' Получена награда: ' . $addmoney . ' золота.';
+			}
 		}
+
+		ChatService::sendSystemMessage($message, [$this->user]);
 
 		if (!empty($wornItems)) {
-			$itemNames = array_map(fn(UserItem $item) => '<b>' . e($item->title) . '</b>', $wornItems);
-			$message = 'Ваши вещи приобрели единицу износа: ' . implode(', ', $itemNames);
-
-			ChatService::insertInChat($this->user, $message);
+			$itemNames = array_map(fn (UserItem $item) => $item->title, $wornItems);
+			ChatService::sendSystemMessage(
+				'Ваши вещи приобрели единицу износа: ' . implode(', ', $itemNames),
+				[$this->user],
+			);
 		}
 
-		//if ($STD == 1)
-		//	$this->game->insertInChat("После боя вы обнаружили <b>" . $Drops['title'] . "</b>. Вы подняли его и положили в рюкзак.", $stat['username'], true);
 		if ($addpoints > 0) {
-			ChatService::insertInChat($this->user, 'Вы заработали для клана ' . $addpoints . ' очков рейтинга.');
+			ChatService::sendSystemMessage('Вы заработали для клана ' . $addpoints . ' очков рейтинга.', [$this->user]);
 		}
 
 		$this->user->battle()->associate(null);
@@ -665,11 +670,9 @@ class Battle
 					->first();
 
 				if ($reachedLevel->level > $user->level) {
-					ChatService::insertInChat(
-						null,
-						'Персонаж <b>' . $user->name . '</b> получил повышение! Теперь он <b>'
-							. $reachedLevel->level . '</b> уровня! Поздравим его с этим достижением.',
-						false,
+					ChatService::sendPublicSystemMessage(
+						'Персонаж ' . $user->name . ' получил повышение! Теперь он '
+							. $reachedLevel->level . ' уровня! Поздравим его с этим достижением.',
 					);
 				}
 
