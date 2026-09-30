@@ -61,8 +61,12 @@ abstract class DamageSpell extends AbstractSpell
 
 	protected function damageAmount(User $caster, User $target): float
 	{
+		$combatStats = $caster->getCombatStats();
+		$minDamage = (int) round($combatStats->getMinMagicDamage());
+		$maxDamage = (int) round($combatStats->getMaxMagicDamage());
+
 		return $this->damage
-			+ random_int((int) round($caster->intelligence / 1.5), (int) round(1 + $caster->intelligence))
+			+ random_int($minDamage, $maxDamage)
 			+ random_int(0, 5);
 	}
 

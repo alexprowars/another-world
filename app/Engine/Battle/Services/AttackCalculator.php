@@ -3,7 +3,7 @@
 namespace App\Engine\Battle\Services;
 
 use App\Engine\Battle\Data\AttackResult;
-use App\Models\User;
+use App\Engine\CombatStats;
 use Random\Randomizer;
 
 class AttackCalculator
@@ -17,24 +17,17 @@ class AttackCalculator
 	 * @param array<int, int> $blocks
 	 */
 	public function calculate(
-		User $attacker,
-		User $defender,
+		CombatStats $attacker,
+		CombatStats $defender,
 		array $hits,
 		array $blocks,
-		int $damageReduction,
 	): AttackResult {
 		$statsVsMod = config('battle.stats_vs_mod');
 
 		$attackMinDamage = $attacker->min;
 		$attackMaxDamage = $attacker->max;
 
-		$armorByZone = [
-			$defender->armor1,
-			$defender->armor2,
-			$defender->armor3,
-			$defender->armor4,
-			$defender->armor5,
-		];
+		$armorByZone = $defender->getArmorByZone();
 
 		// Вероятность уворота защитника
 		$x = $attacker->agility + $attacker->unuv / $statsVsMod;
@@ -68,8 +61,11 @@ class AttackCalculator
 		if ($dodgeChance > $dodgeRoll) {
 			$actionByHit[1] = 'uvorot';
 		} elseif ($critChance > $critRoll) {
-			$minDamage = (int) (1.5 * ($attacker->strength / 3 + $attackMinDamage));
-			$maxDamage = (int) (2.5 * ($attacker->strength / 1.5 + $attackMaxDamage));
+			$baseMinDamage = $attacker->getMinDamage($attackMinDamage);
+			$baseMaxDamage = $attacker->getMaxDamage($attackMaxDamage);
+
+			$minDamage = (int) (1.5 * $baseMinDamage);
+			$maxDamage = (int) (2.5 * $baseMaxDamage);
 
 			$damageByHit[1] = $this->randomizer->getInt($minDamage, $maxDamage);
 
@@ -87,8 +83,11 @@ class AttackCalculator
 
 					if (in_array($hits[$i - 1], $blocks, true)) {
 						if ($blockBreakChance > $blockBreakRoll) {
-							$minDamage = (int) (0.5 * ($attacker->strength / 3 + $attackMinDamage));
-							$maxDamage = (int) (0.75 * ($attacker->strength / 1.5 + $attackMaxDamage));
+							$baseMinDamage = $attacker->getMinDamage($attackMinDamage);
+							$baseMaxDamage = $attacker->getMaxDamage($attackMaxDamage);
+
+							$minDamage = (int) (0.5 * $baseMinDamage);
+							$maxDamage = (int) (0.75 * $baseMaxDamage);
 
 							$damageByHit[$i] = $this->randomizer->getInt($minDamage, $maxDamage);
 
@@ -107,16 +106,18 @@ class AttackCalculator
 						if ($armorPierceChance > $armorPierceRoll) {
 							$armorByZone[$hits[$i - 1] - 1] = 0;
 
-							$attackMinDamage = ceil($attackMinDamage * 0.5);
-							$attackMaxDamage = ceil($attackMaxDamage * 0.5);
+							$attackMinDamage = (int) ceil($attackMinDamage * 0.5);
+							$attackMaxDamage = (int) ceil($attackMaxDamage * 0.5);
 
 							$experienceMultiplier *= 1.2;
 						}
 
 						$armor = $armorByZone[$hits[$i - 1] - 1];
+						$baseMinDamage = $attacker->getMinDamage($attackMinDamage);
+						$baseMaxDamage = $attacker->getMaxDamage($attackMaxDamage);
 
-						$minDamage = (int) round($attacker->strength / 3 + $attackMinDamage - $armor);
-						$maxDamage = (int) round($attacker->strength / 1.5 + $attackMaxDamage - $armor);
+						$minDamage = (int) round($baseMinDamage - $armor);
+						$maxDamage = (int) round($baseMaxDamage - $armor);
 
 						$damageByHit[$i] = $this->randomizer->getInt($minDamage, $maxDamage);
 
@@ -130,7 +131,7 @@ class AttackCalculator
 			}
 		}
 
-		$damage = array_sum($damageByHit) - $damageReduction;
+		$damage = array_sum($damageByHit) - $defender->damageReduction;
 
 		if ($damage < 0) {
 			$damage = 0;
@@ -176,8 +177,6 @@ class AttackCalculator
 			defenderParry: $defenderParry,
 			defenderBlocks: $defenderBlocks,
 			experienceMultiplier: $experienceMultiplier,
-			minDamage: $attackMinDamage,
-			maxDamage: $attackMaxDamage,
 		);
 	}
 

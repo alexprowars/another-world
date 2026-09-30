@@ -4,6 +4,7 @@ namespace App\Engine\Battle\Services;
 
 use App\Engine\Battle\Data\AttackResult;
 use App\Engine\Battle\Enums\BattleStatus;
+use App\Engine\CombatStats;
 use App\Models\Battle;
 use App\Models\BattleLog;
 use App\Models\BattleMember;
@@ -143,6 +144,15 @@ class RoundResolver
 			->filter(fn(BattleLog $log) => !$log->member->died_at && $log->member->user->hp_now > 0)
 			->pluck('member_id');
 
+		// Бонусы приёмов фиксируются до расходования их длительности в атаках.
+		$attackStatsByMember = [];
+
+		foreach ($logs as $log) {
+			$log->member->user->calculate(time: $time);
+
+			$attackStatsByMember[$log->member_id] = $this->abilityService->getAttackStats($log->member);
+		}
+
 		foreach ($logs as $attackLog) {
 			// Погибший от магии до расчёта раунда не выполняет ранее выбранный удар.
 			if (!$aliveAtRoundStart->contains($attackLog->member_id)) {
@@ -155,10 +165,13 @@ class RoundResolver
 				continue;
 			}
 
-			$attackLog->member->user->calculate(time: $time);
-			$defenceLog->member->user->calculate(time: $time);
-
-			$this->resolveAttack($attackLog, $defenceLog, $time);
+			$this->resolveAttack(
+				$attackLog,
+				$defenceLog,
+				$attackStatsByMember[$attackLog->member_id],
+				$attackStatsByMember[$defenceLog->member_id],
+				$time,
+			);
 		}
 
 		$battle->round++;
@@ -174,19 +187,15 @@ class RoundResolver
 	private function resolveAttack(
 		BattleLog $attackLog,
 		BattleLog $defenceLog,
+		CombatStats $attackerStats,
+		CombatStats $defenderStats,
 		CarbonImmutable $time,
 	): void {
-		$attacker = $attackLog->member;
-		$defender = $defenceLog->member;
-
-		$this->abilityService->applyAttackEffect($attacker);
-
 		$attack = $this->attackCalculator->calculate(
-			$attacker->user,
-			$defender->user,
+			$attackerStats,
+			$defenderStats,
 			$attackLog->hit ?? [],
 			$defenceLog->block ?? [],
-			$this->abilityService->getEffect($defender)->damageReduction,
 		);
 
 		$this->applyAttackResult($attackLog, $defenceLog, $attack, $time);
@@ -200,10 +209,6 @@ class RoundResolver
 	): void {
 		$attacker = $attackLog->member;
 		$defender = $defenceLog->member;
-
-		// Пробой брони меняет диапазон урона для последующих ударов этого раунда.
-		$attacker->user->min = $attack->minDamage;
-		$attacker->user->max = $attack->maxDamage;
 
 		if (!$attacker->user->hp_max) {
 			$attacker->user->hp_max = 1;

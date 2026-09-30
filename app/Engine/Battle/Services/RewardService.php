@@ -32,7 +32,7 @@ class RewardService
 		$experienceReward = 0;
 
 		// Восстанавливаем запас сил
-		$user->stamina_now = min($user->stamina_now + 20, $user->vitality * 20);
+		$user->stamina_now = min($user->stamina_now + 20, $user->getCombatStats()->vitality * 20);
 
 		if ($result === ParticipantResult::DRAW) {
 			$user->draws += 1;
@@ -276,7 +276,7 @@ class RewardService
 			return (int) ceil(0.15 * $baseExp);
 		}
 
-		$maxHealth = $user->vitality * 5 + $user->hp;
+		$maxHealth = $user->getCombatStats()->vitality * 5 + $user->hp;
 
 		if ($maxHealth <= 0) {
 			return 0;

@@ -36,12 +36,12 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('room')->default(0);
 			$table->unsignedSmallInteger('rank')->nullable();
 			$table->boolean('is_clone')->default(false);
-			$table->smallInteger('s_strength')->default(3);
-			$table->smallInteger('s_dexterity')->default(3);
-			$table->smallInteger('s_agility')->default(3);
-			$table->smallInteger('s_vitality')->default(3);
-			$table->smallInteger('s_magic')->default(1);
-			$table->smallInteger('s_intelligence')->default(0);
+			$table->smallInteger('strength')->default(3);
+			$table->smallInteger('dexterity')->default(3);
+			$table->smallInteger('agility')->default(3);
+			$table->smallInteger('vitality')->default(3);
+			$table->smallInteger('magic')->default(1);
+			$table->smallInteger('intelligence')->default(0);
 			$table->string('image', 50)->nullable();
 			$table->unsignedSmallInteger('profession')->nullable();
 			$table->decimal('hp_now', 12, 4)->default(15);

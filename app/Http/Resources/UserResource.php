@@ -25,6 +25,8 @@ class UserResource extends JsonResource
 
 		$user = $this->resource;
 
+		$combatStats = $user->getCombatStats();
+
 		$up = Level::query()
 			->select(['levels.up', 'l2.exp'])
 			->join('levels as l2', 'l2.id', '=', DB::raw('levels.id + 1'))
@@ -61,24 +63,24 @@ class UserResource extends JsonResource
 			'energy_max' => $user->energy_max ?: 0,
 			'stamina_now' => (int) floor($user->stamina_now ?: 0),
 			'stamina_max' => $user->stamina_max ?: 0,
-			'krit' => $user->krit,
-			'mkrit' => $user->mkrit,
-			'unkrit' => $user->unkrit,
-			'uv' => $user->uv,
-			'unuv' => $user->unuv,
-			'pblock' => $user->pblock,
-			'mblock' => $user->mblock,
-			'pbr' => $user->pbr,
-			'kbr' => $user->kbr,
-			'armor1' => $user->armor1,
-			'armor2' => $user->armor2,
-			'armor3' => $user->armor3,
-			'armor4' => $user->armor4,
-			'armor5' => $user->armor5,
-			'damage_min' => round($user->strength / 3 + $user->min),
-			'damage_max' => round(1 + $user->strength / 1.5 + $user->max),
-			'magic_min' => $user->intelligence / 1.5,
-			'magic_max' => 1 + $user->intelligence,
+			'krit' => $combatStats->krit,
+			'mkrit' => $combatStats->mkrit,
+			'unkrit' => $combatStats->unkrit,
+			'uv' => $combatStats->uv,
+			'unuv' => $combatStats->unuv,
+			'pblock' => $combatStats->pblock,
+			'mblock' => $combatStats->mblock,
+			'pbr' => $combatStats->pbr,
+			'kbr' => $combatStats->kbr,
+			'armor1' => $combatStats->armor1,
+			'armor2' => $combatStats->armor2,
+			'armor3' => $combatStats->armor3,
+			'armor4' => $combatStats->armor4,
+			'armor5' => $combatStats->armor5,
+			'damage_min' => round($combatStats->getMinDamage()),
+			'damage_max' => round($combatStats->getMaxDamage()),
+			'magic_min' => $combatStats->getMinMagicDamage(),
+			'magic_max' => $combatStats->getMaxMagicDamage(),
 			'poison' => $user->poison,
 			'injury' => $user->injury?->toAtomString(),
 			'r_date' => $user->r_date?->toAtomString(),
@@ -95,10 +97,11 @@ class UserResource extends JsonResource
 		$user->save();
 
 		$data['rating'] = $user->rating;
+		$data['base_stats'] = [];
 
 		foreach (Vars::getStats() as $stat) {
-			$data[$stat] = $user->{$stat};
-			$data['s_' . $stat] = $user->{'s_' . $stat};
+			$data[$stat] = $combatStats->{$stat};
+			$data['base_stats'][$stat] = $user->{$stat};
 		}
 
 		return $data;

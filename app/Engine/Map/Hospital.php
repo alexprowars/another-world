@@ -12,7 +12,7 @@ class Hospital
 	public function __invoke()
 	{
 		$user = auth()->user();
-		$canHeal = $user->vitality > 0 && $user->hp_max > 0;
+		$canHeal = $user->getCombatStats()->vitality > 0 && $user->hp_max > 0;
 		$time = 0;
 
 		if ($canHeal) {
@@ -63,7 +63,7 @@ class Hospital
 			return;
 		}
 
-		if ($user->vitality <= 0 || $user->hp_max <= 0) {
+		if ($user->getCombatStats()->vitality <= 0 || $user->hp_max <= 0) {
 			$user->update(['r_date' => null, 'r_type' => null]);
 
 			return;

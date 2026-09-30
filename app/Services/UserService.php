@@ -80,7 +80,7 @@ class UserService
 			}
 
 			$user->updates--;
-			$user->{'s_' . $stat}++;
+			$user->{$stat}++;
 			$user->save();
 		});
 	}
@@ -133,8 +133,17 @@ class UserService
 
 	public static function getUserRaiting(User $user): int
 	{
+		$combatStats = $user->getCombatStats();
+
 		// Вычисление рейтинга крутизны (цена вещей, статы, процент побед)
-		$a = $user->strength + $user->agility + $user->dexterity + $user->vitality + $user->intelligence + $user->magic - 13;
+		$a = $combatStats->strength
+			+ $combatStats->agility
+			+ $combatStats->dexterity
+			+ $combatStats->vitality
+			+ $combatStats->intelligence
+			+ $combatStats->magic
+			- 13;
+
 		$b = round($user->wins / ($user->losses + $user->wins + 0.000001), 2);
 
 		return (int) round(((($user->rating / 1000) + ($a / 10)) * $b) + ($user->level / 2), 2);
@@ -162,7 +171,7 @@ class UserService
 		}
 
 		if ($user->r_type == 2) {
-			return $user->vitality > 0 && $user->r_date?->isFuture()
+			return $user->getCombatStats()->vitality > 0 && $user->r_date?->isFuture()
 				? self::getHospitalHealingTime($user)
 				: null;
 		}
@@ -177,8 +186,7 @@ class UserService
 
 	public static function calculateStats(User $user, CarbonImmutable $time, bool $persist = true): void
 	{
-		//$user['hp'] = 0;
-		//$user['energy'] = 0;
+		$combatStats = $user->getCombatStats();
 
 		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
 		$effects = $user->effects()
@@ -189,41 +197,38 @@ class UserService
 		foreach ($effects as $effect) {
 			foreach (Vars::getStats() as $stat) {
 				if (isset($effect[$stat])) {
-					$user->{$stat} += $effect[$stat];
+					$combatStats->{$stat} += $effect[$stat];
 				}
 			}
 
-			$user->armor1 += $effect->armor1 ?? 0;
-			$user->armor2 += $effect->armor2 ?? 0;
-			$user->armor3 += $effect->armor3 ?? 0;
-			$user->armor4 += $effect->armor4 ?? 0;
-			$user->armor5 += $effect->armor5 ?? 0;
-			$user->min += $effect->min ?? 0;
-			$user->max += $effect->max ?? 0;
+			$combatStats->armor1 += $effect->armor1 ?? 0;
+			$combatStats->armor2 += $effect->armor2 ?? 0;
+			$combatStats->armor3 += $effect->armor3 ?? 0;
+			$combatStats->armor4 += $effect->armor4 ?? 0;
+			$combatStats->armor5 += $effect->armor5 ?? 0;
+			$combatStats->min += $effect->min ?? 0;
+			$combatStats->max += $effect->max ?? 0;
 		}
 		// Конец эффектов
 
 		foreach (Vars::getStats() as $stat) {
-			if ($user->{$stat} < 0) {
-				$user->{$stat} = 0;
+			if ($combatStats->{$stat} < 0) {
+				$combatStats->{$stat} = 0;
 			}
 		}
 
 		// HP, Energy, Stamina
-		$user->hp_max = $user->vitality * 5 + $user->hp;
+		$user->hp_max = $combatStats->vitality * 5 + $user->hp;
 		$user->hp_now = min($user->hp_now, $user->hp_max);
 
-		$user->energy_max = (int) ceil($user->magic * 5 + $user->energy);
+		$user->energy_max = (int) ceil($combatStats->magic * 5 + $user->energy);
 		$user->energy_now = min($user->energy_now, $user->energy_max);
 
-		$user->stamina_max = (int) max(0, ($user->vitality + $effects->sum('battery')) * 20);
+		$user->stamina_max = (int) max(0, ($combatStats->vitality + $effects->sum('battery')) * 20);
 		$user->stamina_now = min($user->stamina_now, $user->stamina_max);
 
 		// Модификаторы зависят от характеристик после применения зелий и штрафов.
-		$user->krit += $user->dexterity * 5;
-		$user->unkrit += $user->dexterity * 5;
-		$user->uv += $user->agility * 5;
-		$user->unuv += $user->agility * 5;
+		$combatStats->addStatModifiers();
 
 		if ($persist) {
 			$user->save();
@@ -232,6 +237,8 @@ class UserService
 
 	public static function calculateWearsStats(User $user, CarbonImmutable $time, bool $persist = true): void
 	{
+		$combatStats = $user->getCombatStats();
+
 		$slot = $user->getSlot();
 
 		$wears = $slot->getItems();
@@ -247,32 +254,32 @@ class UserService
 
 			foreach (Vars::getStats() as $stat) {
 				if (isset($object->{$stat})) {
-					$user->{$stat} += $object->{$stat};
+					$combatStats->{$stat} += $object->{$stat};
 				}
 			}
 
 			$user->hp		+= $object->hp;
 			$user->energy	+= $object->energy;
 
-			$user->armor1	+= $object->armor1;
-			$user->armor2	+= $object->armor2;
-			$user->armor3	+= $object->armor3;
-			$user->armor4	+= $object->armor4;
-			$user->armor5	+= $object->armor5;
+			$combatStats->armor1 += $object->armor1;
+			$combatStats->armor2 += $object->armor2;
+			$combatStats->armor3 += $object->armor3;
+			$combatStats->armor4 += $object->armor4;
+			$combatStats->armor5 += $object->armor5;
 
-			$user->krit		+= $object->krit;
-			$user->mkrit	+= $object->mkrit;
-			$user->unkrit	+= $object->unkrit;
-			$user->uv		+= $object->uv;
-			$user->unuv		+= $object->unuv;
+			$combatStats->krit += $object->krit;
+			$combatStats->mkrit += $object->mkrit;
+			$combatStats->unkrit += $object->unkrit;
+			$combatStats->uv += $object->uv;
+			$combatStats->unuv += $object->unuv;
 
-			$user->pblock	+= $object->pblock;
-			$user->mblock	+= $object->mblock;
-			$user->pbr		+= $object->pbr;
-			$user->kbr		+= $object->kbr;
+			$combatStats->pblock += $object->pblock;
+			$combatStats->mblock += $object->mblock;
+			$combatStats->pbr += $object->pbr;
+			$combatStats->kbr += $object->kbr;
 
-			$user->min		+= $object->min;
-			$user->max		+= $object->max;
+			$combatStats->min += $object->min;
+			$combatStats->max += $object->max;
 
 			// Для вычисления рейтинга (стоимость вещи)
 			if ($object->price) {

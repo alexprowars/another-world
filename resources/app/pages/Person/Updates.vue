@@ -21,7 +21,7 @@
 					<h2>{{ $t('stats.' + stat) }}</h2>
 					<p>{{ $t('stats-info.' + stat) }}</p>
 				</div>
-				<b class="person-upgrade-value">{{ user['s_' + stat] || 0 }}</b>
+				<b class="person-upgrade-value">{{ user.base_stats[stat] || 0 }}</b>
 				<button
 					type="button"
 					class="ui-button ui-button--compact"

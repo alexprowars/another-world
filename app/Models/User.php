@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Facades\Vars;
+use App\Engine\CombatStats;
 use App\Http\Resources\UserSlotItemResource;
 use App\Services\UserService;
 use Carbon\CarbonImmutable;
@@ -25,36 +25,7 @@ class User extends Authenticatable implements HasMedia
 	public $hp = 0;
 	public $energy = 0;
 
-	// Вычисляемые игровые характеристики
-	public $strength;
-	public $dexterity;
-	public $agility;
-	public $vitality;
-	public $magic;
-	public $intelligence;
-
-	/**
-	 * Вычисляемые модификаторы
-	 */
-	public $armor1 = 0;
-	public $armor2 = 0;
-	public $armor3 = 0;
-	public $armor4 = 0;
-	public $armor5 = 0;
-
-	public $min = 0;
-	public $max = 0;
-
-	public $krit	= 0;
-	public $unkrit	= 0;
-	public $uv		= 0;
-	public $unuv	= 0;
-
-	public $mblock	= 0;
-	public $pbr		= 0;
-	public $kbr		= 0;
-	public $pblock	= 0;
-	public $mkrit	= 0;
+	private ?CombatStats $combatStats = null;
 
 	protected $casts = [
 		'options' => 'array',
@@ -80,16 +51,6 @@ class User extends Authenticatable implements HasMedia
 	{
 		self::created(function (self $user) {
 			$user->slots()->create();
-		});
-
-		self::retrieved(function (self $user) {
-			foreach (Vars::getStats() as $stat) {
-				if (!$user->hasAttribute('s_' . $stat)) {
-					continue;
-				}
-
-				$user->{$stat} = $user->{'s_' . $stat};
-			}
 		});
 	}
 
@@ -193,6 +154,18 @@ class User extends Authenticatable implements HasMedia
 		UserService::calculateStats($this, $time, $persist);
 
 		$this->calculated = true;
+	}
+
+	public function getCombatStats(): CombatStats
+	{
+		return $this->combatStats ??= new CombatStats(
+			strength: $this->strength ?? 0,
+			dexterity: $this->dexterity ?? 0,
+			agility: $this->agility ?? 0,
+			vitality: $this->vitality ?? 0,
+			magic: $this->magic ?? 0,
+			intelligence: $this->intelligence ?? 0,
+		);
 	}
 
 	public function getSlot()

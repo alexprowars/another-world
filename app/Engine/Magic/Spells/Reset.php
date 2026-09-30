@@ -32,12 +32,12 @@ class Reset extends AbstractSpell
 		InventoryService::unsetAllObject($target);
 
 		$target->fill([
-			's_strength' => 3,
-			's_dexterity' => 3,
-			's_agility' => 3,
-			's_vitality' => 3,
-			's_magic' => 1,
-			's_intelligence' => 0,
+			'strength' => 3,
+			'dexterity' => 3,
+			'agility' => 3,
+			'vitality' => 3,
+			'magic' => 1,
+			'intelligence' => 0,
 			'updates' => $updates,
 			'hp_now' => 15,
 			'energy_now' => 5,

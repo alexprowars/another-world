@@ -257,7 +257,9 @@ class InventoryService
 			return false;
 		}
 
-		if (array_any(Vars::getStats(), fn($stat) => isset($req[$stat]) && $user->{$stat} < $req[$stat])) {
+		$combatStats = $user->getCombatStats();
+
+		if (array_any(Vars::getStats(), fn($stat) => isset($req[$stat]) && $combatStats->{$stat} < $req[$stat])) {
 			return false;
 		}
 

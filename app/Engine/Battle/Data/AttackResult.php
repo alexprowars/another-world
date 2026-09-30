@@ -12,8 +12,6 @@ readonly class AttackResult
 		public int $defenderParry,
 		public int $defenderBlocks,
 		public float $experienceMultiplier,
-		public int|float $minDamage,
-		public int|float $maxDamage,
 	) {
 	}
 }

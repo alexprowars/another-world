@@ -330,12 +330,12 @@ class BattleService
 			'gender' => $user->gender,
 			'image' => $user->image,
 			'room' => $user->room,
-			's_strength' => $user->s_strength,
-			's_dexterity' => $user->s_dexterity,
-			's_agility' => $user->s_agility,
-			's_vitality' => $user->s_vitality,
-			's_magic' => $user->s_magic,
-			's_intelligence' => $user->s_intelligence,
+			'strength' => $user->strength,
+			'dexterity' => $user->dexterity,
+			'agility' => $user->agility,
+			'vitality' => $user->vitality,
+			'magic' => $user->magic,
+			'intelligence' => $user->intelligence,
 			'magic_resistance' => $user->magic_resistance,
 			'hp_now' => $user->hp_max,
 			'energy_now' => $user->energy_max,
@@ -705,13 +705,14 @@ class BattleService
 		$param = $injuries[$randomizer->getInt(0, count($injuries) - 1)];
 
 		$strength = $dexterity = $agility = 0;
+		$combatStats = $enemy->getCombatStats();
 
 		if ($param['param'] == 'strength') {
-			$strength = round($enemy->strength * ($level / 3.2)) * (-1);
+			$strength = round($combatStats->strength * ($level / 3.2)) * (-1);
 		} elseif ($param['param'] == 'dexterity') {
-			$dexterity = round($enemy->dexterity * ($level / 3.2)) * (-1);
+			$dexterity = round($combatStats->dexterity * ($level / 3.2)) * (-1);
 		} elseif ($param['param'] == 'agility') {
-			$agility = round($enemy->agility * ($level / 3.2)) * (-1);
+			$agility = round($combatStats->agility * ($level / 3.2)) * (-1);
 		}
 
 		$enemy->injury = $time->addSeconds($duration);

@@ -6,6 +6,7 @@ use App\Engine\Battle\Abilities\Ability;
 use App\Engine\Battle\Abilities\AbilityEffect;
 use App\Engine\Battle\Abilities\AbilityRegistry;
 use App\Engine\Battle\Enums\BattleStatus;
+use App\Engine\CombatStats;
 use App\Models\Battle;
 use App\Models\BattleMember;
 use App\Models\User;
@@ -107,14 +108,18 @@ class AbilityService
 		return $ability === null ? new AbilityEffect() : $ability->effect;
 	}
 
-	public function applyAttackEffect(BattleMember $fighter): void
+	public function getAttackStats(BattleMember $fighter): CombatStats
 	{
+		$stats = clone $fighter->user->getCombatStats();
 		$effect = $this->getEffect($fighter);
 
-		$fighter->user->min += $effect->damageBonus;
-		$fighter->user->max += $effect->damageBonus;
-		$fighter->user->krit += $effect->critBonus;
-		$fighter->user->uv += $effect->dodgeBonus;
+		$stats->min += $effect->damageBonus;
+		$stats->max += $effect->damageBonus;
+		$stats->krit += $effect->critBonus;
+		$stats->uv += $effect->dodgeBonus;
+		$stats->damageReduction += $effect->damageReduction;
+
+		return $stats;
 	}
 
 	public function finishAttack(BattleMember $fighter): void

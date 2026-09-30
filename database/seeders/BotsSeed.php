@@ -104,10 +104,10 @@ class BotsSeed extends Seeder
 				'rank' => 60,
 				'room' => 2,
 				'level' => $player['level'],
-				's_strength' => $player['strength'],
-				's_dexterity' => $player['dexterity'],
-				's_agility' => $player['agility'],
-				's_vitality' => $player['vitality'],
+				'strength' => $player['strength'],
+				'dexterity' => $player['dexterity'],
+				'agility' => $player['agility'],
+				'vitality' => $player['vitality'],
 			]);
 		}
 	}

@@ -13,6 +13,8 @@ class ProfileResource extends JsonResource
 	{
 		$user = $this->resource;
 
+		$combatStats = $user->getCombatStats();
+
 		return [
 			...$user->only(['id', 'name', 'level', 'rank', 'profession', 'wins', 'losses', 'draws', 'rating', 'gender', 'city', 'about']),
 			'avatar' => $user->getAvatar(),
@@ -25,8 +27,8 @@ class ProfileResource extends JsonResource
 			'stamina_max' => $user->stamina_max,
 			'stats' => collect(Vars::getStats())->map(fn (string $stat) => [
 				'code' => $stat,
-				'value' => $user->{$stat},
-				'base' => $user->{'s_' . $stat},
+				'value' => $combatStats->{$stat},
+				'base' => $user->{$stat},
 			])->values(),
 			'tribe' => $user->tribe?->only(['id', 'name', 'short']),
 			'created_at' => $user->created_at?->toAtomString(),

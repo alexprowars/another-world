@@ -58,11 +58,11 @@
 							</div>
 							<div>
 								<dt>Своя</dt>
-								<dd>{{ player['s_' + stat.key] }}</dd>
+								<dd>{{ player.base_stats[stat.key] }}</dd>
 							</div>
 							<div>
 								<dt>Эффекты</dt>
-								<dd>{{ player[stat.key] - player['s_' + stat.key] }}</dd>
+								<dd>{{ player[stat.key] - player.base_stats[stat.key] }}</dd>
 							</div>
 						</dl>
 					</template>
