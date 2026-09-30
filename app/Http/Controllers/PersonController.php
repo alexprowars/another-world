@@ -270,8 +270,7 @@ class PersonController extends Controller
 
 	public function abilities(Request $request): Response|RedirectResponse
 	{
-		/** @var array $priem_full */
-		include(resource_path('/data/battle.php'));
+		$priem_full = require resource_path('data/battle.php');
 
 		$priem_full = array_filter(
 			$priem_full,

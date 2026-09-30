@@ -91,7 +91,7 @@ class InventoryService
 			'life'		=> $item->life > 0 ? now()->addSeconds($item->life) : null,
 		]);
 
-		$object->requirements = (object) array_filter([
+		$object->requirements = array_filter([
 			'level' => $item->req_level,
 			'strength' => $item->req_strength,
 			'dexterity' => $item->req_dexterity,

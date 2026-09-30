@@ -203,7 +203,7 @@ class TribeService
 
 	private static function checkInquisition(User $user): void
 	{
-		if (!$user->inquisitor_check_until || $user->inquisitor_check_until->isPast()) {
+		if (!$user->inquisitor_check || $user->inquisitor_check->isPast()) {
 			throw new Exception('Персонаж не проходил проверку у инквизиторов или срок проверки истёк!');
 		}
 	}

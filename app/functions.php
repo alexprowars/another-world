@@ -1,6 +1,7 @@
 <?php
 
 use App\Support\ToastType;
+use Carbon\CarbonImmutable;
 use Inertia\Inertia;
 
 if (!function_exists('flash')) {
@@ -40,7 +41,9 @@ function startOfDay($timestamp = 0)
 		$timestamp = time();
 	}
 
-	return mktime(0, 0, 0, date("n", $timestamp), date("j", $timestamp), date("Y", $timestamp));
+	return CarbonImmutable::createFromTimestamp($timestamp, date_default_timezone_get())
+		->startOfDay()
+		->getTimestamp();
 }
 
 function endOfDay($timestamp = 0)
@@ -49,7 +52,9 @@ function endOfDay($timestamp = 0)
 		$timestamp = time();
 	}
 
-	return mktime(23, 59, 59, date("n", $timestamp), date("j", $timestamp), date("Y", $timestamp));
+	return CarbonImmutable::createFromTimestamp($timestamp, date_default_timezone_get())
+		->endOfDay()
+		->getTimestamp();
 }
 
 function pretty_time($seconds, $separator = '')

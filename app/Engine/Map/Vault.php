@@ -35,8 +35,14 @@ class Vault
 			});
 		}
 
-		$action = collect(['heal', 'dig', 'unwork', 'go'])
-			->first(fn(string $key) => request()->has($key));
+		$action = null;
+
+		foreach (['heal', 'dig', 'unwork', 'go'] as $key) {
+			if (request()->has($key)) {
+				$action = $key;
+				break;
+			}
+		}
 
 		if ($action) {
 			try {
@@ -231,7 +237,7 @@ class Vault
 		return 'Вы успешно отменили добычу руды.';
 	}
 
-	private function move(User $user, VaultRoom $room, mixed $direction): ?string
+	private function move(User $user, VaultRoom $room, mixed $direction): null
 	{
 		$this->ensureFree($user);
 

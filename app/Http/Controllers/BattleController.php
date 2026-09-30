@@ -46,7 +46,6 @@ class BattleController extends Controller
 					}
 
 					$battle = new BattleEngine($battleModel, $user);
-					$battle->init();
 
 					return $battle->show();
 				});
@@ -105,7 +104,7 @@ class BattleController extends Controller
 			'currentOffer' => $userOffer ? BattleOfferResource::make($userOffer->battle) : null,
 			'currentSide' => $userOffer?->side,
 			'offerError' => $offerError,
-			'canTeleport' => !in_array($user->room, [1, 2, 3, 4], true) && !$user->r_type && !$user->prison_until?->isFuture(),
+			'canTeleport' => !in_array($user->room, [1, 2, 3, 4], true) && !$user->r_type && !$user->prison?->isFuture(),
 		]);
 	}
 
@@ -172,7 +171,7 @@ class BattleController extends Controller
 
 					break;
 				case 'teleport':
-					if ($user->r_type || $user->prison_until?->isFuture()) {
+					if ($user->r_type || $user->prison?->isFuture()) {
 						throw new Exception('Сейчас вы не можете переместиться на арену');
 					}
 

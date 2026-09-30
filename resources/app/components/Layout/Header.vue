@@ -7,7 +7,7 @@
 				<span class="game-player-level">[{{ user.level }}]</span>
 			</span>
 			<div class="game-player-resources">
-				<HpLine :current="user.hp_now" :max="user.hp_max" color="g_line" title="Здоровье">
+				<HpLine :current="user.hp_now" :max="user.hp_max" :regeneration="user.hp_regeneration" color="g_line" title="Здоровье">
 					<template #icon><HealthIcon class="resource-icon" /></template>
 				</HpLine>
 				<HpLine :current="user.energy_now" :max="user.energy_max" color="b_line" title="Мана">

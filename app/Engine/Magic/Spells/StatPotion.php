@@ -10,7 +10,10 @@ use App\Models\UserItem;
 class StatPotion extends Potion
 {
 	/** @param array{strength?: int, dexterity?: int, agility?: int, vitality?: int, magic?: int, intelligence?: int} $stats */
-	public function __construct(private readonly array $stats)
+	public function __construct(
+		private readonly array $stats,
+		private readonly int $hours = 4,
+	)
 	{
 		parent::__construct();
 	}
@@ -24,9 +27,9 @@ class StatPotion extends Potion
 		$target->effects()->create([
 			...$this->stats,
 			'type' => Effect::POTION,
-			'date' => now()->addHours(4),
+			'date' => now()->addHours($this->hours),
 		]);
 
-		return $target->name . ' выпил «' . $item->title . '». Характеристики изменены на 4 часа.';
+		return $target->name . ' выпил «' . $item->title . '». Характеристики изменены на ' . $this->hours . ' часа.';
 	}
 }

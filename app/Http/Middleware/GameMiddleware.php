@@ -35,7 +35,7 @@ class GameMiddleware
 
 		if ($user->battle_id && !str_contains($request->route()->uri(), 'chat/')) {
 			$dispatch = BattleController::class;
-		} elseif ($user->r_date && $user->r_type) {
+		} elseif ($user->r_date) {
 			switch ($user->r_type) {
 				case 1:
 					UserService::checkRoom($user, 666);
@@ -62,7 +62,7 @@ class GameMiddleware
 					$dispatch = MapController::class;
 					break;
 			}
-		} elseif ($user->prison_until) {
+		} elseif ($user->prison) {
 			UserService::checkRoom($user, 666);
 			$dispatch = MapController::class;
 		}

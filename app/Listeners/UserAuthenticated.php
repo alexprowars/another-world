@@ -24,7 +24,12 @@ class UserAuthenticated
 
 		if ($user->blocked_at) {
 			if ($user->blocked_at->isFuture()) {
-				throw new Exception('Ваш аккаунт заблокирован. Срок окончания блокировки: ' . $game->datezone("d.m.Y H:i:s", $user->blocked_at) . '<br>Для получения дополнительной информации зайдите <a href="' . URL::to('/banned') . '">сюда</a>');
+				throw new Exception(
+					'Ваш аккаунт заблокирован. Срок окончания блокировки: '
+					. $user->blocked_at->format('d.m.Y H:i:s')
+					. '<br>Для получения дополнительной информации зайдите <a href="'
+					. URL::to('/banned') . '">сюда</a>'
+				);
 			} else {
 				$user->blocked_at = null;
 				$user->save();

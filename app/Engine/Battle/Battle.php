@@ -45,10 +45,6 @@ class Battle
 		$this->fighter = $battle->members->where('user_id', $this->user->id)->first();
 	}
 
-	public function init()
-	{
-	}
-
 	public function show()
 	{
 		$json = [
@@ -59,8 +55,7 @@ class Battle
 		];
 
 		// Основные боевые константы
-		/** @var array $priem_full */
-		include(resource_path('/data/battle.php'));
+		$priem_full = require resource_path('data/battle.php');
 
 		$this->user->calculate();
 		$this->calculateKickAndBlockCount();
@@ -182,12 +177,10 @@ class Battle
 						$victims[0] = request()->integer('opponent');
 					}
 
-					if ($timeout > 0 && (isset($victims[$random]) || !$this->fighter->finished_at)) {
-						// Если никого не можеш ударить то удар и блок поставить не можеш
-						if (!isset($victims[$random])) {
-							$this->numBlocks = 0;
-							$this->numKicks = 0;
-						}
+					// Если некого ударить, удары и блоки недоступны.
+					if ($timeout > 0 && !isset($victims[$random])) {
+						$this->numBlocks = 0;
+						$this->numKicks = 0;
 					}
 				}
 			} else {
@@ -212,14 +205,6 @@ class Battle
 				} else {
 					$json['result'] = 'lose';
 				}
-			}
-		}
-
-		if (empty($json['action'])) {
-			if ($this->battle->type == BattleType::DUEL && $this->user->room == BattleType::GROUP) {
-				$json['action'] = 'impactForm';
-			} else {
-				$json['action'] = 'mapForm';
 			}
 		}
 
@@ -537,8 +522,8 @@ class Battle
 
 		// Если в клане и выиграли, то прибовляем очки клана
 		if ($this->user->tribe && $type == 3) {
-			$add1 = round($this->fighter->damage / 2);
-			$add2 = round($this->fighter->damage * 1.5);
+			$add1 = (int) round($this->fighter->damage / 2);
+			$add2 = (int) round($this->fighter->damage * 1.5);
 
 			$addpoints = random_int($add1, $add2);
 
@@ -550,17 +535,14 @@ class Battle
 
 		if ($type == 3) {
 			if ($this->user->room == 1) {
-				if ($this->battle->type == BattleType::DUEL) {
-					$addmoney = 0.25 * $this->user->level;
-				} elseif ($this->battle->type == BattleType::GROUP) {
-					$addmoney = 0.3 * $this->user->level;
-				} elseif ($this->battle->type == BattleType::CHAOS) {
-					$addmoney = 0.35 * $this->user->level;
-				} elseif ($this->battle->type == BattleType::ALIGN) {
-					$addmoney = 0.4 * $this->user->level;
-				} else {
-					$addmoney = 0.25 * $this->user->level;
-				}
+				$rewardMultiplier = match ($this->battle->type) {
+					BattleType::DUEL => 0.25,
+					BattleType::GROUP => 0.3,
+					BattleType::CHAOS => 0.35,
+					BattleType::ALIGN => 0.4,
+				};
+
+				$addmoney = $rewardMultiplier * $this->user->level;
 			} else {
 				$addmoney = 0.2 * $this->user->level;
 			}
@@ -623,9 +605,10 @@ class Battle
 					->where('user_id', '!=', $user->id)
 					->first();
 
-				$addExp = round($enemy->exp * random_int(1, 1.2));
-			} else { // ----- # ... для группового поединка # ----- //
-				//include("includes_2/battle/exp.php");
+				$expMultiplier = random_int(100, 120) / 100;
+				$addExp = round($enemy->exp * $expMultiplier);
+			} else {
+				$addExp = $this->getGroupExp($user);
 			}
 
 			$addExp *= 2;
@@ -648,8 +631,8 @@ class Battle
 				$addExp = $maxExp;
 			}
 
-			// ----- # Если есть ускорение, то опыта в 2 раза больше # ----- //
-			if ($user->sign > time()) {
+			// Боевая ярость удваивает опыт до окончания срока действия.
+			if ($user->battle_fury?->isFuture()) {
 				$addExp *= 2;
 			}
 			// ----- # Если есть вип значёк, то опыта в 3 раза больше # ----- //
@@ -704,6 +687,61 @@ class Battle
 		}
 
 		return $addExp;
+	}
+
+	private function getGroupExp(User $user): int
+	{
+		$baseExp = $this->battle->members
+			->where('side', '!=', $this->fighter->side)
+			->avg('exp');
+
+		if ($baseExp === null) {
+			return 0;
+		}
+
+		$baseExp = round($baseExp);
+		$equippedSlots = $user->getSlotsInfo();
+		$equipmentWeight = 0;
+
+		$slotWeights = [
+			1 => 4,
+			3 => 4,
+			4 => 4,
+			5 => 4,
+			9 => 0.765,
+			13 => 0.765,
+			14 => 0.765,
+			15 => 0.765,
+			2 => 0.64,
+			16 => 0.64,
+			19 => 0.64,
+			6 => 0.17,
+			7 => 0.17,
+			8 => 0.17,
+			10 => 0.17,
+			11 => 0.17,
+			12 => 0.17,
+		];
+
+		foreach ($slotWeights as $slot => $weight) {
+			if (isset($equippedSlots['slot_' . $slot])) {
+				$equipmentWeight += $weight;
+			}
+		}
+
+		if ($equipmentWeight == 0) {
+			return (int) ceil(0.15 * $baseExp);
+		}
+
+		$maxHealth = $user->vitality * 5 + $user->hp;
+
+		if ($maxHealth <= 0) {
+			return 0;
+		}
+
+		return (int) ceil(
+			$equipmentWeight * 0.07 * $baseExp * ($this->fighter->damage / $maxHealth)
+		);
 	}
 
 	private function timeout()
@@ -923,7 +961,10 @@ class Battle
 		if ($pu > $a) {
 			$kickAction[1] = 'uvorot';
 		} elseif ($pi > $rb) {  // крит
-			$kickDamage[1] = random_int(1.5 * ($user->member->user->strength / 3 + $user->member->user->min), 2.5 * ($user->member->user->strength / 1.5 + $user->member->user->max));
+			$minDamage = (int) (1.5 * ($user->member->user->strength / 3 + $user->member->user->min));
+			$maxDamage = (int) (2.5 * ($user->member->user->strength / 1.5 + $user->member->user->max));
+
+			$kickDamage[1] = random_int($minDamage, $maxDamage);
 
 			if ($kickDamage[1] < 0) {
 				$kickDamage[1] = 0;
@@ -939,7 +980,10 @@ class Battle
 
 					if (in_array($userKick[$i - 1], $enemyBlock, true)) {
 						if ($pbl > $rnd) {
-							$kickDamage[$i] = random_int(0.5 * ($user->member->user->strength / 3 + $user->member->user->min), 0.75 * ($user->member->user->strength / 1.5 + $user->member->user->max));
+							$minDamage = (int) (0.5 * ($user->member->user->strength / 3 + $user->member->user->min));
+							$maxDamage = (int) (0.75 * ($user->member->user->strength / 1.5 + $user->member->user->max));
+
+							$kickDamage[$i] = random_int($minDamage, $maxDamage);
 
 							if ($kickDamage[$i] < 0) {
 								$kickDamage[$i] = 0;
@@ -962,7 +1006,11 @@ class Battle
 							$exp_x *= 1.2;
 						}
 
-						$kickDamage[$i] = random_int(round(($user->member->user->strength / 3 + $user->member->user->min) - $b[$userKick[$i - 1] - 1]), round(($user->member->user->strength / 1.5 + $user->member->user->max) - $b[$userKick[$i - 1] - 1]));
+						$armor = $b[$userKick[$i - 1] - 1];
+						$minDamage = (int) round($user->member->user->strength / 3 + $user->member->user->min - $armor);
+						$maxDamage = (int) round($user->member->user->strength / 1.5 + $user->member->user->max - $armor);
+
+						$kickDamage[$i] = random_int($minDamage, $maxDamage);
 
 						if ($kickDamage[$i] < 0) {
 							$kickDamage[$i] = 0;
@@ -1008,26 +1056,24 @@ class Battle
 		} elseif ($kickAction[1] == 'crit') {
 			$comment = random_int(21, 23);
 			$add_pr = 2;
-		} elseif ($kickAction[1] == 'prob1' && $kickAction[2] != 'prob2') {
-			$comment = 41;
+		} elseif ($kickAction[1] === 'prob1') {
+			$comment = $kickAction[2] === 'prob2' ? 43 : 41;
 			$add_pr = 3;
-		} elseif ($kickAction[1] != 'prob1' && $kickAction[2] == 'prob2') {
+		} elseif ($kickAction[2] === 'prob2') {
 			$comment = 42;
 			$add_pr = 3;
-		} elseif ($kickAction[1] == 'prob1' && $kickAction[2] == 'prob2') {
-			$comment = 43;
-			$add_pr = 3;
-		} elseif ($kickAction[1] == 'block1' && $kickAction[2] != 'udar') {
-			$comment = random_int(11, 20);
+		} elseif ($kickAction[1] === 'block1') {
+			$comment = $kickAction[2] === 'udar'
+				? random_int(8, 10)
+				: random_int(11, 20);
 			$add_pr = 4;
-		} elseif ($kickAction[1] == "udar" && $kickAction[2] != 'block2') {
-			$comment = random_int(1, 4);
-		} elseif ($kickAction[1] == 'udar' && $kickAction[2] == 'block2') {
-			$comment = random_int(5, 7);
-			$add_pr = 4;
-		} elseif ($kickAction[1] == 'block1' && $kickAction[2] == 'udar') {
-			$comment = random_int(8, 10);
-			$add_pr = 4;
+		} elseif ($kickAction[1] === 'udar') {
+			if ($kickAction[2] === 'block2') {
+				$comment = random_int(5, 7);
+				$add_pr = 4;
+			} else {
+				$comment = random_int(1, 4);
+			}
 		}
 
 		if ($exp_total > 0) {
@@ -1120,7 +1166,7 @@ class Battle
 		}
 
 		if (request()->has('caseImpact') && request()->boolean('caseImpact')) {
-			if ($kick1 > 0 && $this->numKicks == 2 && $kick2 == 0) {
+			if ($kick1 > 0 && $this->numKicks == 2) {
 				$kick2 = 2;
 			} else {
 				$kick1 = 2;
@@ -1313,10 +1359,6 @@ class Battle
 
 			$opponent = $opponents->random();
 
-			if (!$opponent) {
-				continue;
-			}
-
 			$member->user->calculate();
 
 			$kick1  = random_int(1, 5);
@@ -1333,8 +1375,8 @@ class Battle
 
 			$log = $this->battle->logs()->make();
 			$log->round = $this->battle->round;
-			$log->hit = array_filter([$kick1]);
-			$log->block = array_filter([$block1, $block2]);
+			$log->hit = [$kick1];
+			$log->block = [$block1, $block2];
 			$log->member()->associate($member);
 			$log->enemy()->associate($opponent);
 			$log->save();

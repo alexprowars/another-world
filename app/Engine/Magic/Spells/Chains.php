@@ -23,11 +23,11 @@ class Chains extends AbstractSpell
 			throw new Exception('Нельзя использовать донос во время боя');
 		}
 
-		if ($target->prison_until?->isFuture()) {
+		if ($target->prison?->isFuture()) {
 			throw new Exception('Персонаж уже находится в тюрьме');
 		}
 
-		$target->prison_until = now()->addMinutes(15);
+		$target->prison = now()->addMinutes(15);
 		$target->prison_reason = 'Донос на персонажа';
 		$target->room = 666;
 

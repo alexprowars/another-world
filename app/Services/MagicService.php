@@ -68,7 +68,7 @@ class MagicService
 
 			$target->setRelation('battle', $battles->get($targetBattleId));
 
-			if (!$caster->isFree() || $caster->prison_until?->isFuture() || $caster->blocked_at) {
+			if (!$caster->isFree() || $caster->prison?->isFuture() || $caster->blocked_at) {
 				throw new Exception('Сейчас вы не можете использовать магию');
 			}
 
@@ -124,7 +124,7 @@ class MagicService
 			if (
 				!$target->is($caster) && !$target->isAdmin()
 				&& !$spell->ignoresMagicProtection()
-				&& $target->magic_protection_until?->isFuture()
+				&& $target->magic_protection?->isFuture()
 			) {
 				throw new Exception('Персонаж находится под защитой от магии');
 			}
@@ -160,7 +160,7 @@ class MagicService
 
 				$redirect = $target->battle_id && $target->battle_id !== $targetBattleId ? route('battle') : null;
 
-				if ($target->prison_until?->isFuture()) {
+				if ($target->prison?->isFuture()) {
 					$redirect = route('map');
 				}
 

@@ -194,7 +194,7 @@ class BattleService
 			throw new Exception('На этого персонажа нельзя напасть');
 		}
 
-		if ($enemy->attack_protection_until?->isFuture()) {
+		if ($enemy->attack_protection?->isFuture()) {
 			throw new Exception('Персонаж защищён от нападения');
 		}
 
@@ -202,7 +202,7 @@ class BattleService
 			throw new Exception('Нельзя напасть на травмированного персонажа');
 		}
 
-		if ($enemy->room == 2 || $enemy->prison_until?->isFuture() || !$enemy->isFree()) {
+		if ($enemy->room == 2 || $enemy->prison?->isFuture() || !$enemy->isFree()) {
 			throw new Exception('Персонаж сейчас недоступен для нападения');
 		}
 

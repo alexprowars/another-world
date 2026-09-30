@@ -26,11 +26,10 @@ class UserResource extends JsonResource
 		$user = $this->resource;
 
 		$up = Level::query()
-			->select(['l1.up', 'l2.exp'])
-			->from('levels as l1')
-			->join('levels as l2', 'l2.id', '=', DB::raw('l1.id + 1'))
-			->where('l1.up', $user->up)
-			->where('l1.level', $user->level)
+			->select(['levels.up', 'l2.exp'])
+			->join('levels as l2', 'l2.id', '=', DB::raw('levels.id + 1'))
+			->where('levels.up', $user->up)
+			->where('levels.level', $user->level)
 			->toBase()
 			->first();
 
@@ -57,6 +56,7 @@ class UserResource extends JsonResource
 			'tribe' => null,
 			'hp_now' => (int) floor($user->hp_now ?: 0),
 			'hp_max' => $user->hp_max ?: 0,
+			'hp_regeneration' => $this->healthRegeneration(),
 			'energy_now' => (int) floor($user->energy_now ?: 0),
 			'energy_max' => $user->energy_max ?: 0,
 			'stamina_now' => (int) floor($user->stamina_now ?: 0),
@@ -104,6 +104,32 @@ class UserResource extends JsonResource
 		return $data;
 	}
 
+	private function healthRegeneration(): ?array
+	{
+		$user = $this->resource;
+
+		$duration = UserService::getHealthRegenerationTime($user);
+
+		if ($duration === null || $user->hp_now >= $user->hp_max) {
+			return null;
+		}
+
+		$hospital = $user->r_type == 2;
+
+		if ($hospital) {
+			$remaining = now()->diffInSeconds($user->r_date);
+		} else {
+			$elapsed = max(0, (int) $user->online->diffInSeconds());
+			$remaining = (1 - $user->hp_now / $user->hp_max) * $duration - $elapsed;
+		}
+
+		return [
+			'duration' => $duration,
+			'remaining' => max(0, $remaining),
+			'hospital' => $hospital,
+		];
+	}
+
 	private function statuses(): array
 	{
 		$statuses = [];
@@ -112,9 +138,10 @@ class UserResource extends JsonResource
 			'silence' => ['Чат', 'Запрещено общение в чате'],
 			'injury' => ['Травма', 'Персонаж травмирован'],
 			'invisible' => ['Тень', 'Невидимость'],
-			'attack_protection_until' => ['Защита', 'Защита от нападения'],
-			'magic_protection_until' => ['Защита', 'Защита от магии'],
-			'vampire_protection_until' => ['Защита', 'Защита от вампиров'],
+			'battle_fury' => ['Ярость', 'Боевая ярость: опыт в боях увеличен в 2 раза'],
+			'attack_protection' => ['Защита', 'Защита от нападения'],
+			'magic_protection' => ['Защита', 'Защита от магии'],
+			'vampire_protection' => ['Защита', 'Защита от вампиров'],
 		];
 
 		foreach ($attributes as $attribute => [$label, $title]) {

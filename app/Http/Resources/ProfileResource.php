@@ -33,10 +33,13 @@ class ProfileResource extends JsonResource
 			'zodiac' => $this->zodiac(),
 			'admin' => $user->isAdmin(),
 			'blocked' => $user->blocked_at !== null,
-			'prison_until' => $user->prison_until?->isFuture() ? $user->prison_until->toAtomString() : null,
-			'prison_reason' => $user->prison_until?->isFuture() ? $user->prison_reason : null,
+			'prison' => $user->prison?->isFuture() ? $user->prison->toAtomString() : null,
+			'prison_reason' => $user->prison?->isFuture() ? $user->prison_reason : null,
 			'silence_until' => $user->silence?->isFuture() ? $user->silence->toAtomString() : null,
 			'injury_until' => $user->injury?->isFuture() ? $user->injury->toAtomString() : null,
+			'battle_fury' => $user->battle_fury?->isFuture()
+				? $user->battle_fury->toAtomString()
+				: null,
 			'vip' => $user->vip?->isFuture() ?? false,
 		];
 	}

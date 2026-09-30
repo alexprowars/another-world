@@ -85,9 +85,8 @@ class UserService
 
 	public static function activateAbility(User $user, int $abilityId): void
 	{
-		require resource_path('data/battle.php');
+		$priem_full = require resource_path('data/battle.php');
 
-		/** @var array<int, array{level: int}> $priem_full */
 		$ability = $priem_full[$abilityId] ?? null;
 
 		if ($ability === null) {
@@ -143,17 +142,37 @@ class UserService
 
 	public static function getCuredHealth(User $user): float
 	{
-		$result = 0;
+		$duration = self::getHealthRegenerationTime($user);
 
-		if (!$user->battle_id && $user->r_type != 2 && ($user->hp_now < $user->hp_max) && $user->hp_max != 0 && $user->online) {
-			$result = round($user->hp_max * (((int) $user->online->diffInSeconds()) / 600), 4); // 600
-
-			if (($user->hp_now + $result) > $user->hp_max) {
-				$result = $user->hp_max - $user->hp_now;
-			}
+		if ($duration === null || $user->r_type == 2 || $user->hp_now >= $user->hp_max) {
+			return 0;
 		}
 
-		return $result;
+		$seconds = max(0, (int) $user->online->diffInSeconds());
+
+		$result = round($user->hp_max * ($seconds / $duration), 4);
+
+		return min($user->hp_max - $user->hp_now, $result);
+	}
+
+	public static function getHealthRegenerationTime(User $user): ?int
+	{
+		if ($user->battle_id || $user->hp_max <= 0) {
+			return null;
+		}
+
+		if ($user->r_type == 2) {
+			return $user->vitality > 0 && $user->r_date?->isFuture()
+				? self::getHospitalHealingTime($user)
+				: null;
+		}
+
+		return $user->online ? 600 : null;
+	}
+
+	public static function getHospitalHealingTime(User $user): int
+	{
+		return $user->level < 4 ? 180 : 360;
 	}
 
 	public static function calculateStats(User $user, bool $persist = true): void

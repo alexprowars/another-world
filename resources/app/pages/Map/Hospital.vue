@@ -28,7 +28,7 @@
 
 				<div class="hospital-health">
 					<span class="hospital-label">Уровень жизни</span>
-					<HpLine :current="user.hp_now" :max="user.hp_max" color="g_line" />
+					<HpLine :current="user.hp_now" :max="user.hp_max" :regeneration="user.hp_regeneration" color="g_line" />
 				</div>
 
 				<div v-if="user.r_date" class="hospital-treatment">

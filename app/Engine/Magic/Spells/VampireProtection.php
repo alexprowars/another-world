@@ -17,11 +17,11 @@ class VampireProtection extends AbstractSpell
 	{
 		$this->requireOutsideBattle($caster, $target);
 
-		if ($target->vampire_protection_until?->isFuture()) {
+		if ($target->vampire_protection?->isFuture()) {
 			throw new Exception('На персонаже уже действует защита от вампиров');
 		}
 
-		$target->vampire_protection_until = now()->addHours($this->hours);
+		$target->vampire_protection = now()->addHours($this->hours);
 
 		return $caster->name . ' наложил на персонажа ' . $target->name . ' защиту от вампиров на ' . $this->hours . ' ч.';
 	}

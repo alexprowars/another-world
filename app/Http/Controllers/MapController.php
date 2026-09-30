@@ -20,7 +20,7 @@ class MapController extends Controller
 		$user = auth()->user();
 
 		try {
-			if ($user->prison_until?->isFuture()) {
+			if ($user->prison?->isFuture()) {
 				throw new Exception('Нельзя покинуть тюрьму до окончания срока наказания');
 			}
 
@@ -129,8 +129,8 @@ class MapController extends Controller
 			case 11:
 				return new Map\Smithy()();
 			case 12:
+				// Игорный дом
 				return include(app_path('/includes/city/city_1/gamblinghouse.php'));
-				break; // Игорный дом
 			case 13:
 				return new Map\GiftShop()();
 			case 14:
@@ -140,19 +140,19 @@ class MapController extends Controller
 			case 17:
 				return new Map\Bank()();
 			case 19:
+				// Приём ресурсов
 				return include(app_path('/includes/city/city_1/ambar.php'));
-				break; // Приём ресоф
 			case 20:
 				return new Map\Market()();
 			case 22:
+				// Церковь
 				return include(app_path('/includes/city/city_1/brak.php'));
-				break; // Церковь
 			case 25:
+				// Почта
 				return include(app_path('/includes/city/city_1/pochta.php'));
-				break; // Почта
 			case 27:
+				// Знахарка
 				return include(app_path('/includes/city/city_1/znahar.php'));
-				break; // Знахарка
 			case 28:
 				return new Map\PawnShop()();
 			case 29:

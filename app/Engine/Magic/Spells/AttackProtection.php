@@ -8,7 +8,7 @@ use App\Models\UserItem;
 
 class AttackProtection extends AbstractSpell
 {
-	public function __construct()
+	public function __construct(private readonly int $hours = 3)
 	{
 		parent::__construct(10);
 	}
@@ -17,12 +17,15 @@ class AttackProtection extends AbstractSpell
 	{
 		$this->requireOutsideBattle($caster, $target);
 
-		if ($target->attack_protection_until?->isFuture()) {
+		if ($target->attack_protection?->isFuture()) {
 			throw new Exception('На персонаже уже действует защита от нападения');
 		}
 
-		$target->attack_protection_until = now()->addHours(3);
+		$target->attack_protection = now()->addHours($this->hours);
+		$duration = $this->hours % 24 === 0
+			? intdiv($this->hours, 24) . ' д.'
+			: $this->hours . ' ч.';
 
-		return $caster->name . ' наложил на персонажа ' . $target->name . ' защиту от нападения на 3 часа.';
+		return $caster->name . ' наложил на персонажа ' . $target->name . ' защиту от нападения на ' . $duration;
 	}
 }

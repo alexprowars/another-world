@@ -4,6 +4,7 @@ namespace App\Engine\Map;
 
 use App\Models\User;
 use App\Services\ChatService;
+use App\Services\UserService;
 use Inertia\Inertia;
 
 class Hospital
@@ -15,7 +16,7 @@ class Hospital
 		$time = 0;
 
 		if ($canHeal) {
-			$time = round((1 - ($user->hp_now / $user->hp_max)) * $this->getHealingTime($user));
+			$time = round((1 - ($user->hp_now / $user->hp_max)) * UserService::getHospitalHealingTime($user));
 		}
 
 		if (request()->has('heal') && !$user->r_date && $canHeal && $time > 0) {
@@ -56,15 +57,6 @@ class Hospital
 		]);
 	}
 
-	protected function getHealingTime(User $user)
-	{
-		if ($user->level < 4) {
-			return 180;
-		} else {
-			return 360;
-		}
-	}
-
 	protected function checkHealing(User $user)
 	{
 		if (!$user->r_date) {
@@ -90,7 +82,7 @@ class Hospital
 			ChatService::sendSystemMessage($user, '', 'Лечение окончено! Вы транспортированы в помещение: <b><u>Общий зал</u></b>');
 		}
 
-		$hp = $user->hp_max - round($remainingSeconds * ($user->hp_max / $this->getHealingTime($user)));
+		$hp = $user->hp_max - round($remainingSeconds * ($user->hp_max / UserService::getHospitalHealingTime($user)));
 		$user->hp_now = max(0, min($user->hp_max, $hp));
 		$user->save();
 	}

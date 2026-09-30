@@ -27,7 +27,7 @@ class Vampirism extends DamageSpell
 			throw new Exception('Персонаж слишком слаб для высасывания жизненной энергии');
 		}
 
-		if ($target->vampire_protection_until?->isFuture()) {
+		if ($target->vampire_protection?->isFuture()) {
 			throw new Exception('Персонаж защищён от вампиров');
 		}
 

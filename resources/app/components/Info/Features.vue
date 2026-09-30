@@ -8,8 +8,11 @@
 			</li>
 			<li v-if="person.admin">Администратор Another World</li>
 			<li v-if="person.vip">VIP-персона Another World</li>
-			<li v-if="person.prison_until" class="text-red-700">
-				В тюрьме до {{ $formatDate(person.prison_until, 'DD.MM.YYYY HH:mm') }}.
+			<li v-if="person.battle_fury">
+				Боевая ярость: опыт в боях увеличен в 2 раза до {{ $formatDate(person.battle_fury, 'DD.MM.YYYY HH:mm') }}.
+			</li>
+			<li v-if="person.prison" class="text-red-700">
+				В тюрьме до {{ $formatDate(person.prison, 'DD.MM.YYYY HH:mm') }}.
 				<span v-if="person.prison_reason">Причина: {{ person.prison_reason }}</span>
 			</li>
 			<li v-if="person.silence_until">Запрещено общение в чате до {{ $formatDate(person.silence_until, 'DD.MM.YYYY HH:mm') }}.</li>

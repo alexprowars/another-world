@@ -5,6 +5,7 @@ namespace App\Engine\Magic;
 use App\Engine\Magic\Spells\Attack;
 use App\Engine\Magic\Spells\AttackProtection;
 use App\Engine\Magic\Spells\Aura;
+use App\Engine\Magic\Spells\BattleFury;
 use App\Engine\Magic\Spells\Chains;
 use App\Engine\Magic\Spells\ChangeSide;
 use App\Engine\Magic\Spells\CleanseAura;
@@ -52,6 +53,7 @@ class SpellRegistry
 			'showstorm40' => new Snowstorm(40, 15),
 			'razdet' => new Strip(),
 			'invisible' => new Invisibility(),
+			'jarost' => new BattleFury(),
 			'reset' => new Reset(),
 			'attack' => new Attack(),
 			'blood_attack' => new Attack(true),
@@ -71,6 +73,7 @@ class SpellRegistry
 			'mol30' => new Silence(30, 10),
 			'mol60' => new Silence(60, 20),
 			'immun' => new AttackProtection(),
+			'immun1' => new AttackProtection(30 * 24),
 			'vampire' => new Vampirism(),
 			'chesnok' => new VampireProtection(3),
 			'chesnok2' => new VampireProtection(12),
@@ -115,6 +118,9 @@ class SpellRegistry
 			'elik_sila4_4chas' => new StatPotion(['strength' => 4]),
 			'elagil4' => new StatPotion(['agility' => 4]),
 			'eldex4' => new StatPotion(['dexterity' => 4]),
+			'elstr100' => new StatPotion(['strength' => 100], 3),
+			'elagil100' => new StatPotion(['agility' => 100], 3),
+			'eldex100' => new StatPotion(['dexterity' => 100], 3),
 			default => null,
 		};
 	}

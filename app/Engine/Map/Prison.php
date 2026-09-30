@@ -11,26 +11,26 @@ class Prison
 	{
 		$user = auth()->user();
 
-		if ($user->prison_until && $user->prison_until->lessThanOrEqualTo(now())) {
+		if ($user->prison && $user->prison->lessThanOrEqualTo(now())) {
 			$user->update([
-				'prison_until' => null,
+				'prison' => null,
 				'prison_reason' => null,
 			]);
 		}
 
 		$prisoners = User::query()
-			->where('prison_until', '>', now())
-			->orderBy('prison_until')
-			->get(['id', 'name', 'prison_until', 'prison_reason'])
+			->where('prison', '>', now())
+			->orderBy('prison')
+			->get(['id', 'name', 'prison', 'prison_reason'])
 			->map(fn (User $prisoner) => [
 				'id' => $prisoner->id,
 				'name' => $prisoner->name,
 				'reason' => $prisoner->prison_reason,
-				'until' => $prisoner->prison_until->toAtomString(),
+				'until' => $prisoner->prison->toAtomString(),
 			]);
 
 		return Inertia::render('Map/Prison', [
-			'until' => $user->prison_until?->toAtomString(),
+			'until' => $user->prison?->toAtomString(),
 			'reason' => $user->prison_reason,
 			'prisoners' => $prisoners,
 		]);

@@ -14,7 +14,7 @@ return new class extends Migration {
 			$table->timestamp('email_verified_at')->nullable();
 			$table->string('password')->nullable();
 			$table->timestamp('blocked_at')->nullable();
-			$table->timestamp('prison_until')->nullable()->index();
+			$table->timestamp('prison')->nullable()->index();
 			$table->string('prison_reason', 255)->nullable();
 			$table->timestamp('online')->nullable();
 			$table->ipAddress('ip')->nullable();
@@ -53,7 +53,7 @@ return new class extends Migration {
 			$table->unsignedInteger('rating')->default(0);
 			$table->foreignId('tribe_id')->nullable();
 			$table->unsignedTinyInteger('tribe_rank')->default(0);
-			$table->timestamp('inquisitor_check_until')->nullable();
+			$table->timestamp('inquisitor_check')->nullable();
 			$table->foreignId('battle_id')->nullable();
 			$table->integer('r_type')->nullable();
 			$table->timestamp('r_date')->nullable();
@@ -62,9 +62,10 @@ return new class extends Migration {
 			$table->tinyInteger('injury_type')->nullable();
 			$table->tinyInteger('tutorial')->default(0);
 			$table->timestamp('invisible')->nullable();
-			$table->timestamp('magic_protection_until')->nullable();
-			$table->timestamp('attack_protection_until')->nullable();
-			$table->timestamp('vampire_protection_until')->nullable();
+			$table->timestamp('battle_fury')->nullable();
+			$table->timestamp('magic_protection')->nullable();
+			$table->timestamp('attack_protection')->nullable();
+			$table->timestamp('vampire_protection')->nullable();
 			$table->unsignedTinyInteger('magic_resistance')->default(0);
 			$table->unsignedSmallInteger('aura_duration_bonus')->default(0);
 			$table->timestamp('vip')->nullable();
