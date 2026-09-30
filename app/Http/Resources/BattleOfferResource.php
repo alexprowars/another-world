@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Engine\Battle\BattleType;
+use App\Engine\Battle\Enums\BattleType;
 use App\Models\Battle;
 use App\Models\BattleMember;
 use Illuminate\Http\Resources\Json\JsonResource;

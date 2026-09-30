@@ -21,7 +21,7 @@ class BattleLogController extends Controller
 		$logs = $battle->logs()
 			->with(['member.user', 'enemy.user'])
 			->where('comment_id', '>', 0)
-			->when(!$battle->result, fn(Builder $query) => $query->where('round', '<', $battle->round))
+			->when($battle->result === null, fn(Builder $query) => $query->where('round', '<', $battle->round))
 			->orderByDesc('round')
 			->orderByDesc('id')
 			->get();

@@ -89,7 +89,7 @@
 			return;
 		}
 
-		form.post('/battle', {
+		form.post('/arena', {
 			preserveScroll: true,
 			onSuccess: () => emit('close')
 		});

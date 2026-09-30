@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Facades\Vars;
 use App\Http\Resources\UserSlotItemResource;
 use App\Services\UserService;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -180,14 +181,16 @@ class User extends Authenticatable implements HasMedia
 		return $this->rank == 60;
 	}
 
-	public function calculate(bool $persist = true): void
+	public function calculate(bool $persist = true, ?CarbonImmutable $time = null): void
 	{
 		if ($this->calculated) {
 			return;
 		}
 
-		UserService::calculateWearsStats($this, $persist);
-		UserService::calculateStats($this, $persist);
+		$time ??= CarbonImmutable::now();
+
+		UserService::calculateWearsStats($this, $time, $persist);
+		UserService::calculateStats($this, $time, $persist);
 
 		$this->calculated = true;
 	}

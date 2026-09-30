@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Engine\Battle\Abilities\AbilityRegistry;
 use App\Exceptions\Exception;
 use App\Facades\Vars;
 use App\Locale;
@@ -10,6 +11,7 @@ use App\Models\Referal;
 use App\Models\User;
 use App\Notifications\UserRegistrationNotification;
 use App\Settings;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
@@ -85,15 +87,13 @@ class UserService
 
 	public static function activateAbility(User $user, int $abilityId): void
 	{
-		$priem_full = require resource_path('data/battle.php');
-
-		$ability = $priem_full[$abilityId] ?? null;
+		$ability = AbilityRegistry::find($abilityId);
 
 		if ($ability === null) {
 			throw new Exception('Такого приёма не существует');
 		}
 
-		if ($user->level < $ability['level']) {
+		if ($user->level < $ability->level) {
 			throw new Exception('Уровень слишком мал!');
 		}
 
@@ -175,14 +175,14 @@ class UserService
 		return $user->level < 4 ? 180 : 360;
 	}
 
-	public static function calculateStats(User $user, bool $persist = true): void
+	public static function calculateStats(User $user, CarbonImmutable $time, bool $persist = true): void
 	{
 		//$user['hp'] = 0;
 		//$user['energy'] = 0;
 
 		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
 		$effects = $user->effects()
-			->whereFuture('date')
+			->where('date', '>', $time)
 			->get();
 
 		/** @var Effect $effect */
@@ -230,14 +230,14 @@ class UserService
 		}
 	}
 
-	public static function calculateWearsStats(User $user, bool $persist = true): void
+	public static function calculateWearsStats(User $user, CarbonImmutable $time, bool $persist = true): void
 	{
 		$slot = $user->getSlot();
 
 		$wears = $slot->getItems();
 
 		foreach ($wears as $object) {
-			if ($object->life?->isPast()) {
+			if ($object->life?->lessThan($time)) {
 				if ($persist) {
 					InventoryService::unsetObject($user, $object->onset);
 				}

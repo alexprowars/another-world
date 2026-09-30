@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use App\Engine\Battle\BattleStatus;
-use App\Engine\Battle\BattleType;
+use App\Engine\Battle\Enums\BattleResult;
+use App\Engine\Battle\Enums\BattleStatus;
+use App\Engine\Battle\Enums\BattleType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -19,6 +20,7 @@ class Battle extends Model
 		'is_blood' => 'boolean',
 		'type' => BattleType::class,
 		'status' => BattleStatus::class,
+		'result' => BattleResult::class,
 	];
 
 	/** @return HasMany<BattleMember, $this> */

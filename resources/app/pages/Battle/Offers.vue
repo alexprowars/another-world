@@ -13,7 +13,7 @@
 			<Link
 				v-for="type in types"
 				:key="type.id"
-				:href="`/battle?battle_type=${type.id}`"
+				:href="`/arena?battle_type=${type.id}`"
 				preserve-state
 				preserve-scroll
 				class="ui-tab"
@@ -172,7 +172,7 @@
 		}
 
 		actionForm.action = action;
-		actionForm.transform(data => ({ ...data, battle_type: props.page.battleType, ...extra })).post('/battle', { preserveScroll: true });
+		actionForm.transform(data => ({ ...data, battle_type: props.page.battleType, ...extra })).post('/arena', { preserveScroll: true });
 	}
 
 	function join(offer, side) {

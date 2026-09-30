@@ -28,6 +28,7 @@
         "fruitcake/laravel-debugbar": "^4.2",
         "larastan/larastan": "^3.0",
         "laravel/pail": "^1.2",
+        "laravel/tinker": "^3.0",
         "mockery/mockery": "^1.6",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-faker": "^4.0",
@@ -37,6 +38,7 @@
     "replace": {
         "symfony/polyfill-mbstring": "*",
         "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php82": "*",
         "symfony/polyfill-php83": "*",
         "symfony/polyfill-php84": "*",
         "symfony/polyfill-php85": "*",

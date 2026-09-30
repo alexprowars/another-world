@@ -45,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
 		Route::match(['get', 'post'], '/person/settings', [Controllers\PersonController::class, 'settings'])->name('person.settings');
 		Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');
 		Route::get('/map/change/{room}', [Controllers\MapController::class, 'change']);
-		Route::match(['get', 'post'], '/battle', [Controllers\BattleController::class, 'index'])->name('battle');
+		Route::get('/arena', [Controllers\ArenaController::class, 'index'])->name('arena');
+		Route::post('/arena', [Controllers\ArenaController::class, 'store'])->name('arena.store');
+		Route::get('/battle', [Controllers\BattleController::class, 'index'])->name('battle');
+		Route::post('/battle', [Controllers\BattleController::class, 'store'])->name('battle.store');
 	});
 });

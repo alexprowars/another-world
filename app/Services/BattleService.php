@@ -2,17 +2,20 @@
 
 namespace App\Services;
 
-use App\Engine\Battle\BattleStatus;
-use App\Engine\Battle\BattleType;
+use App\Engine\Battle\Enums\BattleStatus;
+use App\Engine\Battle\Enums\BattleType;
 use App\Exceptions\Exception;
 use App\Models\Battle;
 use App\Models\BattleMember;
 use App\Models\Level;
 use App\Models\User;
 use App\Models\UserItem;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Random\Randomizer;
 
 class BattleService
 {
@@ -223,7 +226,7 @@ class BattleService
 		if ($joining) {
 			$battle = $enemy->battle;
 
-			if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result) {
+			if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result !== null) {
 				throw new Exception('Этот бой уже завершён или ещё не начался');
 			}
 
@@ -266,7 +269,7 @@ class BattleService
 
 		$battle = $target->battle;
 
-		if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result || $battle->type === BattleType::DUEL) {
+		if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result !== null || $battle->type === BattleType::DUEL) {
 			throw new Exception('Переманивание доступно только в продолжающемся групповом бою');
 		}
 
@@ -681,19 +684,25 @@ class BattleService
 		});
 	}
 
-	public static function setInjury(User $user, User $enemy, int $level): bool
-	{
+	public static function setInjury(
+		User $user,
+		User $enemy,
+		int $level,
+		CarbonImmutable $time,
+		Randomizer $randomizer,
+	): bool {
 		if ($enemy->rank == 60) {
 			return false;
 		}
 
-		if ($enemy->injury?->isFuture()) {
+		if ($enemy->injury?->greaterThan($time)) {
 			return false;
 		}
 
-		$time = 300 + (300 * $level);
+		$duration = 300 + (300 * $level);
 
-		$param = self::INJURIES[$level][array_rand(self::INJURIES[$level])];
+		$injuries = self::INJURIES[$level];
+		$param = $injuries[$randomizer->getInt(0, count($injuries) - 1)];
 
 		$strength = $dexterity = $agility = 0;
 
@@ -705,13 +714,13 @@ class BattleService
 			$agility = round($enemy->agility * ($level / 3.2)) * (-1);
 		}
 
-		$enemy->injury = now()->addSeconds($time);
+		$enemy->injury = $time->addSeconds($duration);
 		$enemy->injury_type = $level;
 		$enemy->save();
 
 		$enemy->effects()->create([
 			'type' => 3,
-			'date' => now()->addSeconds($time),
+			'date' => $enemy->injury,
 			'strength' => $strength,
 			'dexterity' => $dexterity,
 			'agility' => $agility,
@@ -738,9 +747,9 @@ class BattleService
 	}
 
 	/** @return list<UserItem> */
-	public static function wearout(User $user): array
+	public static function wearout(User $user, Randomizer $randomizer): array
 	{
-		return DB::transaction(function () use ($user) {
+		return DB::transaction(function () use ($user, $randomizer) {
 			$slots = $user->slots()
 				->lockForUpdate()
 				->firstOrFail();
@@ -758,7 +767,8 @@ class BattleService
 				return [];
 			}
 
-			$wornItems = $items->random(random_int(1, $items->count()));
+			$itemKeys = $randomizer->pickArrayKeys($items->all(), $randomizer->getInt(1, $items->count()));
+			$wornItems = $items->toBase()->only($itemKeys);
 
 			foreach ($wornItems as $item) {
 				$item->wearout += 1;
@@ -775,10 +785,15 @@ class BattleService
 		});
 	}
 
-	public static function getBaseLevelExp(int $lvl): int
+	public static function getBaseLevelExp(int $level): int
 	{
-		$level = Level::query()->where('level', $lvl)->first();
+		$baseExperience = Cache::remember('battle:base_level_exp', 86400, function () {
+			return Level::query()
+				->where('up', 0)
+				->pluck('base', 'level')
+				->all();
+		});
 
-		return $level->base ?? 0;
+		return $baseExperience[$level] ?? 0;
 	}
 }

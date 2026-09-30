@@ -173,7 +173,7 @@
 	}
 
 	const lastLogId = computed(() => {
-		let last = -1;
+		let last = 0;
 
 		logs.value.forEach(item => {
 			if (item.id > last) {
@@ -208,16 +208,15 @@
 
 		try {
 			const result = await useHttp({
-				lastLogId: lastLogId.value || 0,
+				lastLogId: lastLogId.value,
 				round: data.value?.round || 0,
 				opponent: selectedEnemy.value || 0,
 				...extra,
-			}).get('/battle');
+			}).post('/battle');
 
 			await actionRefresh(result);
 		} catch (e) {
 			alert('Произошла ошибка при получении ответа от сервера');
-			//window.location.href = '/battle/';
 		}
 	}
 
@@ -246,7 +245,6 @@
 		await refresh({
 			opponent: selectedEnemy.value,
 			...form.payload(),
-			rnd: Math.random(),
 		});
 
 		clearTimeout(refreshTimer);

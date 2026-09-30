@@ -27,7 +27,7 @@ class City
 				return to_route('map');
 			}
 		} elseif ($room == 1) {
-			return to_route('battle');
+			return to_route('arena');
 		}
 
 		$room_1_members = User::query()

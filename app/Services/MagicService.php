@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Engine\Battle\BattleStatus;
+use App\Engine\Battle\Enums\BattleStatus;
 use App\Engine\Magic\Spell;
 use App\Engine\Magic\SpellRegistry;
 use App\Exceptions\Exception;
@@ -173,7 +173,7 @@ class MagicService
 
 	private static function validateBattle(?Battle $battle, User $caster, User $target, UserItem $item, Spell $spell, ?int $round): void
 	{
-		if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result) {
+		if (!$battle || $battle->status !== BattleStatus::ACTIVE || $battle->result !== null) {
 			throw new Exception('Бой уже завершён');
 		}
 

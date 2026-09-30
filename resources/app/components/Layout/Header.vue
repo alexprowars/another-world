@@ -63,7 +63,7 @@
 	const navigation = [
 		{ href: '/map', label: 'Город', icon: 'city' },
 		{ href: '/person', label: 'Персонаж', icon: 'character' },
-		{ href: '/battle', label: 'Поединки', icon: 'swords' },
+		{ href: '/arena', label: 'Поединки', icon: 'swords' },
 		{ href: '/person/work', label: 'Заработок', icon: 'coins' },
 		{ href: '/library', label: 'Библиотека', icon: 'book' },
 	];

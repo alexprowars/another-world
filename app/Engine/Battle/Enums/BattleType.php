@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Engine\Battle;
+namespace App\Engine\Battle\Enums;
 
 enum BattleType: int
 {

@@ -11,7 +11,7 @@ class BattleMember extends Model
 
 	protected $casts = [
 		'finished_at' => 'immutable_datetime',
-		'died_at' => 'immutable_datetime'
+		'died_at' => 'immutable_datetime',
 	];
 
 	/** @return BelongsTo<Battle, $this> */

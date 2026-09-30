@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Engine\Battle\Enums\BattleStatus;
+use App\Http\Controllers\ArenaController;
 use App\Http\Controllers\BattleController;
 use App\Http\Controllers\MapController;
 use App\Services\UserService;
@@ -15,16 +17,6 @@ class GameMiddleware
 	{
 		$user = $request->user();
 
-		$hp = UserService::getCuredHealth($user);
-
-		$user->online = now();
-		$user->hp_now += $hp;
-
-		if ($user->online->diffInSeconds() < 15) {
-			$user->online = now();
-			$user->save();
-		}
-
 		if (($user->r_date && !$user->r_type) || (!$user->r_date && $user->r_type != 0)) {
 			$user->r_date = null;
 			$user->r_type = null;
@@ -34,7 +26,9 @@ class GameMiddleware
 		$dispatch = null;
 
 		if ($user->battle_id && !str_contains($request->route()->uri(), 'chat/')) {
-			$dispatch = BattleController::class;
+			$dispatch = in_array($user->battle?->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)
+				? BattleController::class
+				: ArenaController::class;
 		} elseif ($user->r_date) {
 			switch ($user->r_type) {
 				case 1:
@@ -77,6 +71,14 @@ class GameMiddleware
 
 		$user->rating = UserService::getUserRaiting($user);
 		$user->calculate();
+
+		if ($user->online === null || $user->online->diffInSeconds() >= 15) {
+			$hp = UserService::getCuredHealth($user);
+
+			$user->online = now();
+			$user->hp_now += $hp;
+			$user->save();
+		}
 
 		return $next($request);
 	}

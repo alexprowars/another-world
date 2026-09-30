@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Battle\Abilities\Ability;
+use App\Engine\Battle\Abilities\AbilityRegistry;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
@@ -270,12 +272,12 @@ class PersonController extends Controller
 
 	public function abilities(Request $request): Response|RedirectResponse
 	{
-		$priem_full = require resource_path('data/battle.php');
-
-		$priem_full = array_filter(
-			$priem_full,
-			fn(array $ab) => $ab['level'] <= $this->user->level
+		$abilities = array_filter(
+			AbilityRegistry::all(),
+			fn(Ability $ability) => $ability->level <= $this->user->level,
 		);
+
+		$items = array_map(fn(Ability $ability) => $ability->toArray(), $abilities);
 
 		$active = $this->user->abilities()
 			->pluck('ability', 'slot');
@@ -296,14 +298,14 @@ class PersonController extends Controller
 			flash($e->getMessage());
 		}
 
-		foreach ($priem_full as $k => $v) {
-			if ($active->contains($k)) {
-				$priem_full[$k]['onset'] = 'Y';
+		foreach ($abilities as $abilityId => $ability) {
+			if ($active->contains($abilityId)) {
+				$items[$abilityId]['onset'] = 'Y';
 			}
 		}
 
 		return Inertia::render('Person/Abilities', [
-			'items' => $priem_full,
+			'items' => $items,
 			'active' => $active,
 		]);
 	}
