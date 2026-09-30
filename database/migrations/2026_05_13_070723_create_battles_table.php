@@ -24,10 +24,18 @@ return new class extends Migration {
 			$table->smallInteger('max_level')->nullable();
 			$table->timestamps();
 		});
+
+		Schema::table('users', function (Blueprint $table) {
+			$table->foreign('battle_id')->references('id')->on('battles')->nullOnDelete();
+		});
 	}
 
 	public function down(): void
 	{
+		Schema::table('users', function (Blueprint $table) {
+			$table->dropForeign(['battle_id']);
+		});
+
 		Schema::dropIfExists('battles');
 	}
 };

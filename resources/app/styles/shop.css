@@ -312,12 +312,6 @@
 	font-variant-numeric: tabular-nums;
 }
 
-.storefront-item-vip {
-	flex-basis: 100%;
-	color: var(--paper-link);
-	font-size: 11px;
-}
-
 @container (max-width: 760px) {
 	.storefront-layout {
 		grid-template-columns: minmax(0, 1fr);

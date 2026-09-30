@@ -9,6 +9,7 @@ use App\Http\Resources\ShopItemResource;
 use App\Models\ShopItem;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Models\UserItem;
 use App\Services\InventoryService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,8 @@ use Throwable;
 
 class GiftShop
 {
+	private const array GIFT_TYPES = [15, 16, 17];
+
 	public function __invoke()
 	{
 		$user = auth()->user();
@@ -61,13 +64,10 @@ class GiftShop
 		} else {
 			$subquery = DB::connection()
 				->query()
-				->where(function ($query) {
-					$query->whereLike('code', '%flowers%')
-						->orWhereLike('name', '%otkr%');
-				})
-				->orWhereIn('type', [15, 16, 17]);
+				->whereIn('type', self::GIFT_TYPES);
 
-			$objects = InventoryService::getInventoryObjects($user, 0, $subquery);
+			$objects = InventoryService::getInventoryObjects($user, 0, $subquery)
+				->filter(fn(UserItem $item) => $this->canGift($user, $item));
 
 			return Inertia::render('Map/GiftShop', [
 				'section' => $section,
@@ -116,17 +116,27 @@ class GiftShop
 			throw new Exception('Только начиная с 2 уровня Вы можете дарить подарки!');
 		}
 
-		$object = $user->items()
-			->where('id', $itemId)
-			->first();
+		DB::transaction(function () use ($user, $info, $itemId, $from) {
+			$object = $user->items()
+				->lockForUpdate()
+				->find($itemId);
 
-		if ($object) {
-			if ($object->market) {
-				throw new Exception('Сначала снимите предмет с продажи на рынке!');
+			if (!$object) {
+				throw new Exception('Предмет не найден в Вашем рюкзаке!');
 			}
 
-			if ($object->pawnshop) {
-				throw new Exception('Сначала выкупите предмет из ломбарда!');
+			if (!in_array($object->type, self::GIFT_TYPES, true)) {
+				throw new Exception('В сувенирной лавке можно дарить только открытки, цветы и подарки. Для передачи экипировки используйте раздел передач.');
+			}
+
+			$slots = $user->slots()
+				->lockForUpdate()
+				->firstOrFail();
+
+			$user->setRelation('slots', $slots);
+
+			if (!$this->canGift($user, $object)) {
+				throw new Exception('Этот предмет недоступен для подарка!');
 			}
 
 			$exist = UserGift::query()
@@ -135,10 +145,6 @@ class GiftShop
 
 			if ($exist) {
 				throw new Exception('Этот предмет уже был подарен ранее!');
-			}
-
-			if ($object->artifact) {
-				throw new Exception('Вы не можете дарить артефакты!');
 			}
 
 			$text = htmlspecialchars(addslashes(request()->post('text', '')));
@@ -161,9 +167,21 @@ class GiftShop
 			$object->user()->associate($info);
 			$object->present = true;
 			$object->save();
+		}, 3);
 
-			throw new Exception('Подарок передан к <u>' . $info->name . '</u>!');
-		}
+		flash('Подарок передан к <u>' . $info->name . '</u>!');
+	}
+
+	private function canGift(User $user, UserItem $item): bool
+	{
+		return in_array($item->type, self::GIFT_TYPES, true)
+			&& !$item->artifact
+			&& !$item->present
+			&& !$item->bank
+			&& !$item->market
+			&& !$item->pawnshop
+			&& !$item->onset
+			&& !in_array($item->id, $user->getSlot()->getItemsId());
 	}
 
 	protected function buy(int $itemId)

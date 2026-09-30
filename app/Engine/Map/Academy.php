@@ -68,7 +68,7 @@ class Academy
 			throw new Exception('Недостаточно кредитов!');
 		}
 
-		if ($user->level >= $item->level) {
+		if ($user->level < $item->level) {
 			throw new Exception('Вы не можете получить эту профессию, уровень маловат!');
 		}
 

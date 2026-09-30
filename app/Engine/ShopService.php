@@ -6,6 +6,7 @@ use App\Exceptions\Exception;
 use App\Models\ShopItem;
 use App\Models\UserItem;
 use App\Services\InventoryService;
+use Illuminate\Support\Facades\DB;
 
 class ShopService
 {
@@ -28,29 +29,15 @@ class ShopService
 			$user->update();
 		}
 
+		$price = $item->item->getPurchasePrice($user);
+
 		if ($item->item->credits > 0) {
-			$price = $item->item->credits;
-
-			if ($user->vip?->isFuture()) {
-				$price = $item->item->getVipPrice();
-			}
-
 			if ($price > $user->credits) {
-				throw new Exception("У Вас недостаточно денег для покупки предмета <u>" . $item->item->title . "</u>");
+				throw new Exception('У Вас недостаточно денег для покупки предмета <u>' . $item->item->title . '</u>');
 			}
 
 			$user->credits -= $price;
 		} else {
-			$price = $item->item->gold;
-
-			if ($user->vip?->isFuture()) {
-				$price = $item->item->getVipPrice();
-			}
-
-			if ($user->profession == 8) {
-				$price = $item->item->getMerchantPrice();
-			}
-
 			if ($price > $user->gold) {
 				throw new Exception('У Вас недостаточно денег для покупки предмета <u>' . $item->item->title . '</u>');
 			}
@@ -74,34 +61,60 @@ class ShopService
 	{
 		$user = auth()->user();
 
-		if ($item->type == 12 || $item->market || $item->pawnshop || $item->user_id != $user->id) {
-			throw new Exception('Предмет <u>' . $item->title . '</u> не подледжит продаже!');
-		}
+		$itemId = $item->id;
 
-		if ($item->price_type == 1) {
-			if (!$item->artifact) {
-				$price = round($item->price * 0, 2);
+		return DB::transaction(function () use ($user, $itemId) {
+			$slots = $user->slots()
+				->lockForUpdate()
+				->firstOrFail();
+
+			$user->setRelation('slots', $slots);
+
+			$item = $user->items()
+				->lockForUpdate()
+				->find($itemId);
+
+			if (!$item) {
+				throw new Exception('Предмет не найден в инвентаре');
+			}
+
+			if (
+				$item->type == 12
+				|| $item->bank
+				|| $item->market
+				|| $item->pawnshop
+				|| $item->onset
+				|| in_array($item->id, $slots->getItemsId(), true)
+			) {
+				throw new Exception('Предмет <u>' . $item->title . '</u> не подлежит продаже!');
+			}
+
+			if ($item->price_type == 1) {
+				if (!$item->artifact) {
+					$price = round($item->price * 0, 2);
+				} else {
+					$price = round($item->price * 0.5, 2);
+				}
+			} elseif ($item->type < 12) {
+				$price = round(($item->price * (1 - ($item->wearout / ($item->wearout_max + 0.01)))) * 0.5, 2);
 			} else {
 				$price = round($item->price * 0.5, 2);
 			}
-		} elseif ($item->type < 12) {
-			$price = round(($item->price * (1 - ($item->wearout / ($item->wearout_max + 0.01)))) * 0.5, 2);
-		} else {
-			$price = round($item->price * 0.5, 2);
-		}
 
-		$item->delete();
+			$item->delete();
 
-		if ($item->price_type == 1) {
-			$user->credits += $price;
-		} else {
-			$user->gold += $price;
-		}
+			$user->increment($item->price_type == 1 ? 'credits' : 'gold', $price);
 
-		$user->save();
+			LogsService::addItemLog(
+				$user,
+				'продал',
+				$item->title . ' (' . $price . ' ' . ($item->price_type == 1 ? 'пл.' : 'зол.') . ')',
+				'гос магазин'
+			);
 
-		LogsService::addItemLog($user, 'продал', $item->title . ' (' . $price . ' ' . ($item->price_type == 1 ? 'пл.' : 'зол.') . ')', 'гос магазин');
+			DB::afterCommit(fn() => $slots->clearCache());
 
-		return $price;
+			return $price;
+		}, 3);
 	}
 }

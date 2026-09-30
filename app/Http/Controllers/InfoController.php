@@ -83,7 +83,7 @@ class InfoController extends Controller
 	/** @return Collection<int, User> */
 	private function sharedIpUsers(User $user): Collection
 	{
-		$addresses = LogsIp::query()->whereBelongsTo($user)->where('ip', '>', 0)->select('ip');
+		$addresses = LogsIp::query()->whereBelongsTo($user)->select('ip');
 		$users = LogsIp::query()->whereIn('ip', $addresses)->select('user_id');
 
 		return User::query()->whereIn('id', $users)->where('id', '!=', $user->id)->orderBy('name')->get(['id', 'name']);

@@ -70,6 +70,15 @@ class Battle
 		$abilities = $this->user->abilities()
 			->pluck('ability', 'slot');
 
+		$roundExpired = $this->isRoundExpired();
+
+		if ($roundExpired && $this->battle->status === BattleStatus::ACTIVE && !$this->battle->result) {
+			$this->timeout();
+			$this->checkFinished();
+
+			$json['action'] = 'refresh';
+		}
+
 		$isCurrentRound = request()->integer('round') === $this->battle->round;
 
 		if (!$isCurrentRound && request()->hasAny([
@@ -78,7 +87,7 @@ class Battle
 			$json['m'] = 'Раунд уже изменился. Выберите действие заново';
 		}
 
-		if ($isCurrentRound && request()->has('ability')) {
+		if (!$roundExpired && $isCurrentRound && request()->has('ability')) {
 			$abilityId = request()->integer('ability');
 
 			$ability = $priem_full[$abilityId] ?? null;
@@ -107,7 +116,7 @@ class Battle
 			}
 		}
 
-		if ($this->battle->status === BattleStatus::ACTIVE && !$this->battle->result) {
+		if (!$roundExpired && $this->battle->status === BattleStatus::ACTIVE && !$this->battle->result) {
 			if ($isCurrentRound) {
 				$this->processKick();
 			}
@@ -165,28 +174,13 @@ class Battle
 
 				// Если ты закончил раунд
 				if ($this->fighter->finished_at) {
-					// ----------------------------- # Выиграли по таймауту # -------------------------- //
-					if ($timeout <= 0) {
-						$this->timeout();
-
-						$json['action'] = 'refresh';
-					} else {
-						$json['action'] = 'waitImpact';
-					}
+					$json['action'] = 'waitImpact';
 				} else {
 					$random = 0; // rand(0, $n - 1);
 
 					if ($accept == 1) {
 						$victims[0] = request()->integer('opponent');
 					}
-
-					// ----------------------------- # Проигрыш по таймауту # -------------------------- //
-					if ($timeout <= 0) {
-						$this->timeout();
-
-						$json['action'] = 'refresh';
-					}
-					// --------------------------------- # Конец # ------------------------------------- //
 
 					if ($timeout > 0 && (isset($victims[$random]) || !$this->fighter->finished_at)) {
 						// Если никого не можеш ударить то удар и блок поставить не можеш
@@ -383,6 +377,11 @@ class Battle
 		return $json;
 	}
 
+	private function isRoundExpired(): bool
+	{
+		return $this->battle->round_at->addSeconds($this->battle->timeout)->lessThanOrEqualTo(now());
+	}
+
 	private function getAbilityError(array $ability): ?string
 	{
 		if (
@@ -398,7 +397,7 @@ class Battle
 			return 'Вы уже завершили ход';
 		}
 
-		if ($this->battle->round_at->addSeconds($this->battle->timeout)->isPast()) {
+		if ($this->isRoundExpired()) {
 			return 'Время хода истекло';
 		}
 
@@ -568,7 +567,7 @@ class Battle
 		}
 
 		if ($addmoney > 0) {
-			$this->user->credits += $addmoney;
+			$this->user->gold += $addmoney;
 		}
 
 		if ($this->battle->is_blood && $type == 2) {
@@ -794,6 +793,7 @@ class Battle
 		if ($user->member->wait == 1) {
 			switch ($user->member->ability) {
 				case 1:
+					$ability['hp'] = 5;
 					break;
 				case 2:
 					$ability['damage'] = 35;
@@ -873,8 +873,6 @@ class Battle
 					break;
 			}
 
-			$enemy->member->user->min += $abilityOpponent['antidam'];
-			$enemy->member->user->max += $abilityOpponent['antidam'];
 			$enemy->member->user->krit += $abilityOpponent['crit'];
 			$enemy->member->user->uv += $abilityOpponent['uvorot'];
 			$enemy->member->user->pblock += $abilityOpponent['pblock'];
@@ -976,7 +974,7 @@ class Battle
 			}
 		}
 
-		$damage = array_sum($kickDamage);
+		$damage = array_sum($kickDamage) - $abilityOpponent['antidam'];
 
 		if ($damage < 0) {
 			$damage = 0;
@@ -1106,6 +1104,12 @@ class Battle
 
 	protected function processKick()
 	{
+		if ($this->isRoundExpired()) {
+			$this->timeout();
+
+			return;
+		}
+
 		// Зануляем удары и блоки
 		$kick1 = 0;
 		$kick2 = 0;
@@ -1216,6 +1220,10 @@ class Battle
 
 	protected function checkFinished()
 	{
+		if ($this->isRoundExpired()) {
+			$this->timeout();
+		}
+
 		// Есть ли у тебя жизни
 		if ($this->fighter->finished_at) {
 			// Выбираем бойцов которые не сходили в бою и живы

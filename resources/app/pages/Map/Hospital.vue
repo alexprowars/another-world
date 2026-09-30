@@ -17,8 +17,10 @@
 				<header class="hospital-heading">
 					<div class="hospital-emblem"><GameIcon :name="user.r_date ? 'hourglass' : 'health'" /></div>
 					<div>
-						<h2>{{ user.r_date ? 'Лечение идёт' : page.time > 0 ? 'Восстановление здоровья' : 'Лечение не требуется' }}</h2>
-						<p v-if="user.r_date">Отдыхайте. Лекари позаботятся о вашем здоровье.</p>
+						<h2 v-if="!page.can_heal">Лечение недоступно</h2>
+						<h2 v-else>{{ user.r_date ? 'Лечение идёт' : page.time > 0 ? 'Восстановление здоровья' : 'Лечение не требуется' }}</h2>
+						<p v-if="!page.can_heal">Для лечения нужны положительные выносливость и максимум здоровья.</p>
+						<p v-else-if="user.r_date">Отдыхайте. Лекари позаботятся о вашем здоровье.</p>
 						<p v-else-if="page.time > 0">Восстановите здоровье перед следующим сражением.</p>
 						<p v-else>Ваше здоровье полностью восстановлено. Вы готовы к новым сражениям.</p>
 					</div>
@@ -36,7 +38,7 @@
 					</div>
 					<p class="hospital-hint">После лечения вы вернётесь в общий зал.</p>
 				</div>
-				<div v-else-if="page.time > 0" class="hospital-treatment">
+				<div v-else-if="page.can_heal && page.time > 0" class="hospital-treatment">
 					<div>
 						<span class="hospital-label">Длительность лечения</span>
 						<strong class="hospital-duration">
@@ -74,7 +76,8 @@
 
 		<template #footer>
 			<GameIcon name="health" />
-			<span>{{ user.r_date ? 'Покинуть больницу можно после окончания лечения.' : 'Чем меньше здоровья осталось, тем дольше займёт лечение.' }}</span>
+			<span v-if="!page.can_heal">Дождитесь окончания ослабляющих эффектов.</span>
+			<span v-else>{{ user.r_date ? 'Покинуть больницу можно после окончания лечения.' : 'Чем меньше здоровья осталось, тем дольше займёт лечение.' }}</span>
 		</template>
 	</ContentBlock>
 </template>

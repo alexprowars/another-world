@@ -22,7 +22,9 @@ class InventoryService
 	public static function drop(User $user, int $itemId): void
 	{
 		DB::transaction(function () use ($user, $itemId) {
-			$item = $user->items()->lockForUpdate()->find($itemId);
+			$item = $user->items()
+				->lockForUpdate()
+				->find($itemId);
 
 			if (!$item) {
 				throw new Exception('Предмет не найден в Вашем рюкзаке!');
@@ -80,6 +82,7 @@ class InventoryService
 			'pblock'	=> $item->pblock,
 			'mblock'	=> $item->mblock,
 			'pbr'		=> $item->pbr,
+			'kbr'		=> $item->kbr,
 			'about'		=> $item->about,
 			'class'		=> $item->class,
 			'poison'	=> $item->poison,
@@ -133,8 +136,8 @@ class InventoryService
 		}
 
 		if ($slotId == 4 && $slots->i16) {
-			$slots->i16 = 0;
 			$items[] = $slots->i16;
+			$slots->i16 = 0;
 		}
 
 		if (!empty($items) && $slots->save()) {
@@ -148,44 +151,66 @@ class InventoryService
 
 	public static function onsetObject(User $user, int $itemId)
 	{
-		$object = $user->items()->whereKey($itemId)
-			->first();
+		DB::transaction(function () use ($user, $itemId) {
+			$slots = $user->slots()
+				->lockForUpdate()
+				->firstOrFail();
 
-		if (!$object) {
-			throw new Exception('Вещь не найдена');
-		}
+			$user->setRelation('slots', $slots);
 
-		if (!self::isAllowOnset($object, $user)) {
-			throw new Exception('Вы не можете надеть эту вещь');
-		}
+			$object = $user->items()
+				->lockForUpdate()
+				->find($itemId);
 
-		$slots = $user->getSlot();
-
-		$availableSlots = self::itemSlots($object);
-		$slot = $availableSlots[0] ?? null;
-
-		if (in_array($object->type, [1, 17])) {
-			if ($slots->i3 && $object->second) {
-				$slot = 5;
+			if (!$object) {
+				throw new Exception('Вещь не найдена');
 			}
-		} else {
-			foreach ($availableSlots as $availableSlot) {
-				if (!$slots->{'i' . $availableSlot}) {
-					$slot = $availableSlot;
-					break;
+
+			if (in_array($object->id, $slots->getItemsId(), true)) {
+				return;
+			}
+
+			if (!self::isAllowOnset($object, $user)) {
+				throw new Exception('Вы не можете надеть эту вещь');
+			}
+
+			$availableSlots = self::itemSlots($object);
+
+			$slot = $availableSlots[0] ?? null;
+
+			if (in_array($object->type, [1, 17])) {
+				if ($slots->i3 && $object->second) {
+					$slot = 5;
+				}
+			} else {
+				foreach ($availableSlots as $availableSlot) {
+					if (!$slots->{'i' . $availableSlot}) {
+						$slot = $availableSlot;
+						break;
+					}
 				}
 			}
-		}
 
-		if ($slot) {
+			if (!$slot) {
+				return;
+			}
+
+			$previousItemId = $slots->{'i' . $slot};
+
+			if ($previousItemId) {
+				$user->items()
+					->whereKey($previousItemId)
+					->update(['onset' => null]);
+			}
+
 			$object->onset = $slot;
-			$object->update();
+			$object->saveOrFail();
 
 			$slots->{'i' . $slot} = $object->id;
-			$slots->save();
-		}
+			$slots->saveOrFail();
 
-		$slots->clearCache();
+			DB::afterCommit(fn() => $slots->clearCache());
+		}, 3);
 	}
 
 	/** @return list<int> */

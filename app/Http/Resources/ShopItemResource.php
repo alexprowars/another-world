@@ -31,7 +31,7 @@ class ShopItemResource extends JsonResource
 				'code' => $item->code,
 				'title' => $item->title,
 				'price' => $price,
-				'price_vip' => $item->getVipPrice(),
+				'price_buy' => $item->getPurchasePrice($user),
 				'credits' => $item->credits,
 				'type' => $item->type,
 				'wearout' => $item->wearout,

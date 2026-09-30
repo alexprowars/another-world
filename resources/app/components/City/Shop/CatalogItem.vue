@@ -62,9 +62,6 @@
 			<slot name="actions">
 				<button type="button" class="ui-button" :disabled="processing" @click="$emit('trade')">{{ selling ? 'Продать' : 'Купить' }}</button>
 			</slot>
-			<span v-if="!owned && player.vip && product.price_vip != null" class="storefront-item-vip">
-				VIP: {{ product.price_vip }} {{ platinum ? 'пл.' : 'зол.' }}
-			</span>
 		</div>
 	</article>
 </template>
@@ -96,10 +93,21 @@
 				value: key === 'profession' ? t('profession.' + value) : value,
 			})),
 	);
+
 	const platinum = computed(() => (owned.value ? product.value.price_type === 1 : product.value.credits > 0));
-	const price = computed(() =>
-		props.selling ? product.value.price_sell : owned.value ? product.value.price : platinum.value ? product.value.credits : product.value.price,
-	);
+
+	const price = computed(() => {
+		if (props.selling) {
+			return product.value.price_sell;
+		}
+
+		if (owned.value) {
+			return product.value.price;
+		}
+
+		return product.value.price_buy;
+	});
+
 	const details = computed(() =>
 		owned.value
 			? product.value

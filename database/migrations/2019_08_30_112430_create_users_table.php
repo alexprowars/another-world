@@ -17,7 +17,7 @@ return new class extends Migration {
 			$table->timestamp('prison_until')->nullable()->index();
 			$table->string('prison_reason', 255)->nullable();
 			$table->timestamp('online')->nullable();
-			$table->bigInteger('ip')->nullable();
+			$table->ipAddress('ip')->nullable();
 			$table->enum('gender', ['M', 'F'])->nullable();
 			$table->char('locale', 2)->default('ru');
 			$table->string('name', 100)->nullable();
@@ -51,10 +51,10 @@ return new class extends Migration {
 			$table->decimal('stamina_now', 12, 4)->default(0);
 			$table->unsignedInteger('stamina_max')->default(0);
 			$table->unsignedInteger('rating')->default(0);
-			$table->foreignId('tribe_id')->nullable()->constrained('tribes')->nullOnDelete();
+			$table->foreignId('tribe_id')->nullable();
 			$table->unsignedTinyInteger('tribe_rank')->default(0);
 			$table->timestamp('inquisitor_check_until')->nullable();
-			$table->foreignId('battle_id')->nullable()->constrained('battles')->nullOnDelete();
+			$table->foreignId('battle_id')->nullable();
 			$table->integer('r_type')->nullable();
 			$table->timestamp('r_date')->nullable();
 			$table->timestamp('silence')->nullable();

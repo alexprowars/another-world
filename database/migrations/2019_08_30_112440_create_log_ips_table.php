@@ -10,7 +10,7 @@ return new class extends Migration {
 		Schema::create('logs_ips', function (Blueprint $table) {
 			$table->id();
 			$table->foreignId('user_id')->constrained('users')->noActionOnDelete();
-			$table->integer('ip')->unsigned()->default(0);
+			$table->ipAddress('ip');
 			$table->timestamp('created_at')->useCurrent();
 		});
 	}

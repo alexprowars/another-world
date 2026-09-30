@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Facades\Vars;
 use App\Http\Resources\UserSlotItemResource;
 use App\Services\UserService;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -154,15 +153,6 @@ class User extends Authenticatable implements HasMedia
 			->storeConversionsOnDisk('resize')
 			->singleFile()
 			->useDisk('media');
-	}
-
-	/** @return Attribute<string, string> */
-	protected function ip(): Attribute
-	{
-		return Attribute::make(
-			get: static fn($value) => long2ip($value),
-			set: static fn($value) => sprintf("%u", ip2long($value)),
-		);
 	}
 
 	public function isAdmin(): bool

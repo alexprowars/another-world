@@ -11,9 +11,14 @@ class Hospital
 	public function __invoke()
 	{
 		$user = auth()->user();
-		$time = round((1 - ($user->hp_now / $user->hp_max)) * $this->getHealingTime($user));
+		$canHeal = $user->vitality > 0 && $user->hp_max > 0;
+		$time = 0;
 
-		if (request()->has('heal') && !$user->r_date && $user->vitality > 0 && $time) {
+		if ($canHeal) {
+			$time = round((1 - ($user->hp_now / $user->hp_max)) * $this->getHealingTime($user));
+		}
+
+		if (request()->has('heal') && !$user->r_date && $canHeal && $time > 0) {
 			$user->r_date = now()->addSeconds($time);
 			$user->r_type = 2;
 			$user->update();
@@ -46,6 +51,7 @@ class Hospital
 		}
 
 		return Inertia::render('Map/Hospital', [
+			'can_heal' => $canHeal,
 			'time' => $time,
 		]);
 	}
@@ -65,11 +71,13 @@ class Hospital
 			return;
 		}
 
-		$remainingSeconds = max(0, (int) now()->diffInSeconds($user->r_date));
-
-		if ($user->vitality < 1) {
+		if ($user->vitality <= 0 || $user->hp_max <= 0) {
 			$user->update(['r_date' => null, 'r_type' => null]);
+
+			return;
 		}
+
+		$remainingSeconds = max(0, (int) now()->diffInSeconds($user->r_date));
 
 		if ($remainingSeconds <= 0) {
 			$user->update([

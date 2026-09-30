@@ -20,10 +20,26 @@ return new class extends Migration {
 			$table->string('logo')->nullable();
 			$table->timestamps();
 		});
+
+		Schema::table('users', function (Blueprint $table) {
+			$table->foreign('tribe_id')->references('id')->on('tribes')->nullOnDelete();
+		});
+
+		Schema::table('users_items', function (Blueprint $table) {
+			$table->foreign('tribe_id')->references('id')->on('tribes')->restrictOnDelete();
+		});
 	}
 
 	public function down(): void
 	{
+		Schema::table('users_items', function (Blueprint $table) {
+			$table->dropForeign(['tribe_id']);
+		});
+
+		Schema::table('users', function (Blueprint $table) {
+			$table->dropForeign(['tribe_id']);
+		});
+
 		Schema::dropIfExists('tribes');
 	}
 };

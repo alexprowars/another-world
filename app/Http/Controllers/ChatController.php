@@ -128,8 +128,8 @@ class ChatController extends Controller
 		$message = strtr($message, $stopwords);
 
 		$recipients = User::query()
-			->select(['id', 'nickname'])
-			->whereIn('nickname', $users)
+			->select(['id', 'name'])
+			->whereIn('name', $users)
 			->get();
 
 		if ((str_starts_with($message, '/kick') || str_starts_with($message, '/speak')) && $recipients->isNotEmpty() && $user->isAdmin()) {
@@ -193,8 +193,11 @@ class ChatController extends Controller
 	{
 		$users = User::query()
 			->with(['tribe'])
-			->whereNot('rank', 60)
-			->where('online', '<', now()->addMinutes(5))
+			->where(function ($query) {
+				$query->whereNull('rank')
+					->orWhereNot('rank', 60);
+			})
+			->where('online', '>=', now()->subMinutes(5))
 			->get();
 
 		$userList = [];
@@ -206,7 +209,7 @@ class ChatController extends Controller
 				'rank' => $user->rank,
 				'tribe' => $user->tribe?->only(['id', 'name']),
 				'level' => $user->level,
-				'battle' => $user->battle,
+				'battle' => $user->battle_id,
 				'profession' => $user->profession,
 				'status' => $user->status,
 				'travma' => $user->injury?->isFuture() ? $user->injury->utc()->toAtomString() : null,

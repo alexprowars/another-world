@@ -737,25 +737,39 @@ class BattleService
 	/** @return list<UserItem> */
 	public static function wearout(User $user): array
 	{
-		$items = $user->getSlot()->getItems()
-			->filter(fn(UserItem $item) => $item->type != 12);
+		return DB::transaction(function () use ($user) {
+			$slots = $user->slots()
+				->lockForUpdate()
+				->firstOrFail();
 
-		if ($items->isEmpty()) {
-			return [];
-		}
+			$user->setRelation('slots', $slots);
 
-		$wornItems = $items->random(random_int(1, $items->count()));
+			$items = $user->items()
+				->whereIn('id', $slots->getItemsId())
+				->whereNot('type', 12)
+				->orderBy('id')
+				->lockForUpdate()
+				->get();
 
-		foreach ($wornItems as $item) {
-			$item->wearout += 1;
-			$item->save();
-
-			if ($item->wearout_max <= $item->wearout) {
-				InventoryService::unsetObject($user, $item->onset);
+			if ($items->isEmpty()) {
+				return [];
 			}
-		}
 
-		return $wornItems->values()->all();
+			$wornItems = $items->random(random_int(1, $items->count()));
+
+			foreach ($wornItems as $item) {
+				$item->wearout += 1;
+				$item->save();
+
+				if ($item->wearout_max <= $item->wearout) {
+					InventoryService::unsetObject($user, $item->onset);
+				}
+			}
+
+			DB::afterCommit(fn() => $slots->clearCache());
+
+			return $wornItems->values()->all();
+		});
 	}
 
 	public static function getBaseLevelExp(int $lvl): int

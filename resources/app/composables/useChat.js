@@ -116,13 +116,6 @@ export default function useChat() {
 	});
 
 	async function sendMessage(message) {
-		message = message.replace('%', '%25');
-		message = message.replaceAll('+', '%2B');
-		message = message.replace('#', '%23');
-		message = message.replace('&', '%26');
-		message = message.replace('?', '%3F');
-		message = message.replace("'", '`');
-
 		if (message.length === 0) {
 			return;
 		}

@@ -15,7 +15,12 @@ class LogUserIP
 
 		$ip = $request->ip();
 
-		if (($user = $request->user()) && $user->ip != $ip && $request->ip() != '127.0.0.1') {
+		if (
+			($user = $request->user())
+			&& filter_var($ip, FILTER_VALIDATE_IP) !== false
+			&& $user->ip !== $ip
+			&& !in_array($ip, ['127.0.0.1', '::1'], true)
+		) {
 			$user->ip = $ip;
 			$user->save();
 
