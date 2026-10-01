@@ -70,20 +70,11 @@
 	font-weight: 600;
 }
 
-.person-info-portrait .person-name::before,
-.person-info-portrait .person-name::after {
-	display: none;
-}
-
 .person-info-portrait .person-name a {
 	min-width: 0;
 	overflow: hidden;
 	color: var(--shell-text);
 	text-overflow: ellipsis;
-}
-
-.person-info-portrait .person-name img {
-	flex-shrink: 0;
 }
 
 .person-info-panel {

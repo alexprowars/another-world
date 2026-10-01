@@ -172,11 +172,6 @@
 	overflow-wrap: anywhere;
 }
 
-.arena-members .person-name::before,
-.arena-members .person-name::after {
-	display: none;
-}
-
 .arena-members .person-name a {
 	min-width: 0;
 	color: var(--paper-link);

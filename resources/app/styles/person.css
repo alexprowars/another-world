@@ -23,6 +23,39 @@
 	padding: var(--space-8);
 }
 
+.person-name {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-6);
+	max-width: 100%;
+	color: var(--paper-muted);
+	font-size: 12px;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+
+.person-name a {
+	min-width: 0;
+	overflow: hidden;
+	color: var(--paper-link);
+	text-overflow: ellipsis;
+}
+
+.person-name a:where(:hover) {
+	color: var(--paper-link-hover);
+}
+
+.person-name img {
+	flex-shrink: 0;
+}
+
+.person-name .person-name__info {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
 .person-view {
 	width: 280px;
 }
@@ -126,20 +159,11 @@
 	font-weight: 600;
 }
 
-.person-layout .person-name::before,
-.person-layout .person-name::after {
-	display: none;
-}
-
 .person-layout .person-name a {
 	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	color: var(--shell-text);
-}
-
-.person-layout .person-name img {
-	flex-shrink: 0;
 }
 
 .hp-line {

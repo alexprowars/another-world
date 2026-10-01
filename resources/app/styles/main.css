@@ -1,17 +1,3 @@
-.tmain {
-	width: 100%;
-}
-
-.nmenus {
-	background: url(/assets/images/main/cp.jpg) repeat-x;
-	font-weight: bold;
-	color: white;
-}
-
-.ltable {
-	width: 100%;
-}
-
 .textblock {
 	margin: var(--space-10) var(--space-6) 0 var(--space-6);
 	padding: var(--space-10);
@@ -19,33 +5,11 @@
 	background: #efdcb8;
 }
 
-.dlfr {
-	width: 100%;
-	height: 100%;
-	padding: var(--space-6) 0;
-}
-
-.l_z_f {
-	background: url(/assets/images/main/lpr.jpg) repeat-x;
-	white-space: nowrap;
-	font-size: 15px;
-	font-weight: bold;
-	color: #ffffff;
-	padding-left: var(--space-10);
-	padding-right: var(--space-10);
-}
-
 hr {
 	width: 100%;
 	color: #a08359;
 	height: 1px;
-	border-style: none;
-}
-
-html body hr {
-	width: 100%;
 	border: 0 solid #a08359;
-	height: 1px;
 	background-color: #a08359;
 	margin: var(--space-6) 0;
 }
@@ -71,16 +35,6 @@ a:hover {
 	color: #ff4400;
 }
 
-.input {
-	color: #ffffff;
-	font-size: 12px;
-	font-weight: bold;
-	text-decoration: none;
-	border: 1px solid #636363;
-	background: #9a9996 url('/assets/images/main/buttons_bg.gif') repeat-x right;
-	height: 20px;
-}
-
 .tmain a {
 	color: #fff;
 	text-decoration: none;
@@ -91,28 +45,7 @@ a:hover {
 }
 
 .shoutbox {
-	padding: 0 var(--space-4) var(--space-10);
-	font-size: 12px;
-	height: 100%;
 	overflow-y: scroll;
-
-	.date2 {
-		font-size: 12px;
-		text-decoration: none;
-		font-weight: normal;
-		color: #007000;
-		padding: var(--space-2);
-		background-color: #00ffaa;
-	}
-
-	.date3 {
-		font-size: 12px;
-		text-decoration: none;
-		font-weight: normal;
-		color: #007000;
-		background-color: #ddd;
-		padding: var(--space-2);
-	}
 
 	div {
 		margin-top: var(--space-4);
@@ -121,106 +54,20 @@ a:hover {
 
 	.to {
 		cursor: pointer;
-		color: #2e5289;
-		font-weight: bold;
-	}
-
-	.player,
-	.player a {
-		color: #0046d5;
-		font-weight: bold;
-		font-size: 12px;
 	}
 
 	.private,
 	.private a {
-		color: Red;
 		font-weight: bold;
-		font-size: 12px;
 	}
-}
-
-.shoutbox .date1 {
-	font-size: 12px;
-	text-decoration: none;
-	font-weight: normal;
-	color: #007000;
-	padding: var(--space-2);
-}
-
-form {
-	margin: 0;
-	padding: 0;
 }
 
 #usersContent {
 	text-align: center;
-	margin: var(--space-10) 0;
-}
-
-#usersContent > div {
-	padding: var(--space-6);
-	text-align: center;
-	border: 1px #d8c792 solid;
 }
 
 p.message {
 	padding: var(--space-16);
-}
-
-.person-name {
-	width: 244px;
-	background: url(/assets/images/main/mnf.jpg) repeat-x;
-	font-size: 12px;
-	font-weight: normal;
-	color: #ffffff;
-	height: 28px;
-	padding-top: var(--space-6);
-	position: relative;
-	padding-left: 50px;
-	white-space: nowrap;
-	overflow: hidden;
-}
-
-.person-name a {
-	font-size: 12px;
-	color: #ffffff;
-}
-
-.person-name .person-name__info {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	vertical-align: middle;
-}
-
-.person-name:after {
-	display: inline-block;
-	content: '';
-	background: url(/assets/images/main/rlnm.jpg) no-repeat;
-	height: 28px;
-	width: 46px;
-	position: absolute;
-	top: 0;
-	right: 0;
-}
-
-.person-name:before {
-	display: inline-block;
-	content: '';
-	background: url(/assets/images/main/btn_on.jpg) no-repeat;
-	height: 28px;
-	width: 46px;
-	position: absolute;
-	left: 0;
-	top: 0;
-}
-
-#autofight + label {
-	font-weight: normal;
-	margin: 0;
-	display: inline;
 }
 
 .creditList {
