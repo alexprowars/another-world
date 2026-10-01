@@ -1,5 +1,9 @@
 <template>
-	<ItemPopover :item="item" class="person-view-slot" :style="{ width: width + 'px', height: height + 'px' }">
+	<ItemPopover
+		:item="item"
+		class="person-view-slot"
+		:style="{ width: width + 'px', height: height + 'px' }"
+	>
 		<img :src="image" :class="{ 'cursor-pointer': isEdit }" :width="width" :height="height" :alt="title" @click.prevent="unsetItem()" />
 
 		<template #empty>
@@ -67,7 +71,7 @@
 			case 17:
 			case 18:
 			case 19:
-				return 40;
+				return 60;
 			case 20:
 				return 120;
 			case 21:
@@ -83,13 +87,13 @@
 			case 1:
 				return 60;
 			case 2:
-				return 20;
+				return 30;
 			case 3:
-				return 75;
+				return 90;
 			case 4:
-				return 75;
+				return 80;
 			case 5:
-				return 60;
+				return 90;
 			case 6:
 				return 20;
 			case 7:
@@ -97,7 +101,7 @@
 			case 8:
 				return 20;
 			case 9:
-				return 30;
+				return 40;
 			case 10:
 				return 20;
 			case 11:
@@ -105,19 +109,17 @@
 			case 12:
 				return 20;
 			case 13:
-				return 40;
+				return 60;
 			case 14:
-				return 40;
+				return 45;
 			case 15:
-				return 40;
+				return 45;
 			case 16:
 				return 80;
 			case 17:
-				return 25;
 			case 18:
-				return 25;
 			case 19:
-				return 25;
+				return 40;
 			case 20:
 				return 60;
 			case 21:
@@ -156,6 +158,8 @@
 				return 'Нарукавники';
 			case 15:
 				return 'Перчатки';
+			case 16:
+				return 'Рубаха';
 			case 17:
 			case 18:
 			case 19:
@@ -184,6 +188,6 @@
 			return '/assets/images/items/' + props.item.type + '/' + props.item.code + '.gif';
 		}
 
-		return '/assets/images/items/w' + props.position + '.gif';
+		return '/assets/images/items/w' + props.position + '.png';
 	});
 </script>

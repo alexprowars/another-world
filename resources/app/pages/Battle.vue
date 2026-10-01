@@ -55,10 +55,6 @@
 							</template>
 						</div>
 
-						<div v-show="loading" class="battle-loading">
-							<GameIcon name="refresh" /> Обновляем бой…
-						</div>
-
 						<div v-show="!isFinished" class="battle-timer">
 							<GameIcon name="hourglass" />
 							<span>До тайм-аута</span>
@@ -80,9 +76,9 @@
 									</div>
 								</div>
 							</div>
-							<div v-show="!loading" class="text-center" id="refresh_b">
-								<button type="button" class="ui-button ui-button--secondary" @click="loaderRefresh">
-									<GameIcon name="refresh" /> Обновить
+							<div class="text-center">
+								<button type="button" class="ui-button ui-button--secondary battle-refresh" :disabled="loading" @click="loaderRefresh">
+									<GameIcon name="refresh" :class="{ 'battle-refresh__icon--loading': loading }" /> Обновить
 								</button>
 							</div>
 						</div>
@@ -127,7 +123,7 @@
 </template>
 
 <script setup>
-	import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+	import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 	import { Link, router, useHttp } from '@inertiajs/vue3';
 	import { toast } from 'vue3-toastify';
 	import BattleFighter from '~/components/Battle/BattleFighter.vue';
@@ -138,10 +134,15 @@
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import UseMagic from '~/components/Dialogs/UseMagic.vue';
 	import { openPopupModal } from '~/composables/useModals.js';
+	import useState from '~/composables/useState.js';
 
-	defineProps({
+	const props = defineProps({
 		page: Object,
 	});
+
+	const state = useState();
+	const echo = inject('echo', null);
+	const userChannel = state.user ? echo?.private('user.' + state.user.id) : null;
 
 	const data = ref(null);
 	const logs = ref([]);
@@ -155,6 +156,8 @@
 
 	let refreshTimer;
 	let timeoutTimer;
+	let refreshPending = false;
+	let unmounted = false;
 
 	const isFinished = computed(() => data.value?.action === 'finishBattle');
 	const showNoEnemy = computed(() => !isFinished.value);
@@ -185,22 +188,42 @@
 	});
 
 	onMounted(() => {
+		userChannel?.listen('BattleUpdated', onBattleUpdated);
+
 		loaderRefresh();
 	});
 
 	onBeforeUnmount(() => {
+		unmounted = true;
+		userChannel?.stopListening('BattleUpdated', onBattleUpdated);
+
 		clearTimeout(refreshTimer);
 		clearTimeout(timeoutTimer);
 	});
 
+	function onBattleUpdated({ battleId }) {
+		if (battleId === props.page.id) {
+			loaderRefresh();
+		}
+	}
+
 	function loaderRefresh() {
+		if (unmounted || isFinished.value) {
+			return;
+		}
+
 		refresh();
 		clearTimeout(refreshTimer);
 		refreshTimer = setTimeout(loaderRefresh, 45000);
 	}
 
 	async function refresh(extra = {}) {
-		if (isFinished.value) {
+		if (unmounted || isFinished.value) {
+			return;
+		}
+
+		if (loading.value) {
+			refreshPending = true;
 			return;
 		}
 
@@ -214,19 +237,38 @@
 				...extra,
 			}).post('/battle');
 
-			await actionRefresh(result);
+			if (!unmounted) {
+				await actionRefresh(result);
+			}
 		} catch (e) {
-			alert('Произошла ошибка при получении ответа от сервера');
+			if (!unmounted) {
+				alert('Произошла ошибка при получении ответа от сервера');
+			}
+		} finally {
+			loading.value = false;
+
+			if (refreshPending) {
+				refreshPending = false;
+				loaderRefresh();
+			}
 		}
 	}
 
 	async function useAbility(id) {
+		if (loading.value) {
+			return;
+		}
+
 		await refresh({ ability: id });
 		clearTimeout(refreshTimer);
 		refreshTimer = setTimeout(loaderRefresh, 45000);
 	}
 
 	async function gofight() {
+		if (loading.value) {
+			return false;
+		}
+
 		const form = impactForm.value;
 
 		if (!form?.isImpactsComplete()) {
@@ -262,7 +304,7 @@
 		}
 
 		if (res.action === 'refresh') {
-			loaderRefresh();
+			refreshPending = true;
 			return;
 		}
 
@@ -283,7 +325,6 @@
 
 			clearTimeout(refreshTimer);
 			clearTimeout(timeoutTimer);
-			loading.value = false;
 			return;
 		}
 
@@ -295,7 +336,6 @@
 			selectedEnemy.value = 0;
 		}
 
-		loading.value = false;
 		await nextTick();
 	}
 

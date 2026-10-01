@@ -1,0 +1,36 @@
+.game-popper {
+	display: inline-flex;
+	align-items: center;
+	min-width: 0;
+	vertical-align: middle;
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+	max-width: min(320px, calc(100vw - 24px));
+	padding: var(--space-10) var(--space-12);
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-panel);
+	color: var(--paper-text);
+	box-shadow: 0 6px 24px var(--shadow-popover);
+	font: 12px/1.5 var(--font-interface);
+	text-align: left;
+	overflow-wrap: anywhere;
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-outer {
+	border-color: var(--paper-border);
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-inner {
+	visibility: visible;
+	border-color: var(--paper-panel);
+}
+
+.v-popper--theme-tooltip .v-popper__inner a {
+	color: var(--paper-link);
+}
+
+.v-popper--theme-tooltip .v-popper__inner a:hover {
+	color: var(--paper-link-hover);
+}

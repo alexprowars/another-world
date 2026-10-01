@@ -1,5 +1,12 @@
 <template>
-	<Tooltip v-bind="attrs" placement="top" :triggers="['hover', 'focus', 'touch']" :popper-triggers="['hover']" :aria-id="ariaId">
+	<Tooltip
+		v-bind="attrs"
+		class="game-popper"
+		placement="top"
+		:triggers="['hover', 'focus', 'touch']"
+		:popper-triggers="['hover']"
+		:aria-id="ariaId"
+	>
 		<slot />
 		<template #popper="props">
 			<slot name="content" v-bind="props" />

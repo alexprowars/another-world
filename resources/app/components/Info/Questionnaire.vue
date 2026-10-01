@@ -1,26 +1,30 @@
 <template>
-	<section>
-		<h2 class="mb-3 font-bold">Анкетные данные</h2>
-		<p>
-			<b>Имя:</b>
-			{{ person.name }}
-		</p>
-		<p>
-			<b>Пол:</b>
-			{{ person.gender === 'M' ? 'Мужской' : person.gender === 'F' ? 'Женский' : 'Не указан' }}
-		</p>
-		<p v-if="person.city">
-			<b>Город:</b>
-			{{ person.city }}
-		</p>
-		<template v-if="person.about">
-			<p class="mt-3 font-bold">О себе:</p>
-			<p class="whitespace-pre-line break-words">{{ person.about }}</p>
-		</template>
+	<section class="person-info-panel ui-panel">
+		<h2 class="person-info-panel-heading"><GameIcon name="book" />Анкетные данные</h2>
+		<dl class="person-info-data">
+			<div>
+				<dt>Имя</dt>
+				<dd>{{ person.name }}</dd>
+			</div>
+			<div>
+				<dt>Пол</dt>
+				<dd>{{ person.gender === 'M' ? 'Мужской' : person.gender === 'F' ? 'Женский' : 'Не указан' }}</dd>
+			</div>
+			<div v-if="person.city">
+				<dt>Город</dt>
+				<dd>{{ person.city }}</dd>
+			</div>
+		</dl>
+		<div v-if="person.about" class="person-info-about">
+			<h3>О себе</h3>
+			<p>{{ person.about }}</p>
+		</div>
 	</section>
 </template>
 
 <script setup>
+	import GameIcon from '~/components/Layout/GameIcon.vue';
+
 	defineProps({
 		person: Object,
 	});

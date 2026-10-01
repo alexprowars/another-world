@@ -157,7 +157,7 @@
 	min-width: 0;
 }
 
-.arena-members .personName {
+.arena-members .person-name {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
@@ -172,18 +172,18 @@
 	overflow-wrap: anywhere;
 }
 
-.arena-members .personName::before,
-.arena-members .personName::after {
+.arena-members .person-name::before,
+.arena-members .person-name::after {
 	display: none;
 }
 
-.arena-members .personName a {
+.arena-members .person-name a {
 	min-width: 0;
 	color: var(--paper-link);
 	font-weight: 600;
 }
 
-.arena-members .personName a:hover {
+.arena-members .person-name a:hover {
 	color: var(--paper-link-hover);
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="personName">
+	<div class="person-name">
 		<img
 			v-if="player.rank"
 			:src="'/assets/images/rank/' + player.rank + '.png'"
@@ -17,6 +17,9 @@
 		/>
 		<a :href="'/info/' + player.id" target="_blank">{{ player.name }}</a>
 		[{{ player.level }}]
+		<a :href="'/info/' + player.id" target="_blank" class="person-name__info" :title="'Профиль: ' + player.name">
+			<img src="/assets/images/images/inf.png" width="18" height="18" alt="Профиль" />
+		</a>
 	</div>
 </template>
 

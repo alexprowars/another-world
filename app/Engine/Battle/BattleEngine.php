@@ -12,6 +12,7 @@ use App\Engine\Battle\Services\BattleFinishService;
 use App\Engine\Battle\Services\RewardService;
 use App\Engine\Battle\Services\RoundResolver;
 use App\Engine\Battle\Services\TurnService;
+use App\Events\BattleUpdated;
 use App\Models\Battle;
 use App\Models\BattleMember;
 use App\Models\User;
@@ -110,9 +111,10 @@ class BattleEngine
 	private function processActions(TurnData $turn, ?int $abilityId, bool $roundExpired, CarbonImmutable $time): ?string
 	{
 		$message = null;
+		$battleUpdated = false;
 
 		if ($roundExpired && $this->battle->status === BattleStatus::ACTIVE && $this->battle->result === null) {
-			$this->roundResolver->resolve($this->battle, $time);
+			$battleUpdated = $this->roundResolver->resolve($this->battle, $time);
 		}
 
 		$isCurrentRound = $turn->round === $this->battle->round;
@@ -129,6 +131,10 @@ class BattleEngine
 				$abilityId,
 				$time,
 			);
+
+			if ($message === null) {
+				$battleUpdated = true;
+			}
 		}
 
 		if (!$roundExpired && $this->battle->status === BattleStatus::ACTIVE && $this->battle->result === null) {
@@ -143,10 +149,26 @@ class BattleEngine
 
 				if ($turnError !== null) {
 					$message = $turnError;
+				} else {
+					$battleUpdated = true;
 				}
 			}
 
-			$this->roundResolver->resolve($this->battle, $time);
+			if ($this->roundResolver->resolve($this->battle, $time)) {
+				$battleUpdated = true;
+			}
+		}
+
+		if ($battleUpdated) {
+			$userIds = $this->battle->members
+				->filter(fn (BattleMember $member) => $member->user_id !== $this->user->id && !$member->user->isBot())
+				->pluck('user_id')
+				->values()
+				->all();
+
+			if (!empty($userIds)) {
+				BattleUpdated::dispatch($this->battle->id, $userIds);
+			}
 		}
 
 		return $message;

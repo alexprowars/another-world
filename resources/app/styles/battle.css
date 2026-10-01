@@ -1,7 +1,7 @@
 .battle-page {
 	width: 100%;
 	min-width: 800px;
-	max-width: 1000px;
+	max-width: 1080px;
 	margin: 0 auto;
 	color: var(--paper-text);
 }
@@ -14,7 +14,7 @@
 }
 
 .battle-layout__fighter {
-	flex: 0 0 242px;
+	flex: 0 0 282px;
 	min-width: 0;
 }
 
@@ -61,7 +61,7 @@
 	color: var(--shell-gold);
 }
 
-.battle-fighter .personName {
+.battle-fighter .person-name {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -74,12 +74,12 @@
 	color: var(--shell-gold);
 }
 
-.battle-fighter .personName::before,
-.battle-fighter .personName::after {
+.battle-fighter .person-name::before,
+.battle-fighter .person-name::after {
 	display: none;
 }
 
-.battle-fighter .personName a {
+.battle-fighter .person-name a {
 	min-width: 0;
 	overflow: hidden;
 	color: var(--shell-text);
@@ -93,21 +93,6 @@
 	padding: var(--space-12) var(--space-10);
 	border-bottom: 1px solid var(--paper-border);
 	background: var(--paper-highlight);
-}
-
-.battle-fighter__equipment {
-	width: 240px;
-	background: var(--paper-inset);
-}
-
-.battle-fighter__equipment .left img,
-.battle-fighter__equipment .right img,
-.battle-fighter__equipment a img {
-	border-color: var(--paper-border);
-}
-
-.battle-fighter__slot-spacer {
-	height: 10px;
 }
 
 .battle-form__title,
@@ -141,7 +126,6 @@
 .battle-form__title svg,
 .battle-journal__heading svg,
 .battle-timer svg,
-.battle-loading svg,
 .battle-log-link svg {
 	flex-shrink: 0;
 	width: 16px;
@@ -452,8 +436,7 @@
 	color: var(--paper-muted);
 }
 
-.battle-timer,
-.battle-loading {
+.battle-timer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -476,13 +459,24 @@
 	font-variant-numeric: tabular-nums;
 }
 
-.battle-loading {
-	margin-top: var(--space-12);
-}
-
 .battle-actions .ui-button {
 	padding-right: var(--space-10);
 	padding-left: var(--space-10);
+}
+
+.battle-actions .battle-refresh:disabled {
+	opacity: 1;
+	cursor: wait;
+}
+
+.battle-refresh__icon--loading {
+	animation: battle-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes battle-refresh-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .battle-change {

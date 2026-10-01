@@ -1,45 +1,45 @@
 <template>
-	<section>
-		<h2 class="mb-3 font-bold">Статистика</h2>
-		<table class="table w-full">
+	<section class="person-info-panel ui-panel">
+		<h2 class="person-info-panel-heading"><GameIcon name="swords" />Статистика</h2>
+		<table class="person-info-table">
 			<tbody>
 				<tr>
-					<th class="text-left">Уровень</th>
-					<td class="text-right">{{ person.level }}</td>
+					<th scope="row">Уровень</th>
+					<td>{{ person.level }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Побед</th>
-					<td class="text-right">{{ person.wins }}</td>
+					<th scope="row">Побед</th>
+					<td>{{ person.wins }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Поражений</th>
-					<td class="text-right">{{ person.losses }}</td>
+					<th scope="row">Поражений</th>
+					<td>{{ person.losses }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Ничьих</th>
-					<td class="text-right">{{ person.draws }}</td>
+					<th scope="row">Ничьих</th>
+					<td>{{ person.draws }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Крутизна</th>
-					<td class="text-right">{{ person.rating }}</td>
+					<th scope="row">Крутизна</th>
+					<td>{{ person.rating }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Дата рождения</th>
-					<td class="text-right">
+					<th scope="row">Дата рождения</th>
+					<td>
 						{{ person.admin ? 'До начала времён' : person.created_at ? $formatDate(person.created_at, 'DD.MM.YYYY') : 'Не указана' }}
 					</td>
 				</tr>
 				<tr>
-					<th class="text-left">Профессия</th>
-					<td class="text-right">{{ $t('profession.' + (person.profession || 0)) }}</td>
+					<th scope="row">Профессия</th>
+					<td>{{ $t('profession.' + (person.profession || 0)) }}</td>
 				</tr>
 				<tr>
-					<th class="text-left">Статус</th>
-					<td class="text-right">{{ $t('rank.' + (person.rank || 0)) }}</td>
+					<th scope="row">Статус</th>
+					<td>{{ $t('rank.' + (person.rank || 0)) }}</td>
 				</tr>
 				<tr v-if="person.tribe">
-					<th class="text-left">Клан</th>
-					<td class="text-right">{{ person.tribe.name }}</td>
+					<th scope="row">Клан</th>
+					<td>{{ person.tribe.name }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -47,6 +47,8 @@
 </template>
 
 <script setup>
+	import GameIcon from '~/components/Layout/GameIcon.vue';
+
 	defineProps({
 		person: Object,
 	});

@@ -155,7 +155,6 @@
 }
 
 .game-player .hp-line-track {
-	height: 9px;
 	border-color: var(--resource-color);
 	background: var(--shell-input);
 }

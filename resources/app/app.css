@@ -15,6 +15,7 @@
 @import './styles/online.css';
 @import './styles/library.css';
 @import './styles/person.css';
+@import './styles/info.css';
 @import './styles/city.css';
 @import './styles/location.css';
 @import './styles/services.css';
@@ -28,5 +29,6 @@
 @import './styles/smithy.css';
 
 @import 'floating-vue/dist/style.css';
+@import './styles/popper.css';
 @import 'vue3-toastify/dist/index.css';
 @import './styles/toast.css';

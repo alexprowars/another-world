@@ -1,0 +1,405 @@
+.person-info-shell {
+	min-height: 100dvh;
+	padding: var(--space-20) var(--space-16) var(--space-32);
+	background: radial-gradient(ellipse at 50% 0, var(--shell-glow), var(--shell-bg) 65%);
+	color: var(--paper-text);
+	font: 13px/1.5 var(--font-interface);
+}
+
+.person-info-masthead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-8) var(--space-16);
+	max-width: 1120px;
+	margin: 0 auto var(--space-16);
+	color: var(--shell-muted);
+	font-size: 12px;
+}
+
+.person-info-brand {
+	color: var(--shell-gold);
+	font: 700 20px/1.3 Georgia, serif;
+	letter-spacing: 0.04em;
+	text-decoration: none;
+}
+
+.person-info-brand:hover {
+	color: var(--shell-text);
+}
+
+.person-info.location-card {
+	max-width: 1120px;
+	margin: 0 auto;
+}
+
+.person-info-overview {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 306px minmax(0, 1fr);
+	align-items: start;
+	gap: var(--space-16);
+}
+
+.person-info-column {
+	display: grid;
+	gap: var(--space-16);
+	min-width: 0;
+}
+
+.person-info-portrait {
+	display: flex;
+	justify-content: center;
+	padding: var(--space-12);
+	background: var(--paper-inset);
+	box-shadow: inset 0 0 0 3px var(--paper-panel);
+}
+
+.person-info-portrait .person-name {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-6);
+	height: auto;
+	min-height: 34px;
+	padding: var(--space-6) var(--space-8);
+	border: 1px solid var(--shell-line);
+	border-radius: 3px;
+	background: var(--shell-panel);
+	color: var(--shell-gold);
+	font-weight: 600;
+}
+
+.person-info-portrait .person-name::before,
+.person-info-portrait .person-name::after {
+	display: none;
+}
+
+.person-info-portrait .person-name a {
+	min-width: 0;
+	overflow: hidden;
+	color: var(--shell-text);
+	text-overflow: ellipsis;
+}
+
+.person-info-portrait .person-name img {
+	flex-shrink: 0;
+}
+
+.person-info-panel {
+	min-width: 0;
+}
+
+.person-info-panel-heading {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+	margin: 0;
+	padding: var(--space-10) var(--space-14);
+	border-bottom: 1px solid var(--paper-border);
+	border-radius: 3px 3px 0 0;
+	background: var(--paper-inset);
+	color: var(--paper-heading);
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.5;
+}
+
+.person-info-panel-heading > svg {
+	width: 18px;
+	height: 18px;
+	color: var(--paper-link);
+}
+
+.person-info-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+}
+
+.person-info-table th,
+.person-info-table td {
+	padding: var(--space-6) var(--space-14);
+	vertical-align: baseline;
+	overflow-wrap: anywhere;
+}
+
+.person-info-table th {
+	width: 52%;
+	color: var(--paper-muted);
+	font-weight: 400;
+	text-align: left;
+}
+
+.person-info-table td {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.person-info-table tr:nth-child(even) {
+	background: var(--paper-stripe);
+}
+
+.person-info-stat-value {
+	min-width: 32px;
+	min-height: 28px;
+	padding: var(--space-2) var(--space-6);
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-panel);
+	color: var(--paper-link);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.person-info-stat-value:hover,
+.person-info-stat-value:focus-visible {
+	background: var(--paper-inset);
+}
+
+.person-info-features {
+	display: grid;
+	gap: var(--space-10);
+	margin: 0;
+	padding: var(--space-14);
+	list-style: none;
+	font-size: 12px;
+	overflow-wrap: anywhere;
+}
+
+.person-info-zodiac {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+}
+
+.person-info-danger {
+	color: var(--paper-danger);
+}
+
+.person-info-muted,
+.person-info-empty {
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+.person-info-empty {
+	margin: 0;
+	padding: var(--space-20) var(--space-16);
+}
+
+.person-info-gifts,
+.person-info-details,
+.person-info-private {
+	margin-top: var(--space-16);
+}
+
+.person-info-gift-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-10);
+	padding: var(--space-16);
+}
+
+.person-info-gift-button {
+	display: grid;
+	place-items: center;
+	width: 80px;
+	height: 80px;
+	padding: var(--space-6);
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-panel);
+	cursor: pointer;
+}
+
+.person-info-gift-button:hover,
+.person-info-gift-button:focus-visible {
+	border-color: var(--paper-link);
+	background: var(--paper-inset);
+}
+
+.person-info-gift-button img {
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
+	object-fit: contain;
+}
+
+.person-info-panel-footer {
+	padding: 0 var(--space-16) var(--space-16);
+}
+
+.person-info-details {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+	gap: var(--space-16);
+}
+
+.person-info-data {
+	margin: 0;
+	padding: var(--space-8) var(--space-14);
+	font-size: 12px;
+}
+
+.person-info-data > div {
+	display: grid;
+	grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr);
+	gap: var(--space-12);
+	padding: var(--space-6) 0;
+}
+
+.person-info-data dt {
+	color: var(--paper-muted);
+}
+
+.person-info-data dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.person-info-about {
+	margin: 0 var(--space-14) var(--space-14);
+	padding-top: var(--space-12);
+	border-top: 1px solid var(--paper-border);
+}
+
+.person-info-about h3,
+.person-info-friend-group h3 {
+	margin: 0 0 var(--space-8);
+	color: var(--paper-heading);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.person-info-about p {
+	margin: 0;
+	font-size: 12px;
+	white-space: pre-line;
+	overflow-wrap: anywhere;
+}
+
+.person-info-friends > summary {
+	list-style: none;
+	cursor: pointer;
+}
+
+.person-info-friends > summary::-webkit-details-marker {
+	display: none;
+}
+
+.person-info-friends:not([open]) > summary {
+	border-bottom: 0;
+	border-radius: 3px;
+}
+
+.person-info-chevron {
+	margin-left: auto;
+	transform: rotate(-90deg);
+}
+
+.person-info-friends[open] .person-info-chevron {
+	transform: rotate(0);
+}
+
+.person-info-friend-group {
+	padding: var(--space-14);
+}
+
+.person-info-friend-group + .person-info-friend-group {
+	border-top: 1px solid var(--paper-border);
+}
+
+.person-info-friend-group h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--space-8);
+}
+
+.person-info-friend-group .ui-badge {
+	padding: 0 var(--space-6);
+	font-variant-numeric: tabular-nums;
+}
+
+.person-info-links {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: var(--space-6) var(--space-10);
+}
+
+.person-info-links a {
+	color: var(--paper-link);
+	font-size: 12px;
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.person-info-links a:hover {
+	color: var(--paper-link-hover);
+	text-decoration: underline;
+}
+
+@container (max-width: 900px) {
+	.person-info-overview {
+		grid-template-columns: 306px minmax(0, 1fr);
+	}
+
+	.person-info-portrait {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.person-info-overview > .person-info-panel {
+		grid-column: 1;
+		grid-row: 2;
+	}
+
+	.person-info-column {
+		grid-column: 2;
+		grid-row: 1 / 3;
+	}
+}
+
+@container (max-width: 600px) {
+	.person-info-overview,
+	.person-info-details {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.person-info-overview > .person-info-panel,
+	.person-info-column {
+		grid-column: auto;
+		grid-row: auto;
+	}
+
+	.person-info-portrait {
+		justify-self: center;
+	}
+}
+
+@media (max-width: 400px) {
+	.person-info-shell {
+		padding: var(--space-12) var(--space-6) var(--space-20);
+	}
+
+	.person-info .location-card-body {
+		padding: var(--space-12) var(--space-6);
+	}
+
+	.person-info-portrait {
+		padding: var(--space-6);
+	}
+
+	.person-info .location-card-header {
+		align-items: flex-start;
+	}
+
+	.person-info-data > div {
+		grid-template-columns: 1fr;
+		gap: var(--space-2);
+	}
+}
