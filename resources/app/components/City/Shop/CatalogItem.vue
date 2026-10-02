@@ -3,7 +3,7 @@
 		<div class="storefront-item-top">
 			<ItemPopover :item="details" :player="player">
 				<button type="button" class="storefront-item-image" :title="'Характеристики: ' + product.title">
-					<img :src="'/assets/images/items/' + product.type + '/' + product.code + '.gif'" :alt="product.title" loading="lazy" />
+					<img :src="getItemImagePath(product)" :alt="product.title" loading="lazy" />
 				</button>
 			</ItemPopover>
 			<div class="storefront-item-heading">
@@ -70,6 +70,7 @@
 	import { computed } from 'vue';
 	import { useI18n } from 'vue-i18n';
 	import { getUnmetItemRequirements } from '~/utils/itemRequirements.js';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 	import ItemPopover from '~/components/Person/ItemPopover.vue';
 
 	const props = defineProps({

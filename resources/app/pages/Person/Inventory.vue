@@ -10,6 +10,10 @@
 
 		<InventoryNavigation :active="page.item_type" />
 
+		<div v-if="onsetError" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
+			{{ onsetError }}
+		</div>
+
 		<div v-if="equippedMagic.length" class="flex flex-wrap gap-2">
 			<button v-for="item in equippedMagic" :key="item.id" type="button" class="ui-button ui-button--compact" @click="useItem(item)">
 				Использовать: {{ item.title }}
@@ -46,7 +50,7 @@
 <script setup>
 	import GameLayout from '~/layouts/Game.vue';
 	import PersonLayout from '~/layouts/Person.vue';
-	import { Link, router, useForm } from '@inertiajs/vue3';
+	import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 	import InventoryItem from '~/components/Person/InventoryItem.vue';
 	import InventoryNavigation from '~/components/Person/InventoryNavigation.vue';
 	import useState from '~/composables/useState.js';
@@ -63,7 +67,9 @@
 	});
 
 	const state = useState();
+	const inertiaPage = usePage();
 	const user = computed(() => state.user);
+	const onsetError = computed(() => inertiaPage.props.errors?.onset);
 
 	const dropForm = useForm({
 		id: null,
@@ -92,6 +98,9 @@
 	}
 
 	function wearItem(item) {
-		router.get('/person/inventory', { onset: item.id }, { preserveScroll: true });
+		router.get('/person/inventory', {
+			onset: item.id,
+			item_type: props.page.item_type,
+		}, { preserveScroll: true });
 	}
 </script>

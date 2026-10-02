@@ -82,7 +82,7 @@ ul.service-list {
 .administration-image img {
 	max-width: 100%;
 	height: auto;
-	max-height: 260px;
+	max-height: 320px;
 	object-fit: contain;
 }
 

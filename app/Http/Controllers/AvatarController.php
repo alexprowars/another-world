@@ -21,7 +21,7 @@ class AvatarController extends Controller
 				$image = $request->integer('image');
 
 				if ($image && $image < 6) {
-					$this->user->image = 'images/' . ($this->user->gender == 'F' ? 2 : 1) . '/' . $image . '.png';
+					$this->user->image = 'images/' . ($this->user->gender == 'F' ? 2 : 1) . '/' . $image . '.jpg';
 					$this->user->update();
 
 					throw new Exception('Образ установлен!');

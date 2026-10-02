@@ -16,7 +16,7 @@
 		<div v-else class="flex gap-4 justify-center">
 			<div v-for="i in page.images">
 				<a href="" @click.prevent="changeImage(i)">
-					<img :src="'/assets/images/avatar/images/' + (user.gender === 'F' ? 2 : 1) + '/' + i + '.png'" alt="" />
+					<img :src="'/assets/images/avatar/images/' + (user.gender === 'F' ? 2 : 1) + '/' + i + '.jpg'" alt="" />
 				</a>
 			</div>
 		</div>

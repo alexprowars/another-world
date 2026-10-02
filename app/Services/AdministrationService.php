@@ -52,7 +52,7 @@ class AdministrationService
 
 		DB::transaction(function () use ($user, $image) {
 			$account = User::query()->lockForUpdate()->findOrFail($user->id);
-			$path = 'images/' . ($account->gender === 'F' ? 2 : 1) . '/' . $image . '.png';
+			$path = 'images/' . ($account->gender === 'F' ? 2 : 1) . '/' . $image . '.jpg';
 
 			if ($account->image === $path) {
 				throw new Exception('Этот образ уже установлен!');

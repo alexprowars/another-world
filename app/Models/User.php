@@ -206,6 +206,6 @@ class User extends Authenticatable implements HasMedia
 			return '/assets/images/avatar/' . $this->image;
 		}
 
-		return '/assets/images/avatar/1/' . ($this->gender === 'F' ? '2' : '1') . '.png';
+		return '/assets/images/avatar/1/' . ($this->gender === 'F' ? '2' : '1') . '.jpg';
 	}
 }

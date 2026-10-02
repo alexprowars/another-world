@@ -170,8 +170,10 @@ class InventoryService
 				return;
 			}
 
-			if (!self::isAllowOnset($object, $user)) {
-				throw new Exception('Вы не можете надеть эту вещь');
+			$onsetError = self::getOnsetError($object, $user);
+
+			if ($onsetError !== null) {
+				throw new Exception('Нельзя надеть «' . $object->title . '»: ' . $onsetError);
 			}
 
 			$availableSlots = self::itemSlots($object);
@@ -239,39 +241,48 @@ class InventoryService
 
 	public static function isAllowOnset(UserItem $item, User $user): bool
 	{
+		return self::getOnsetError($item, $user) === null;
+	}
+
+	private static function getOnsetError(UserItem $item, User $user): ?string
+	{
 		if ($item->bank || $item->market || $item->pawnshop) {
-			return false;
+			return 'Предмет находится в хранилище, на рынке или в ломбарде.';
 		}
 
 		$req = $item->requirements;
 
 		if ($item->wearout >= $item->wearout_max) {
-			return false;
+			return in_array($item->type, [12, 14], true)
+				? 'Использования предмета закончились.'
+				: 'Предмет полностью изношен.';
 		}
 
 		if (isset($req['level']) && $user->level < $req['level']) {
-			return false;
+			return 'Требуется уровень ' . $req['level'] . '.';
 		}
 
 		if (isset($req['profession']) && $user->profession != $req['profession']) {
-			return false;
+			return 'Требуется профессия «' . __('main.professions.' . $req['profession']) . '».';
 		}
 
 		$combatStats = $user->getCombatStats();
 
-		if (array_any(Vars::getStats(), fn($stat) => isset($req[$stat]) && $combatStats->{$stat} < $req[$stat])) {
-			return false;
+		foreach (Vars::getStats() as $stat) {
+			if (isset($req[$stat]) && $combatStats->{$stat} < $req[$stat]) {
+				return 'Требуется характеристика «' . __('main.stats.' . $stat) . '»: ' . $req[$stat] . '.';
+			}
 		}
 
 		if (in_array($item->type, [15, 16, 19, 20, 21, 22, 23])) {
-			return false;
+			return 'Этот тип предметов нельзя надевать.';
 		}
 
 		if ($item->life?->isPast()) {
-			return false;
+			return 'Срок действия предмета истёк.';
 		}
 
-		return true;
+		return null;
 	}
 
 	public static function getInventoryObjects(User $user, int $type = 1, ?\Illuminate\Database\Query\Builder $query = null)

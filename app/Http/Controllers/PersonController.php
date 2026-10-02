@@ -34,9 +34,13 @@ class PersonController extends Controller
 		$type = $type >= 1 && $type <= 8 ? $type : 1;
 
 		if ($request->integer('onset')) {
-			InventoryService::onsetObject($this->user, $request->integer('onset'));
+			try {
+				InventoryService::onsetObject($this->user, $request->integer('onset'));
+			} catch (Exception $e) {
+				return to_route('person.inventory', ['item_type' => $type])->withErrors(['onset' => $e->getMessage()]);
+			}
 
-			return to_route('person.inventory');
+			return to_route('person.inventory', ['item_type' => $type]);
 		}
 
 		if ($request->input('unset') === 'all') {

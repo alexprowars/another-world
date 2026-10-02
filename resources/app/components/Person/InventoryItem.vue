@@ -2,7 +2,7 @@
 	<article class="inventory-item">
 		<ItemPopover :item="item" :player="player" class="inventory-item-preview">
 			<button type="button" class="inventory-item-image" :title="'Информация: ' + item.title">
-				<img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title" />
+				<img :src="getItemImagePath(item)" :alt="item.title" />
 			</button>
 		</ItemPopover>
 		<div class="inventory-item-description">
@@ -38,6 +38,7 @@
 
 <script setup>
 	import { openConfirmModal } from '~/composables/useModals.js';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 	import ItemPopover from './ItemPopover.vue';
 
 	const props = defineProps({

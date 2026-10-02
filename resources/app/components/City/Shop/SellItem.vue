@@ -3,7 +3,7 @@
 		<table border="1">
 			<tr>
 				<td width="30%" align="center">
-					<div><img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title" /></div>
+					<div><img :src="getItemImagePath(item)" :alt="item.title" /></div>
 					<slot name="actions">
 						<a href="" @click.prevent="sellItem" class="text-xs">
 							<b>Продать за {{ item.price_sell }} {{ item.price_type === 1 ? 'плт.' : 'зол.' }}</b>
@@ -62,6 +62,7 @@
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import { openConfirmModal } from '~/composables/useModals.js';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 
 	const props = defineProps({
 		item: Object,

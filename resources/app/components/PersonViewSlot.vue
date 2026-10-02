@@ -19,6 +19,7 @@
 	import { computed } from 'vue';
 	import ItemPopover from '~/components/Person/ItemPopover.vue';
 	import { router, usePage } from '@inertiajs/vue3';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 
 	const props = defineProps({
 		position: {
@@ -185,7 +186,7 @@
 
 	const image = computed(() => {
 		if (props.item) {
-			return '/assets/images/items/' + props.item.type + '/' + props.item.code + '.gif';
+			return getItemImagePath(props.item);
 		}
 
 		return '/assets/images/items/w' + props.position + '.png';

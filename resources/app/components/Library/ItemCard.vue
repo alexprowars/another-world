@@ -2,7 +2,7 @@
 	<article class="ui-panel library-item">
 		<header class="library-item-heading">
 			<div class="library-item-image">
-				<img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title" loading="lazy" />
+				<img :src="getItemImagePath(item)" :alt="item.title" loading="lazy" />
 			</div>
 			<div>
 				<p class="library-eyebrow">{{ $t('weapon.' + item.type) }}</p>
@@ -79,6 +79,7 @@
 <script setup>
 	import { computed } from 'vue';
 	import { useI18n } from 'vue-i18n';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 
 	const props = defineProps({
 		item: {

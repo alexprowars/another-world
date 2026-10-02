@@ -54,7 +54,7 @@
 	});
 
 	function imagePath(image) {
-		return 'images/' + (user.value.gender === 'F' ? 2 : 1) + '/' + image + '.png';
+		return 'images/' + (user.value.gender === 'F' ? 2 : 1) + '/' + image + '.jpg';
 	}
 
 	function buyImage(image) {

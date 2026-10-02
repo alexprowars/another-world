@@ -2,7 +2,7 @@
 	<form class="service-form gift-form" @submit.prevent="send">
 		<div class="gift-form-item">
 			<div class="gift-form-image">
-				<img :src="'/assets/images/items/' + item.type + '/' + item.code + '.gif'" :alt="item.title" />
+				<img :src="getItemImagePath(item)" :alt="item.title" />
 			</div>
 			<div>
 				<p class="service-hint">Ваш подарок</p>
@@ -70,6 +70,7 @@
 	import { useVuelidate } from '@vuelidate/core';
 	import { required } from '@vuelidate/validators';
 	import { closeModals } from '~/composables/useModals.js';
+	import { getItemImagePath } from '~/utils/itemImage.js';
 
 	const props = defineProps({
 		item: Object,

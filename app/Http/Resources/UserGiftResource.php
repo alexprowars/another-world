@@ -25,7 +25,7 @@ class UserGiftResource extends JsonResource
 		return [
 			'id' => $gift->id,
 			'title' => $gift->item->title,
-			'image' => '/assets/images/items/' . $gift->item->type . '/' . $gift->item->code . '.gif',
+			'image' => '/assets/images/items/' . $gift->item->type . '/' . $gift->item->code . '.png',
 			'text' => $gift->text,
 			'sender' => $senderName,
 			'date' => $gift->date->toAtomString(),
