@@ -77,13 +77,13 @@ class MapController extends Controller
 			case 15:
 			case 17:
 			case 20:
-			case 25:
 				$new_room = 103;
 				break;
 			case 10:
 			case 12:
 			case 13:
 			case 16:
+			case 25:
 			case 26:
 			case 35:
 				$new_room = 104;
@@ -148,8 +148,7 @@ class MapController extends Controller
 				// Церковь
 				return include(app_path('/includes/city/city_1/brak.php'));
 			case 25:
-				// Почта
-				return include(app_path('/includes/city/city_1/pochta.php'));
+				return new Map\PostOffice()();
 			case 27:
 				// Знахарка
 				return include(app_path('/includes/city/city_1/znahar.php'));

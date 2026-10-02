@@ -49,7 +49,7 @@ class Street
 			$user->save();
 		}
 
-		if ($user->room == 103 && in_array($room, [23, 17, 25, 7, 11, 15, 20, 101, 104])) {
+		if ($user->room == 103 && in_array($room, [23, 17, 7, 11, 15, 20, 101, 104])) {
 			$user->room = $room;
 			$user->save();
 		}
@@ -59,7 +59,7 @@ class Street
 			$user->save();
 		}
 
-		if ($user->room == 104 && in_array($room, [10, 12, 13, 16, 35, 103, 105])) {
+		if ($user->room == 104 && in_array($room, [10, 12, 13, 16, 25, 35, 103, 105])) {
 			$user->room = $room;
 			$user->save();
 		}

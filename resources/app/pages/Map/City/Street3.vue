@@ -55,6 +55,16 @@
 			width: 198,
 			height: 113,
 		},
+		{
+			room: 25,
+			title: 'Почта',
+			description: 'Письма и городские весточки',
+			number: 4,
+			x: 31,
+			y: 367,
+			width: 190,
+			height: 181,
+		},
 	];
 
 	const exits = [
