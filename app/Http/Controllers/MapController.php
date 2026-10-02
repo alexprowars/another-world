@@ -129,8 +129,7 @@ class MapController extends Controller
 			case 11:
 				return new Map\Smithy()();
 			case 12:
-				// Игорный дом
-				return include(app_path('/includes/city/city_1/gamblinghouse.php'));
+				return new Map\GamblingHouse()();
 			case 13:
 				return new Map\GiftShop()();
 			case 14:
@@ -145,8 +144,7 @@ class MapController extends Controller
 			case 20:
 				return new Map\Market()();
 			case 22:
-				// Церковь
-				return include(app_path('/includes/city/city_1/brak.php'));
+				return new Map\Church()();
 			case 25:
 				return new Map\PostOffice()();
 			case 27:

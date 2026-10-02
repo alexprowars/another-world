@@ -26,6 +26,16 @@
 
 	const places = [
 		{
+			room: 12,
+			title: 'Игорный дом',
+			description: 'Кости и городская лотерея',
+			number: 5,
+			x: 78,
+			y: 10,
+			width: 398,
+			height: 380,
+		},
+		{
 			room: 10,
 			title: 'Башня магов',
 			description: 'Магия и заклинания',

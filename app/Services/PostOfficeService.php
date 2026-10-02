@@ -9,12 +9,11 @@ use Illuminate\Validation\ValidationException;
 
 class PostOfficeService
 {
-	public const int SEND_COST = 1;
-
 	public static function send(User $user, string $recipientName, string $subject, string $body): MailLetter
 	{
 		return DB::transaction(function () use ($user, $recipientName, $subject, $body) {
 			$sender = User::query()->lockForUpdate()->findOrFail($user->id);
+			$sendCost = config('game.postoffice.send_cost');
 
 			if ($sender->room !== 25) {
 				throw ValidationException::withMessages(['letter' => 'Отправлять письма можно только на почте.']);
@@ -30,8 +29,8 @@ class PostOfficeService
 				throw ValidationException::withMessages(['recipient' => 'Нельзя отправить письмо самому себе.']);
 			}
 
-			if ($sender->gold < self::SEND_COST) {
-				throw ValidationException::withMessages(['letter' => 'Для отправки письма нужно ' . self::SEND_COST . ' зол.']);
+			if ($sender->gold < $sendCost) {
+				throw ValidationException::withMessages(['letter' => 'Для отправки письма нужно ' . $sendCost . ' зол.']);
 			}
 
 			$letter = MailLetter::create([
@@ -42,10 +41,10 @@ class PostOfficeService
 				'created_at' => now(),
 			]);
 
-			$sender->decrement('gold', self::SEND_COST);
+			$sender->decrement('gold', $sendCost);
 
 			ChatService::sendSystemMessage(
-				'Письмо отправлено персонажу ' . $recipient->name . '. Списано ' . self::SEND_COST . ' зол.',
+				'Письмо отправлено персонажу ' . $recipient->name . '. Списано ' . $sendCost . ' зол.',
 				[$sender],
 				name: 'Почта',
 			);

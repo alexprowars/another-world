@@ -21,10 +21,12 @@
 @import './styles/services.css';
 @import './styles/market.css';
 @import './styles/bank.css';
-@import './styles/post_office.css';
+@import './styles/gamblinghouse.css';
+@import './styles/postoffice.css';
 @import './styles/prison.css';
 @import './styles/academy.css';
 @import './styles/administration.css';
+@import './styles/church.css';
 @import './styles/vault.css';
 @import './styles/hospital.css';
 @import './styles/smithy.css';

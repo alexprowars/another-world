@@ -55,6 +55,16 @@
 			width: 159,
 			height: 180,
 		},
+		{
+			room: 22,
+			title: 'Церковь',
+			description: 'Заключение брака и развод',
+			number: 4,
+			x: 824,
+			y: 12,
+			width: 275,
+			height: 400,
+		},
 	];
 
 	const exits = [

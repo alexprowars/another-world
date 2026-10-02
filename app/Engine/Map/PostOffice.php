@@ -32,7 +32,7 @@ class PostOffice
 
 			$letter = PostOfficeService::send($user, $data['recipient'], $data['subject'], $data['body']);
 
-			flash('Письмо успешно отправлено. Списано ' . PostOfficeService::SEND_COST . ' зол.');
+			flash('Письмо успешно отправлено. Списано ' . config('game.postoffice.send_cost') . ' зол.');
 
 			return to_route('map', ['section' => 'sent', 'letter' => $letter->id]);
 		}
@@ -84,7 +84,7 @@ class PostOffice
 
 		return Inertia::render('Map/PostOffice', [
 			'section' => $section,
-			'send_cost' => PostOfficeService::SEND_COST,
+			'send_cost' => config('game.postoffice.send_cost'),
 			'unread_count' => MailLetter::query()
 				->where('recipient_id', $user->id)
 				->whereNull('read_at')

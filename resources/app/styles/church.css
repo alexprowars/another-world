@@ -1,0 +1,125 @@
+.church-intro {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: center;
+	gap: var(--space-24);
+	margin-bottom: var(--space-24);
+	padding: var(--space-24);
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: linear-gradient(135deg, var(--paper-highlight), var(--paper-panel));
+}
+
+.church-emblem {
+	display: grid;
+	place-items: center;
+	width: 82px;
+	height: 100px;
+	border: 3px double var(--paper-border);
+	border-radius: 42px 42px 4px 4px;
+	color: var(--paper-link);
+	background: var(--paper-stripe);
+}
+
+.church-emblem svg {
+	width: 46px;
+	height: 46px;
+}
+
+.church-kicker {
+	color: var(--paper-link);
+	font-size: 11px;
+	letter-spacing: 0.5px;
+}
+
+.church-intro h2 {
+	margin: var(--space-6) 0 var(--space-10);
+	color: var(--paper-heading);
+	font: 700 clamp(20px, 2.5cqi, 26px)/1.3 var(--font-interface);
+}
+
+.church-intro p,
+.church-status p {
+	margin: 0;
+	color: var(--paper-muted);
+	font-size: 13px;
+	line-height: 1.7;
+}
+
+.church-content {
+	display: grid;
+	gap: var(--space-24);
+}
+
+.church-content > .ui-notice {
+	margin: 0;
+}
+
+.church-status,
+.church-price {
+	display: flex;
+	align-items: center;
+	gap: var(--space-16);
+}
+
+.church-status {
+	padding: var(--space-16) var(--space-20);
+}
+
+.church-status h3 {
+	margin: 0 0 var(--space-4);
+	color: var(--paper-heading);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.church-status-date {
+	display: inline-block;
+	margin-left: var(--space-8);
+}
+
+.church-status > svg,
+.church-price > svg {
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	color: var(--paper-link);
+}
+
+.church-price img {
+	flex-shrink: 0;
+	object-fit: contain;
+}
+
+.church-price > div {
+	display: grid;
+	gap: var(--space-4);
+}
+
+.church-price strong {
+	color: var(--paper-heading);
+	font-size: 22px;
+	font-variant-numeric: tabular-nums;
+}
+
+.church-price span {
+	color: var(--paper-muted);
+	font-size: 12px;
+}
+
+@container (max-width: 560px) {
+	.church-intro {
+		gap: var(--space-16);
+		padding: var(--space-16);
+	}
+
+	.church-emblem {
+		width: 54px;
+		height: 72px;
+	}
+
+	.church-emblem svg {
+		width: 32px;
+		height: 32px;
+	}
+}
