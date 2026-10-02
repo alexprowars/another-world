@@ -49,7 +49,9 @@ createInertiaApp({
 		dayjs.locale(en, null, true);
 		dayjs.locale(ru, null, true);
 
-		app.use(FloatingVue);
+		app.use(FloatingVue, {
+			strategy: 'fixed',
+		});
 
 		app.config.globalProperties.$formatDate = (value, format) => {
 			return dayjs(value).tz().format(format);

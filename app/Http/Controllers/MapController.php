@@ -76,6 +76,7 @@ class MapController extends Controller
 			case 11:
 			case 15:
 			case 17:
+			case 28:
 			case 20:
 				$new_room = 103;
 				break;
@@ -89,7 +90,6 @@ class MapController extends Controller
 				$new_room = 104;
 				break;
 			case 19:
-			case 28:
 			case 36:
 			case 200:
 			case 666:
@@ -139,8 +139,7 @@ class MapController extends Controller
 			case 17:
 				return new Map\Bank()();
 			case 19:
-				// Приём ресурсов
-				return include(app_path('/includes/city/city_1/ambar.php'));
+				return new Map\Barn()();
 			case 20:
 				return new Map\Market()();
 			case 22:
@@ -148,8 +147,7 @@ class MapController extends Controller
 			case 25:
 				return new Map\PostOffice()();
 			case 27:
-				// Знахарка
-				return include(app_path('/includes/city/city_1/znahar.php'));
+				return new Map\Healer()();
 			case 28:
 				return new Map\PawnShop()();
 			case 29:

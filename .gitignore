@@ -33,3 +33,4 @@ app/config/*.ini
 /output
 .playwright-cli
 *.md
+/tmp

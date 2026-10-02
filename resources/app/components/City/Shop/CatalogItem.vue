@@ -20,7 +20,7 @@
 				<dt>{{ owned ? 'Износ' : 'Долговечность' }}</dt>
 				<dd>{{ owned ? product.wearout + ' / ' + product.wearout_max : product.wearout }}</dd>
 			</div>
-			<div v-if="!owned">
+			<div v-if="!owned && item.stock != null">
 				<dt>На складе</dt>
 				<dd>{{ item.stock }} шт.</dd>
 			</div>

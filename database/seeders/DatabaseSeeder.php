@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
 			}
 		}
 
+		$this->call(CraftSeed::class);
 		$this->call(UserSeed::class);
 		$this->call(BotsSeed::class);
 		$this->call(AcademySeed::class);

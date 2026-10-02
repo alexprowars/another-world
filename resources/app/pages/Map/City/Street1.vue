@@ -65,6 +65,16 @@
 			width: 275,
 			height: 400,
 		},
+		{
+			room: 27,
+			title: 'Домик Знахаря',
+			description: 'Перераспределение характеристик и алхимия',
+			number: 5,
+			x: 78,
+			y: 378,
+			width: 209,
+			height: 180,
+		},
 	];
 
 	const exits = [

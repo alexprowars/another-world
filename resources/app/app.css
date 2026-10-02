@@ -30,6 +30,7 @@
 @import './styles/vault.css';
 @import './styles/hospital.css';
 @import './styles/smithy.css';
+@import './styles/healer.css';
 
 @import 'floating-vue/dist/style.css';
 @import './styles/popper.css';

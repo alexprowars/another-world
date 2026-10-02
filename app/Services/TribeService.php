@@ -133,6 +133,39 @@ class TribeService
 		});
 	}
 
+	public static function leave(User $user): string
+	{
+		return self::transaction($user, function (User $account, Tribe $tribe) {
+			HealerService::ensureAvailable($account);
+
+			if (self::isLeader($account)) {
+				throw new Exception('Глава клана не может покинуть его таким способом.');
+			}
+
+			self::checkInquisition($account);
+
+			$price = config('game.healer.leave_tribe_price');
+
+			if ($account->gold < $price) {
+				throw new Exception('Для выхода из клана нужно ' . $price . ' зол.');
+			}
+
+			$account->update([
+				'tribe_id' => null,
+				'tribe_rank' => 0,
+				'gold' => $account->gold - $price,
+			]);
+
+			$tribe->logs()->create([
+				'user_id' => $account->id,
+				'target_user_id' => $account->id,
+				'action' => 'Персонаж ' . $account->name . ' покинул клан через знахаря.',
+			]);
+
+			return 'Вы покинули клан «' . $tribe->name . '» за ' . $price . ' зол.';
+		});
+	}
+
 	public static function transferGold(User $user, float $amount, bool $withdraw): string
 	{
 		if (!is_finite($amount) || $amount <= 0 || $amount > 9999999999.99 || round($amount, 2) != $amount) {

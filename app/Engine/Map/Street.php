@@ -49,7 +49,7 @@ class Street
 			$user->save();
 		}
 
-		if ($user->room == 103 && in_array($room, [23, 17, 7, 11, 15, 20, 101, 104])) {
+		if ($user->room == 103 && in_array($room, [23, 17, 7, 11, 15, 20, 28, 101, 104])) {
 			$user->room = $room;
 			$user->save();
 		}
@@ -64,7 +64,7 @@ class Street
 			$user->save();
 		}
 
-		if ($user->room == 105 && in_array($room, [19, 28, 31, 36, 666, 200, 104])) {
+		if ($user->room == 105 && in_array($room, [19, 31, 36, 666, 200, 104])) {
 			if ($room == 200 && $user->level < 2) {
 				throw new Exception('Вход в подземелье только с 2 уровня!');
 			}

@@ -46,9 +46,9 @@
 			height: 251,
 		},
 		{
-			room: 28,
-			title: 'Ломбард',
-			description: 'Операции с вещами',
+			room: 19,
+			title: 'Амбар',
+			description: 'Сдача ресурсов и инструменты',
 			number: 3,
 			x: 410,
 			y: 357,

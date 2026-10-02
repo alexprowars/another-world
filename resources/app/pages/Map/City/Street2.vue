@@ -75,6 +75,16 @@
 			width: 184,
 			height: 149,
 		},
+		{
+			room: 28,
+			title: 'Ломбард',
+			description: 'Залог и выкуп вещей',
+			number: 6,
+			x: 931,
+			y: 472,
+			width: 252,
+			height: 159,
+		},
 	];
 
 	const exits = [
