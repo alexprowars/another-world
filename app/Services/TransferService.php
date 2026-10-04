@@ -134,6 +134,10 @@ class TransferService
 			throw new Exception('Персонаж не существует!');
 		}
 
+		if ($sender->room !== 25) {
+			throw new Exception('Передавать предметы и золото можно только на почте.');
+		}
+
 		if (!self::canTransfer($sender)) {
 			throw new Exception('Передачи разрешены только персонажам начиная с 6 уровня!');
 		}

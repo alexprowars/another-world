@@ -13,7 +13,7 @@
 			<div class="ui-emblem"><GameIcon name="mail" /></div>
 			<div class="service-heading">
 				<h2>Городское почтовое отделение</h2>
-				<p>Вести от друзей, приглашения и важные слова — всё дойдёт до адресата.</p>
+				<p>Отправляйте письма, предметы и золото другим персонажам.</p>
 			</div>
 		</header>
 
@@ -31,6 +31,10 @@
 				<GameIcon name="quill" />
 				Написать письмо
 			</Link>
+			<Link href="/map?section=transfers" class="ui-tab" :class="{ 'is-active': page.section === 'transfers' }">
+				<GameIcon name="transfer" />
+				Передача предметов и золота
+			</Link>
 		</nav>
 
 		<Compose
@@ -39,12 +43,13 @@
 			:draft="page.draft"
 			:send-cost="page.send_cost"
 		/>
+		<Transfers v-else-if="page.section === 'transfers'" :transfer="page.transfer" />
 		<Letter v-else-if="page.letter" :letter="page.letter" :section="page.section" :list-url="listUrl" />
 		<LetterList v-else :letters="page.letters" :section="page.section" :pagination="page.pagination" />
 
 		<template #footer>
 			<GameIcon name="coins" />
-			<span>Отправка одного письма — {{ page.send_cost }} зол. Чтение писем бесплатно.</span>
+			<span>Отправка одного письма — {{ page.send_cost }} зол. Чтение писем и передачи бесплатны.</span>
 		</template>
 	</ContentBlock>
 </template>
@@ -57,6 +62,7 @@
 	import Compose from '~/components/PostOffice/Compose.vue';
 	import Letter from '~/components/PostOffice/Letter.vue';
 	import LetterList from '~/components/PostOffice/LetterList.vue';
+	import Transfers from '~/components/PostOffice/Transfers.vue';
 
 	const props = defineProps({
 		page: Object,

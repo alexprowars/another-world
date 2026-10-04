@@ -80,6 +80,7 @@
 	const state = useState();
 	const canAfford = computed(() => Number(state.user.gold) >= props.sendCost);
 	const form = useForm({
+		action: 'letter',
 		recipient: props.draft.recipient,
 		subject: props.draft.subject,
 		body: '',

@@ -29,10 +29,6 @@
 					<GameIcon name="clan" />
 					<span>Клан</span>
 				</Link>
-				<Link v-if="user.level >= 6 || user.admin" href="/transfers" class="social-action" title="Передачи">
-					<GameIcon name="transfer" />
-					<span>Передачи</span>
-				</Link>
 				<Link v-if="(user.rank >= 10 && user.rank < 15) || user.rank >= 98" href="/guard" class="social-action" title="Инквизиция">
 					<GameIcon name="justice" />
 					<span>Инквизиция</span>

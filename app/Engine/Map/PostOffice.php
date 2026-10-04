@@ -2,10 +2,16 @@
 
 namespace App\Engine\Map;
 
+use App\Exceptions\Exception;
+use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\MailLetterResource;
 use App\Models\MailLetter;
+use App\Models\UserItem;
+use App\Services\InventoryService;
 use App\Services\PostOfficeService;
+use App\Services\TransferService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,6 +23,12 @@ class PostOffice
 		$user = $request->user();
 
 		if ($request->isMethod('post')) {
+			$action = $request->validate(['action' => ['required', 'in:letter,item,gold']]);
+
+			if ($action['action'] !== 'letter') {
+				return $this->transfer($request);
+			}
+
 			$data = $request->validate([
 				'recipient' => ['required', 'string', 'max:100'],
 				'subject' => ['required', 'string', 'max:100'],
@@ -39,7 +51,7 @@ class PostOffice
 
 		$section = $request->query('section', 'inbox');
 
-		if (!in_array($section, ['inbox', 'sent', 'compose'], true)) {
+		if (!in_array($section, ['inbox', 'sent', 'compose', 'transfers'], true)) {
 			$section = 'inbox';
 		}
 
@@ -62,7 +74,7 @@ class PostOffice
 				'recipient' => $original->sender->name,
 				'subject' => mb_substr($subject, 0, 100),
 			];
-		} elseif ($section !== 'compose' && $request->integer('letter') > 0) {
+		} elseif (in_array($section, ['inbox', 'sent'], true) && $request->integer('letter') > 0) {
 			$letter = MailLetter::query()
 				->with(['sender:id,name', 'recipient:id,name'])
 				->where($section === 'sent' ? 'sender_id' : 'recipient_id', $user->id)
@@ -73,7 +85,7 @@ class PostOffice
 			}
 		}
 
-		$letters = $section !== 'compose'
+		$letters = in_array($section, ['inbox', 'sent'], true)
 			? MailLetter::query()
 				->with(['sender:id,name', 'recipient:id,name'])
 				->where($section === 'sent' ? 'sender_id' : 'recipient_id', $user->id)
@@ -102,6 +114,88 @@ class PostOffice
 				['body' => $letter->body],
 			) : null,
 			'draft' => $draft,
+			'transfer' => $section === 'transfers' ? $this->transferData($request) : null,
 		]);
+	}
+
+	private function transferData(Request $request): array
+	{
+		$data = $request->validate(['login' => ['nullable', 'string', 'max:100']]);
+		$user = $request->user();
+		$login = $data['login'] ?? '';
+		$recipient = null;
+		$message = null;
+		$allowed = TransferService::canTransfer($user);
+
+		if (!$allowed) {
+			$message = 'Передачи разрешены только персонажам начиная с 6 уровня!';
+		} elseif ($login !== '') {
+			try {
+				$recipient = TransferService::findRecipient($user, $login);
+			} catch (Exception $e) {
+				$message = $e->getMessage();
+			}
+		}
+
+		$items = $recipient ? InventoryService::getInventoryObjects($user, 0) : collect();
+
+		return [
+			'login' => $login,
+			'allowed' => $allowed,
+			'message' => $message,
+			'recipient' => $recipient ? [
+				...$recipient->only(['id', 'name', 'level', 'rank']),
+				'tribe' => $recipient->tribe?->only(['id', 'name']),
+			] : null,
+			'items' => $items->map(fn (UserItem $item) => [
+				'item' => InventoryItemResource::make($item),
+				'restriction' => TransferService::itemRestriction($user, $item),
+			])->values(),
+		];
+	}
+
+	private function transfer(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'action' => ['required', 'in:item,gold'],
+			'recipient_id' => ['required', 'integer', 'min:1'],
+			'item_id' => ['exclude_unless:action,item', 'required', 'integer', 'min:1'],
+			'amount' => ['exclude_unless:action,gold', 'required', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
+			'comment' => ['exclude_unless:action,gold', 'required', 'string', 'max:255'],
+		], [
+			'amount.required' => 'Укажите сумму.',
+			'amount.regex' => 'Укажите сумму с точностью до сотых.',
+			'comment.required' => 'Укажите причину передачи.',
+			'comment.max' => 'Причина должна содержать не более 255 символов.',
+		]);
+
+		try {
+			if ($data['action'] === 'item') {
+				$transfer = TransferService::transferItem(
+					$request->user(),
+					(int) $data['recipient_id'],
+					(int) $data['item_id'],
+					$request->ip(),
+				);
+
+				flash('Предмет «' . e($transfer->item_title) . '» успешно передан.');
+			} else {
+				$transfer = TransferService::transferGold(
+					$request->user(),
+					(int) $data['recipient_id'],
+					(float) str_replace(',', '.', $data['amount']),
+					$data['comment'],
+					$request->ip(),
+				);
+				flash('Успешно передано ' . $transfer->gold . ' зол.');
+			}
+		} catch (Exception $e) {
+			return to_route('map', [
+				'section' => 'transfers',
+				'login' => $data['recipient_id'],
+			])->withErrors(['transfer' => $e->getMessage()]);
+		}
+
+		return to_route('map', ['section' => 'transfers', 'login' => $data['recipient_id']]);
 	}
 }

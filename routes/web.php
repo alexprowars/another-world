@@ -30,8 +30,6 @@ Route::middleware(['auth'])->group(function () {
 	Route::middleware(['game'])->group(function () {
 		Route::get('/tribe', [Controllers\TribeController::class, 'index'])->name('tribe');
 		Route::post('/tribe', [Controllers\TribeController::class, 'store'])->name('tribe.store');
-		Route::get('/transfers', [Controllers\TransfersController::class, 'index'])->name('transfers');
-		Route::post('/transfers', [Controllers\TransfersController::class, 'store'])->name('transfers.store');
 		Route::get('/pay', [Controllers\PayController::class, 'index'])->name('pay');
 		Route::get('/avatar', [Controllers\AvatarController::class, 'index']);
 		Route::get('/person', [Controllers\PersonController::class, 'index'])->name('person.detail');
