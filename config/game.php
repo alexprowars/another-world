@@ -16,6 +16,7 @@ return [
 	'barn' => [
 		'tool_type' => 18,
 		'resource_types' => [19, 20],
+		'resource_sell_rate' => 0.6,
 	],
 
 	'church' => [

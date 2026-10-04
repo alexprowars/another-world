@@ -27,6 +27,12 @@ class UserItem extends Model
 		return $this->belongsTo(User::class);
 	}
 
+	/** @return BelongsTo<Item, $this> */
+	public function template(): BelongsTo
+	{
+		return $this->belongsTo(Item::class, 'code', 'code');
+	}
+
 	public function getSellPrice(): float
 	{
 		if ($this->price_type == 1) {

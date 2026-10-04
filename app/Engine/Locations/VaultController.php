@@ -3,8 +3,10 @@
 namespace App\Engine\Locations;
 
 use App\Engine\Services\ChatService;
+use App\Engine\Services\InventoryService;
 use App\Engine\World\World;
 use App\Exceptions\Exception;
+use App\Models\Item;
 use App\Models\User;
 use App\Models\Vault as VaultRoom;
 use Illuminate\Http\Request;
@@ -16,14 +18,14 @@ class VaultController extends LocationController
 	private const array DIRECTIONS = ['top', 'bottom', 'left', 'right'];
 
 	private const array GEMS = [
-		'alexandrit' => 'Александрит',
-		'almaz' => 'Алмаз',
-		'amazonit' => 'Амазонит',
-		'biruza' => 'Бирюза',
-		'pirit' => 'Пирит',
-		'opal' => 'Опал',
-		'rubin' => 'Рубин',
-		'sapfir' => 'Сапфир',
+		'alexandrit_raw',
+		'almaz_raw',
+		'amazonit_raw',
+		'biruza_raw',
+		'pirit_raw',
+		'opal_raw',
+		'rubin_raw',
+		'sapfir_raw',
 	];
 
 	public function index()
@@ -153,16 +155,14 @@ class VaultController extends LocationController
 
 		if ($user->r_type == 8) {
 			$gem = ($user->profession == 5 ? random_int(2, 7) : random_int(0, 9)) == 5;
-			$code = $gem ? array_rand(self::GEMS) : 'ruda';
+			$code = $gem ? self::GEMS[array_rand(self::GEMS)] : 'ruda';
 
-			$user->items()->create([
-				'code' => $code,
-				'title' => $gem ? self::GEMS[$code] : 'Руда',
-				'price' => $gem ? 15 : 6,
-				'type' => $gem ? 20 : 19,
-				'wearout_max' => 1,
-				'about' => $gem ? 'Неограненный камень' : 'Руда',
-			]);
+			$template = Item::query()
+				->where('code', $code)
+				->where('type', $gem ? 20 : 19)
+				->firstOrFail();
+
+			InventoryService::addInInventory($user, $template);
 
 			$user->update([
 				'r_date' => null,

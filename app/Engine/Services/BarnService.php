@@ -17,12 +17,21 @@ class BarnService
 			&& !$item->bank
 			&& !$item->market
 			&& !$item->pawnshop
-			&& !$item->onset;
+			&& !$item->onset
+			&& $item->template?->type == $item->type;
 	}
 
 	public static function sellPrice(UserItem $item): float
 	{
-		return round($item->price);
+		$template = $item->template;
+
+		if (!$template || $template->type != $item->type) {
+			throw new Exception('Ресурс не найден в каталоге Амбара.');
+		}
+
+		$catalogPrice = $item->price_type == 1 ? $template->credits : $template->gold;
+
+		return round($catalogPrice * config('game.barn.resource_sell_rate'), 2);
 	}
 
 	public static function sell(User $user, int $itemId): UserItem

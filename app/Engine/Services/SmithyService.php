@@ -34,7 +34,7 @@ class SmithyService
 
 	public static function rawGem(UserItem $item): bool
 	{
-		return $item->type == 20 && !array_any(self::GEM_BONUSES, fn ($stat) => $item->{$stat} != 0);
+		return $item->type == 20 && str_ends_with($item->code, '_raw');
 	}
 
 	public static function repairPrice(UserItem $item, bool $full = true): float
@@ -153,7 +153,10 @@ class SmithyService
 				throw new Exception('Этот камень не подлежит огранке!');
 			}
 
-			$template = Item::query()->where('code', $gem->code)->where('type', 20)->first();
+			$template = Item::query()
+				->where('code', substr($gem->code, 0, -4))
+				->where('type', 20)
+				->first();
 
 			if (!$template || !array_any(self::GEM_BONUSES, fn ($stat) => $template->{$stat} != 0)) {
 				throw new Exception('Характеристики огранённого камня не найдены!');
@@ -163,10 +166,15 @@ class SmithyService
 
 			$gem->fill($template->only([...self::GEM_BONUSES, 'hp', 'energy', 'intelligence', 'min', 'max']));
 			$gem->fill([
-				'price' => 30,
+				'code' => $template->code,
+				'title' => $template->title,
+				'price' => $template->credits > 0 ? $template->credits : $template->gold,
+				'price_type' => $template->credits > 0 ? 1 : 0,
 				'wearout' => 0,
+				'wearout_max' => $template->wearout,
 				'about' => 'Может быть вставлен в предметы для изменения характеристик',
 			]);
+			$gem->unsetRelation('template');
 
 			$gem->save();
 
@@ -184,7 +192,8 @@ class SmithyService
 			$gem = self::item($user, $gemId);
 			$item = self::item($user, $itemId);
 
-			if ($gem->type != 20 || self::rawGem($gem)) {
+			if ($gem->type != 20 || self::rawGem($gem)
+				|| !array_any(self::GEM_BONUSES, fn ($stat) => $gem->{$stat} != 0)) {
 				throw new Exception('Для вставки нужен огранённый драгоценный камень!');
 			}
 

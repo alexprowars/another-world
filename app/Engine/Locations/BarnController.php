@@ -27,6 +27,7 @@ class BarnController extends LocationController
 		$query = DB::query()->whereIn('type', config('game.barn.resource_types'));
 
 		$items = InventoryService::getInventoryObjects($request->user(), 0, $query)
+			->load('template')
 			->filter(fn (UserItem $item) => BarnService::canSell($item))
 			->map(fn (UserItem $item) => [
 				'item' => InventoryItemResource::make($item),
@@ -37,6 +38,7 @@ class BarnController extends LocationController
 		return Inertia::render('Map/Barn', [
 			'tab' => 'resources',
 			'items' => $items,
+			'resource_sell_percent' => config('game.barn.resource_sell_rate') * 100,
 		]);
 	}
 

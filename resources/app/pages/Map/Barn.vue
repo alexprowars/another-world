@@ -33,10 +33,9 @@
 				<strong>Ресурсы и драгоценные камни</strong>
 			</div>
 			<div>
-				<span>Цена приёма</span>
-				<strong>100% гос. цены</strong>
+				<span>Цена приёма ресурсов</span>
+				<strong>{{ page.resource_sell_percent }}% цены каталога</strong>
 			</div>
-			<p>Цена округляется до целого. Оплата в валюте предмета. Подаренные и занятые вещи не принимаются.</p>
 		</div>
 
 		<section class="storefront-catalog">

@@ -155,8 +155,7 @@ class RewardService
 					->where('user_id', '!=', $user->id)
 					->first();
 
-				$expMultiplier = $this->randomizer->getInt(100, 120) / 100;
-				$addExp = round($enemy->experience_base * $expMultiplier);
+				$addExp = $this->calculateDuelExperience($enemy, $user);
 			} else {
 				$addExp = $this->calculateGroupExperience($battle, $fighter, $user);
 			}
@@ -232,6 +231,20 @@ class RewardService
 		}
 
 		return $addExp;
+	}
+
+	private function calculateDuelExperience(BattleMember $enemy, User $user): int
+	{
+		$baseExp = BattleService::getBaseLevelExp($enemy->user->level);
+		$maxHealth = max(1, $user->hp_max);
+		$receivedDamage = max(0, $enemy->damage);
+
+		// Бонус за полученный урон ограничен одной полной полосой здоровья победителя.
+		$damageRatio = min(1, $receivedDamage / $maxHealth);
+		$difficultyMultiplier = 1 + $damageRatio;
+		$randomMultiplier = $this->randomizer->getInt(100, 120) / 100;
+
+		return (int) round($baseExp * $difficultyMultiplier * $randomMultiplier);
 	}
 
 	private function calculateGroupExperience(Battle $battle, BattleMember $fighter, User $user): int

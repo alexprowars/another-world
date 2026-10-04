@@ -51,7 +51,6 @@ class AttackCalculator
 
 		$dodgeRoll = $this->randomizer->nextFloat();
 		$critRoll = $this->randomizer->nextFloat();
-		$armorPierceRoll = $this->randomizer->nextFloat();
 
 		$damageByHit = [1 => 0, 2 => 0];
 		$actionByHit = [1 => '', 2 => ''];
@@ -104,16 +103,15 @@ class AttackCalculator
 							$actionByHit[$i] = 'block' . $i;
 						}
 					} else {
-						if ($armorPierceChance > $armorPierceRoll) {
-							$armorByZone[$hits[$i - 1] - 1] = 0;
+						$armor = $armorByZone[$hits[$i - 1] - 1];
+						$armorPierceRoll = $this->randomizer->nextFloat();
 
-							$attackMinDamage = (int) ceil($attackMinDamage * 0.5);
-							$attackMaxDamage = (int) ceil($attackMaxDamage * 0.5);
+						if ($armorPierceChance > $armorPierceRoll) {
+							$armor = 0;
 
 							$experienceMultiplier *= 1.2;
 						}
 
-						$armor = $armorByZone[$hits[$i - 1] - 1];
 						$baseMinDamage = $attacker->getMinDamage($attackMinDamage);
 						$baseMaxDamage = $attacker->getMaxDamage($attackMaxDamage);
 
@@ -181,31 +179,20 @@ class AttackCalculator
 		);
 	}
 
-	private function calculateChance(float $x, float $y): float
+	private function calculateChance(float $resistance, float $power): float
 	{
-		if ($y == 0) {
-			// Равные нулевые характеристики дают тот же шанс, что и равные положительные.
-			return $x == 0 ? 0.1 : 0;
+		$resistance = max(0, $resistance);
+		$power = max(0, $power);
+		$baseChance = config('battle.chance.base');
+
+		if ($resistance == 0 && $power == 0) {
+			return $baseChance;
 		}
 
-		$chance = 0;
+		$successWeight = $baseChance * $power ** 2;
+		$resistanceWeight = (1 - $baseChance) * $resistance ** 2;
+		$chance = $successWeight / ($successWeight + $resistanceWeight);
 
-		if (4 * $x <= $y) {
-			$chance = 1 - 2 * $x / (5 * $y);
-		} elseif (2 * $x <= $y && $y < 4 * $x) {
-			$chance = 1.05 - 0.6 * $x / $y;
-		} elseif (4 * $x / 3 <= $y && $y < 2 * $x) {
-			$chance = 1.75 - 2 * $x / $y;
-		} elseif ($x <= $y && $y < 4 * $x / 3) {
-			$chance = 0.7 - 0.6 * $x / $y;
-		} elseif (2 * $x / 3 <= $y && $y < $x) {
-			$chance = 0.28 - 0.18 * $x / $y;
-		} elseif ($x / 2 <= $y && $y < 2 * $x / 3) {
-			$chance = 0.04 - 0.02 * $x / $y;
-		} elseif ($y < $x / 2) {
-			$chance = 0;
-		}
-
-		return $chance;
+		return max(config('battle.chance.min'), min(config('battle.chance.max'), $chance));
 	}
 }
