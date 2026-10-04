@@ -18,7 +18,7 @@ export default defineConfig({
 	},
 	plugins: [
 		laravel({
-			input: ['resources/app/app.js'],
+			input: ['resources/app/app.js', 'resources/app/portal.js'],
 			//refresh: true,
 		}),
 		tailwindcss(),

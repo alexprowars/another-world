@@ -6,6 +6,7 @@ use App\Engine\CombatStats;
 use App\Engine\Services\UserService;
 use App\Engine\World\Location;
 use App\Http\Resources\UserSlotItemResource;
+use App\Notifications\ResetPasswordNotification;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -53,6 +54,12 @@ class User extends Authenticatable implements HasMedia
 		self::created(function (self $user) {
 			$user->slots()->create();
 		});
+	}
+
+	/** @param string $token */
+	public function sendPasswordResetNotification(#[\SensitiveParameter] $token): void
+	{
+		$this->notify(new ResetPasswordNotification($token));
 	}
 
 	/** @return HasOne<UserSlot, $this> */

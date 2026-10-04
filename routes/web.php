@@ -10,14 +10,21 @@ use Illuminate\Support\Str;
 
 Route::get('/info/{id?}', [Controllers\InfoController::class, 'index'])->whereNumber('id')->name('info');
 Route::get('/battle/log/{id}', [Controllers\BattleLogController::class, 'index'])->whereNumber('id')->name('battle.log');
+Route::get('/law', [Controllers\IndexController::class, 'law'])->name('law');
+Route::get('/agreement', [Controllers\IndexController::class, 'agreement'])->name('agreement');
 
 Route::middleware([RedirectToGame::class])->group(function () {
 	Route::get('/', [Controllers\IndexController::class, 'index'])->middleware([CheckReferral::class])->name('index');
 	Route::get('/login', [Controllers\LoginController::class, 'index'])->name('login');
+	Route::post('/login', [Controllers\LoginController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
+	Route::get('/register', [Controllers\RegistrationController::class, 'index'])->name('register');
+	Route::post('/register', [Controllers\RegistrationController::class, 'store'])->middleware('throttle:5,1')->name('register.store');
+	Route::get('/forgot-password', [Controllers\PasswordController::class, 'request'])->name('password.request');
+	Route::post('/forgot-password', [Controllers\PasswordController::class, 'email'])->middleware('throttle:5,1')->name('password.email');
+	Route::get('/reset-password/{token}', [Controllers\PasswordController::class, 'reset'])->name('password.reset');
+	Route::post('/reset-password', [Controllers\PasswordController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
 	Route::get('login/social/{service}', [Controllers\LoginController::class, 'services'])->name('login.social');
 	Route::get('login/callback/{service}', [Controllers\LoginController::class, 'callback']);
-	Route::get('/reg', [Controllers\IndexController::class, 'reg']);
-	Route::get('/reminder', [Controllers\IndexController::class, 'reminder']);
 });
 
 Route::middleware(['auth'])->group(function () {
