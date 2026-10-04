@@ -25,7 +25,7 @@
 			</dl>
 			<div class="post-office-letter-body">{{ letter.body }}</div>
 			<div class="post-office-actions">
-				<Link v-if="section === 'inbox'" :href="location.url + '?section=compose&reply=' + letter.id" class="ui-button">
+				<Link v-if="section === 'inbox'" :href="location.url + '/compose?reply=' + letter.id" class="ui-button">
 					<GameIcon name="quill" />
 					Ответить
 				</Link>

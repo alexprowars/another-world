@@ -4,10 +4,10 @@
 			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="location.url + '?section=100'" class="ui-icon-button" title="Продать предметы">
+			<Link :href="location.url + '/sell'" class="ui-icon-button" title="Продать предметы">
 				<GameIcon name="coins" />
 			</Link>
-			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
+			<Link :href="refreshUrl" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -17,22 +17,22 @@
 			<p v-for="(error, key) in form.errors" :key="key">{{ error }}</p>
 		</div>
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link class="ui-tab" :href="location.url" :class="{ 'is-active': page.section < 100 }">
+			<Link class="ui-tab" :href="location.url + '/buy'" :class="{ 'is-active': page.tab === 'buy' }">
 				<GameIcon name="coins" />
 				Купить
 			</Link>
-			<Link class="ui-tab" :href="location.url + '?section=100'" :class="{ 'is-active': page.section === 100 }">
+			<Link class="ui-tab" :href="location.url + '/sell'" :class="{ 'is-active': page.tab === 'sell' }">
 				<GameIcon name="transfer" />
 				Выставить предмет
 			</Link>
-			<Link class="ui-tab" :href="location.url + '?section=101'" :class="{ 'is-active': page.section === 101 }">
+			<Link class="ui-tab" :href="location.url + '/my-items'" :class="{ 'is-active': page.tab === 'my-items' }">
 				<GameIcon name="armor" />
 				Мои товары
 			</Link>
 		</nav>
-		<div class="storefront-layout" :class="{ 'storefront-layout--inventory': page.section >= 100 }">
-			<nav v-if="page.section < 100" class="ui-menu storefront-departments">
-				<Link :href="location.url" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
+		<div class="storefront-layout" :class="{ 'storefront-layout--inventory': page.tab !== 'buy' }">
+			<nav v-if="page.tab === 'buy'" class="ui-menu storefront-departments">
+				<Link :href="location.url + '/buy'" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
 					Новые поступления
 					<GameIcon name="forward" />
 				</Link>
@@ -42,7 +42,7 @@
 						<Link
 							v-for="[id, title] in group.sections"
 							:key="id"
-							:href="location.url + '?section=' + id"
+							:href="location.url + '/buy?section=' + id"
 							class="ui-menu-link"
 							:class="{ 'is-active': page.section === id }"
 						>
@@ -60,23 +60,23 @@
 				</header>
 				<p class="storefront-description">
 					{{
-						page.section === 100
+						page.tab === 'sell'
 							? 'Укажите цену в золоте и выставьте предмет на продажу.'
-							: page.section === 101
+							: page.tab === 'my-items'
 								? 'Здесь собраны ваши предложения. Предмет можно снять с продажи.'
 								: 'Снаряжение и припасы от других игроков. Все покупки оплачиваются золотом.'
 					}}
 				</p>
 				<div v-if="page.items.length" class="storefront-grid">
-					<CatalogItem v-for="entry in page.items" :key="page.section + ':' + entry.item.id" :item="entry.item" :player="user" inventory-item>
-						<template v-if="page.section !== 100" #details>
+					<CatalogItem v-for="entry in page.items" :key="page.tab + ':' + entry.item.id" :item="entry.item" :player="user" inventory-item>
+						<template v-if="page.tab !== 'sell'" #details>
 							<p class="service-item-note">
 								Продавец:
 								<strong>{{ entry.seller }}</strong>
 								<span v-if="entry.is_own" class="ui-badge">Ваш товар</span>
 							</p>
 						</template>
-						<template v-if="page.section !== 100" #price>
+						<template v-if="page.tab !== 'sell'" #price>
 							<div class="storefront-item-price">
 								<span>Цена продавца</span>
 								<strong>
@@ -87,7 +87,7 @@
 							</div>
 						</template>
 						<template #actions>
-							<form v-if="page.section === 100" class="service-item-actions" @submit.prevent="sell(entry)">
+							<form v-if="page.tab === 'sell'" class="service-item-actions" @submit.prevent="sell(entry)">
 								<label class="service-field">
 									<span>Цена, зол.</span>
 									<input
@@ -121,16 +121,16 @@
 					<GameIcon name="armor" />
 					<h3>
 						{{
-							page.section === 100
+							page.tab === 'sell'
 								? 'Нет вещей для продажи'
-								: page.section === 101
+								: page.tab === 'my-items'
 									? 'У вас пока нет товаров на рынке'
 									: 'В этом разделе пока нет товаров'
 						}}
 					</h3>
 					<p>
 						{{
-							page.section === 100
+							page.tab === 'sell'
 								? 'Здесь появятся предметы из инвентаря, которые можно продать.'
 								: 'Выберите другой раздел или загляните позже.'
 						}}
@@ -151,7 +151,7 @@
 	import useLocation from '~/composables/useLocation.js';
 
 	import { computed, reactive } from 'vue';
-	import { Link, useForm } from '@inertiajs/vue3';
+	import { Link, useForm, usePage } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
@@ -159,6 +159,8 @@
 	import { openConfirmModal } from '~/composables/useModals.js';
 
 	const location = useLocation();
+	const inertiaPage = usePage();
+	const refreshUrl = computed(() => inertiaPage.url);
 
 	const props = defineProps({
 		page: Object
@@ -170,7 +172,6 @@
 	const prices = reactive({});
 
 	const form = useForm({
-		action: '',
 		id: null,
 		price: null
 	});
@@ -219,11 +220,11 @@
 		},
 	];
 	const sectionTitle = computed(() => {
-		if (props.page.section === 100) {
+		if (props.page.tab === 'sell') {
 			return 'Выставить предмет на продажу';
 		}
 
-		if (props.page.section === 101) {
+		if (props.page.tab === 'my-items') {
 			return 'Мои товары';
 		}
 
@@ -236,13 +237,16 @@
 			return;
 		}
 
-		form.action = action;
 		form.id = id;
 		form.price = price;
 
 		form.clearErrors();
 
-		form.post(location.value.actions[action] + '?section=' + props.page.section, {
+		const url = action === 'buy'
+			? location.value.actions.buy + '?section=' + props.page.section
+			: location.value.actions[action];
+
+		form.post(url, {
 			preserveScroll: true
 		});
 	}

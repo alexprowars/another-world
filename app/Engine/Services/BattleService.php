@@ -172,7 +172,7 @@ class BattleService
 			$member = $battle->members()->create([
 				'user_id' => $user->id,
 				'side' => $side,
-				'exp' => self::getBaseLevelExp($user->level),
+				'experience_base' => self::getBaseLevelExp($user->level),
 			]);
 
 			$battle->logs()
@@ -200,13 +200,13 @@ class BattleService
 			$memberUser = $battle->members()->create([
 				'user_id' => $user->id,
 				'side' => 0,
-				'exp' => self::getBaseLevelExp($user->level),
+				'experience_base' => self::getBaseLevelExp($user->level),
 			]);
 
 			$battle->members()->create([
 				'user_id' => $enemy->id,
 				'side' => 1,
-				'exp' => self::getBaseLevelExp($enemy->level),
+				'experience_base' => self::getBaseLevelExp($enemy->level),
 			]);
 
 			$user->battle()->associate($battle);
@@ -397,7 +397,7 @@ class BattleService
 
 		$cloneSlots->save();
 
-		foreach ($user->effects()->whereFuture('date')->get() as $effect) {
+		foreach ($user->effects as $effect) {
 			$copy = $effect->replicate();
 			$copy->user()->associate($clone);
 			$copy->save();
@@ -495,7 +495,7 @@ class BattleService
 			$battle->members()->create([
 				'user_id' => $user->id,
 				'side' => 0,
-				'exp' => self::getBaseLevelExp($user->level),
+				'experience_base' => self::getBaseLevelExp($user->level),
 			]);
 
 			return $battle;
@@ -557,7 +557,7 @@ class BattleService
 			$battle->members()->create([
 				'user_id' => $user->id,
 				'side' => $side,
-				'exp' => self::getBaseLevelExp($user->level),
+				'experience_base' => self::getBaseLevelExp($user->level),
 			]);
 
 			if (isset($opponent)) {
@@ -765,6 +765,7 @@ class BattleService
 			'dexterity' => $dexterity,
 			'agility' => $agility,
 		]);
+		$enemy->unsetRelation('effects');
 
 		$message = $enemy->name . ' получает в бою ';
 

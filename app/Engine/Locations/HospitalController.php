@@ -35,14 +35,12 @@ class HospitalController extends LocationController
 		]);
 	}
 
-	public function store()
+	public function heal()
 	{
 		$user = $this->user;
-		$action = request()->route('locationAction');
 
 		if (
-			$action === 'heal'
-			&& !$user->r_date
+			!$user->r_date
 			&& !$user->r_type
 			&& $user->getCombatStats()->vitality > 0
 			&& $user->hp_max > 0
@@ -55,8 +53,18 @@ class HospitalController extends LocationController
 					'r_type' => 2,
 				]);
 			}
-		} elseif ($action === 'injury' && $user->injury?->isFuture() && $user->gold >= 200) {
+		}
+
+		return $this->redirectToLocation();
+	}
+
+	public function injury()
+	{
+		$user = $this->user;
+
+		if ($user->injury?->isFuture() && $user->gold >= 200) {
 			$user->effects()->where('type', 3)->delete();
+			$user->unsetRelation('effects');
 
 			$user->update([
 				'injury' => null,

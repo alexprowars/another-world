@@ -14,12 +14,6 @@
 			{{ onsetError }}
 		</div>
 
-		<div v-if="equippedMagic.length" class="flex flex-wrap gap-2">
-			<button v-for="item in equippedMagic" :key="item.id" type="button" class="ui-button ui-button--compact" @click="useItem(item)">
-				Использовать: {{ item.title }}
-			</button>
-		</div>
-
 		<div v-if="Object.keys(dropForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
 			<p v-for="(error, field) in dropForm.errors" :key="field">{{ error }}</p>
 		</div>
@@ -75,8 +69,6 @@
 		id: null,
 		item_type: null
 	});
-
-	const equippedMagic = computed(() => Object.values(user.value?.slots || {}).filter(item => item.can_use));
 
 	function useItem(item) {
 		openPopupModal(UseMagic, {

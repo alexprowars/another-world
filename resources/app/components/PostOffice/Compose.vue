@@ -59,7 +59,7 @@
 						<GameIcon name="send" />
 						{{ form.processing ? 'Отправляем…' : 'Отправить письмо' }}
 					</button>
-					<Link :href="location.url + '?section=inbox'" class="ui-button ui-button--secondary">К входящим</Link>
+					<Link :href="location.url + '/inbox'" class="ui-button ui-button--secondary">К входящим</Link>
 				</div>
 			</form>
 		</div>
@@ -84,7 +84,6 @@
 	const state = useState();
 	const canAfford = computed(() => Number(state.user.gold) >= props.sendCost);
 	const form = useForm({
-		action: 'letter',
 		recipient: props.draft.recipient,
 		subject: props.draft.subject,
 		body: '',

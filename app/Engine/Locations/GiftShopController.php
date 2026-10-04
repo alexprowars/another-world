@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\UserGift;
 use App\Models\UserItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -22,11 +23,11 @@ class GiftShopController extends StoreController
 {
 	private const array GIFT_TYPES = [15, 16, 17];
 
-	public function index()
+	public function index(Request $request)
 	{
 		$user = auth()->user();
 
-		$section = request()->integer('section');
+		$section = $request->integer('section');
 
 		if ($section < 4) {
 			$objects = ShopItem::query()
@@ -62,25 +63,24 @@ class GiftShopController extends StoreController
 		]);
 	}
 
-	public function store()
+	public function buy(Request $request)
 	{
-		$request = request();
-
-		$this->prepareAction($request);
-
 		$data = $request->validate([
 			'item_id' => ['required', 'integer', 'min:1'],
-			'user' => ['required_if:action,gift', 'nullable', 'string', 'max:100'],
-			'from' => ['sometimes', 'integer', 'in:1,2,3'],
-			'text' => ['nullable', 'string', 'max:5000'],
 		]);
 
 		try {
-			if ($request->input('action') === 'gift') {
-				$this->gift((int) $data['item_id']);
-			} else {
-				$this->buy((int) $data['item_id']);
+			$item = ShopItem::query()
+				->where('shop_id', $this->shopId())
+				->findOne((int) $data['item_id']);
+
+			if (!$item) {
+				throw new Exception('Предмет не найден в магазине');
 			}
+
+			$price = ShopService::buy($item);
+
+			flash('Вы купили предмет <u>' . $item->item->title . '</u> за <u>' . $price . '</u> ' . ($item->item->credits > 0 ? 'пл.' : 'зол.'));
 		} catch (Throwable $e) {
 			flash($e->getMessage());
 		}
@@ -88,12 +88,30 @@ class GiftShopController extends StoreController
 		return $this->redirectToLocation(['section' => $request->integer('section')]);
 	}
 
-	protected function gift(int $itemId)
+	public function gift(Request $request)
+	{
+		$data = $request->validate([
+			'item_id' => ['required', 'integer', 'min:1'],
+			'user' => ['required', 'string', 'max:100'],
+			'from' => ['sometimes', 'integer', 'in:1,2,3'],
+			'text' => ['nullable', 'string', 'max:5000'],
+		]);
+
+		try {
+			$this->sendGift($request, (int) $data['item_id']);
+		} catch (Throwable $e) {
+			flash($e->getMessage());
+		}
+
+		return $this->redirectToLocation(['section' => $request->integer('section')]);
+	}
+
+	private function sendGift(Request $request, int $itemId)
 	{
 		$user = auth()->user();
 
-		$from 	= request()->integer('from', 1);
-		$name 	= Str::sanitize(request()->post('user'));
+		$from 	= $request->integer('from', 1);
+		$name 	= Str::sanitize($request->post('user'));
 
 		if ($from != 1 && $from != 2 && $from != 3) {
 			$from = 1;
@@ -123,7 +141,7 @@ class GiftShopController extends StoreController
 			throw new Exception('Только начиная с 2 уровня Вы можете дарить подарки!');
 		}
 
-		DB::transaction(function () use ($user, $info, $itemId, $from) {
+		DB::transaction(function () use ($request, $user, $info, $itemId, $from) {
 			$object = $user->items()
 				->lockForUpdate()
 				->find($itemId);
@@ -154,7 +172,7 @@ class GiftShopController extends StoreController
 				throw new Exception('Этот предмет уже был подарен ранее!');
 			}
 
-			$text = strip_tags(request()->string('text')->toString());
+			$text = strip_tags($request->string('text')->toString());
 
 			$gift = $info->gifts()->make([
 				'from' => $from,
@@ -189,20 +207,5 @@ class GiftShopController extends StoreController
 			&& !$item->pawnshop
 			&& !$item->onset
 			&& !in_array($item->id, $user->getSlot()->getItemsId());
-	}
-
-	protected function buy(int $itemId)
-	{
-		$item = ShopItem::query()
-			->where('shop_id', $this->shopId())
-			->findOne($itemId);
-
-		if (!$item) {
-			throw new Exception('Предмет не найден в магазине');
-		}
-
-		$price = ShopService::buy($item);
-
-		flash('Вы купили предмет <u>' . $item->item->title . '</u> за <u>' . $price . '</u> ' . ($item->item->credits > 0 ? 'пл.' : 'зол.'));
 	}
 }

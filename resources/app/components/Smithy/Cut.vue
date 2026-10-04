@@ -74,15 +74,14 @@
 	});
 
 	const form = useForm({
-		action: '',
 		id: null,
 	});
 
 	function confirmCut(entry) {
-		confirm('Огранить камень? Работа займёт ' + props.page.work_seconds / 60 + ' минут.', 'cut', entry.item.id);
+		confirm('Огранить камень? Работа займёт ' + props.page.work_seconds / 60 + ' минут.', entry.item.id);
 	}
 
-	function confirm(message, action, id, data = {}) {
+	function confirm(message, id, data = {}) {
 		openConfirmModal('Подтвердите действие', message, [
 			{ title: 'Нет' },
 			{
@@ -95,9 +94,9 @@
 					form.reset();
 					form.clearErrors();
 
-					Object.assign(form, { action, id }, data);
+					Object.assign(form, { id }, data);
 
-					form.post(location.value.actions.cut + '?section=2', {
+					form.post(location.value.actions.cut, {
 						preserveScroll: true
 					});
 				},

@@ -126,7 +126,6 @@
 	onBeforeUnmount(() => clearInterval(clock));
 
 	const form = useForm({
-		action: 'ticket',
 		draw_id: props.lottery.id,
 	});
 	const canBuy = computed(() => Number(state.user.gold) >= props.lottery.price);

@@ -11,3 +11,5 @@ Artisan::command('lottery:draw', function () {
 });
 
 Schedule::command('lottery:draw')->everyMinute()->withoutOverlapping();
+
+Schedule::command('model:prune')->daily()->withoutOverlapping();

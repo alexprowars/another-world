@@ -11,96 +11,130 @@ use App\Models\MarketItem;
 use App\Models\UserItem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class MarketController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
+		return to_route('city.market.buyPage', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		$user = $request->user();
+	public function buyPage(Request $request): Response
+	{
 		$section = $request->integer('section');
 
-		if ($section === 100) {
-			$items = InventoryService::getInventoryObjects($user, 0)
-				->filter(fn (UserItem $item) => MarketService::canSell($item))
-				->map(fn (UserItem $item) => [
-					'item' => InventoryItemResource::make($item),
-					'min_price' => MarketService::minimumPrice($item),
-				])->values();
+		if ($section <= 0 || $section >= 40) {
+			$section = 0;
+		}
+
+		$query = MarketItem::query()
+			->with(['item', 'user'])
+			->whereHas('item', function (Builder $query) use ($section) {
+				$query->where('market', true)
+					->when($section !== 0, fn (Builder $query) => $query->where('type', $section));
+			});
+
+		if ($section !== 0) {
+			$query->orderBy('price')
+				->orderBy('id');
 		} else {
-			$query = MarketItem::query()
-				->with(['item', 'user'])
-				->whereHas('item', function (Builder $query) use ($section) {
-					$query->where('market', true)
-						->when($section > 0 && $section < 40, fn (Builder $query) => $query->where('type', $section));
-				});
-
-			if ($section === 101) {
-				$query->whereBelongsTo($user)
-					->latest();
-			} elseif ($section > 0 && $section < 40) {
-				$query->orderBy('price')
-					->orderBy('id');
-			} else {
-				$section = 0;
-
-				$query->latest()
-					->orderByDesc('id')
-					->limit(10);
-			}
-
-			$items = MarketItemResource::collection($query->get());
+			$query->latest()
+				->orderByDesc('id')
+				->limit(10);
 		}
 
 		return Inertia::render('Map/Market', [
+			'tab' => 'buy',
 			'section' => $section,
+			'items' => MarketItemResource::collection($query->get()),
+		]);
+	}
+
+	public function sellPage(Request $request): Response
+	{
+		$items = InventoryService::getInventoryObjects($request->user(), 0)
+			->filter(fn (UserItem $item) => MarketService::canSell($item))
+			->map(fn (UserItem $item) => [
+				'item' => InventoryItemResource::make($item),
+				'min_price' => MarketService::minimumPrice($item),
+			])->values();
+
+		return Inertia::render('Map/Market', [
+			'tab' => 'sell',
 			'items' => $items,
 		]);
 	}
 
-	public function store()
+	public function myItems(Request $request): Response
 	{
-		$request = request();
+		$items = MarketItem::query()
+			->with(['item', 'user'])
+			->whereHas('item', fn (Builder $query) => $query->where('market', true))
+			->whereBelongsTo($request->user())
+			->latest()
+			->get();
 
-		$user = $request->user();
-		$section = $request->integer('section');
+		return Inertia::render('Map/Market', [
+			'tab' => 'my-items',
+			'items' => MarketItemResource::collection($items),
+		]);
+	}
 
-		$this->prepareAction($request);
-
+	public function sell(Request $request)
+	{
 		$data = $request->validate([
-			'action' => ['required', 'in:sell,buy,withdraw'],
 			'id' => ['required', 'integer', 'min:1'],
-			'price' => ['required_if:action,sell', 'nullable', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
+			'price' => ['required', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
 		]);
 
 		try {
-			switch ($data['action']) {
-				case 'sell':
-					$item = MarketService::sell($user, (int) $data['id'], (float) str_replace(',', '.', $data['price']));
+			$item = MarketService::sell($request->user(), (int) $data['id'], (float) str_replace(',', '.', $data['price']));
 
-					flash('Предмет <u>' . e($item->title) . '</u> выставлен на продажу');
-
-					break;
-				case 'withdraw':
-					$item = MarketService::withdraw($user, (int) $data['id']);
-
-					flash('Предмет <u>' . e($item->title) . '</u> снят с продажи');
-
-					break;
-				case 'buy':
-					$item = MarketService::buy($user, (int) $data['id']);
-
-					flash('Вы купили предмет за <u>' . $item->price . '</u> зол.');
-
-					break;
-			}
+			flash('Предмет <u>' . e($item->title) . '</u> выставлен на продажу');
 		} catch (Exception $e) {
 			flash($e->getMessage());
 		}
 
-		return $this->redirectToLocation(['section' => $section]);
+		return to_route('city.market.sellPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function withdraw(Request $request)
+	{
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			$item = MarketService::withdraw($request->user(), (int) $data['id']);
+
+			flash('Предмет <u>' . e($item->title) . '</u> снят с продажи');
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.market.myItems', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function buy(Request $request)
+	{
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			$item = MarketService::buy($request->user(), (int) $data['id']);
+
+			flash('Вы купили предмет за <u>' . $item->price . '</u> зол.');
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.market.buyPage', [
+			'city' => $this->user->currentLocation()->city,
+			'section' => $request->integer('section'),
+		]);
 	}
 }

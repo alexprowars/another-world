@@ -7,80 +7,109 @@ use App\Exceptions\Exception;
 use App\Models\Tribe;
 use App\Models\TribeRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class AdministrationController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
-		$user = $request->user();
-		$section = $request->integer('section', 1);
+		return to_route('city.administration.registrationRules', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		if (!in_array($section, [1, 2, 3, 4], true)) {
-			$section = 1;
-		}
-
-		$requests = $section === 2
-			? TribeRequest::query()->with('user:id,name')->latest()->orderByDesc('id')->limit(15)->get()
-				->map(fn (TribeRequest $entry) => [
-					'id' => $entry->id,
-					'user' => $entry->user->name ?? 'Удалённый игрок',
-					'status' => $entry->status,
-				])
-			: collect();
-
+	public function registrationRules(): Response
+	{
 		return Inertia::render('Map/Administration', [
-			'section' => $section,
-			'request_price' => 100,
-			'image_price' => 2000,
+			'tab' => 'rules',
 			'min_level' => 4,
-			'requests' => $requests,
-			'has_request' => $section === 2 && TribeRequest::query()->whereBelongsTo($user)->exists(),
-			'images' => $section === 3 ? range(1, 49) : [],
-			'tribes' => $section === 4 ? Tribe::query()->orderBy('id')->get(['id', 'name', 'short', 'about', 'laws']) : [],
 		]);
 	}
 
-	public function store()
+	public function requests(Request $request): Response
 	{
-		$request = request();
-		$user = $request->user();
-		$section = $request->integer('section', 1);
+		$requests = TribeRequest::query()
+			->with('user:id,name')
+			->latest()
+			->orderByDesc('id')
+			->limit(15)
+			->get()
+			->map(fn (TribeRequest $entry) => [
+				'id' => $entry->id,
+				'user' => $entry->user->name ?? 'Удалённый игрок',
+				'status' => $entry->status,
+			]);
 
-		if (!in_array($section, [1, 2, 3, 4], true)) {
-			$section = 1;
-		}
-
-		$this->prepareAction($request);
-
-		$data = $request->validate([
-			'action' => ['required', 'in:submit,withdraw,buy_image'],
-			'image' => ['required_if:action,buy_image', 'nullable', 'integer', 'min:1', 'max:49'],
+		return Inertia::render('Map/Administration', [
+			'tab' => 'requests',
+			'request_price' => 100,
+			'min_level' => 4,
+			'requests' => $requests,
+			'has_request' => TribeRequest::query()->whereBelongsTo($request->user())->exists(),
 		]);
+	}
 
-		$section = $data['action'] === 'buy_image' ? 3 : 2;
+	public function images(): Response
+	{
+		return Inertia::render('Map/Administration', [
+			'tab' => 'images',
+			'image_price' => 2000,
+			'images' => range(1, 49),
+		]);
+	}
 
+	public function clanArchive(): Response
+	{
+		$tribes = Tribe::query()
+			->orderBy('id')
+			->get(['id', 'name', 'short', 'about', 'laws']);
+
+		return Inertia::render('Map/Administration', [
+			'tab' => 'clans',
+			'tribes' => $tribes,
+		]);
+	}
+
+	public function submit(): RedirectResponse
+	{
 		try {
-			switch ($data['action']) {
-				case 'submit':
-					AdministrationService::submitRequest($user);
-					flash('Вы подали заявку на проверку. Дождитесь действий инквизиторов.');
-					break;
-				case 'withdraw':
-					AdministrationService::withdrawRequest($user);
-					flash('Заявка отозвана.');
-					break;
-				case 'buy_image':
-					AdministrationService::buyImage($user, (int) $data['image']);
-					flash('Образ куплен!');
-					break;
-			}
+			AdministrationService::submitRequest($this->user);
+
+			flash('Вы подали заявку на проверку. Дождитесь действий инквизиторов.');
 		} catch (Exception $e) {
 			flash($e->getMessage());
 		}
 
-		return $this->redirectToLocation(['section' => $section]);
+		return to_route('city.administration.requests', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function withdraw(): RedirectResponse
+	{
+		try {
+			AdministrationService::withdrawRequest($this->user);
+
+			flash('Заявка отозвана.');
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.administration.requests', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function buyImage(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'image' => ['required', 'integer', 'min:1', 'max:49'],
+		]);
+
+		try {
+			AdministrationService::buyImage($this->user, (int) $data['image']);
+
+			flash('Образ куплен!');
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.administration.images', ['city' => $this->user->currentLocation()->city]);
 	}
 }

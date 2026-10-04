@@ -45,6 +45,8 @@ class RewardService
 			$experienceReward = $this->awardExperience($battle, $fighter, $user, $time);
 		}
 
+		$fighter->update(['experience_reward' => $experienceReward]);
+
 		$clanPoints = 0;
 
 		// Начисляем рейтинг клана за победу
@@ -128,7 +130,7 @@ class RewardService
 		}
 
 		if ($experience > 0) {
-			$attacker->exp += (int) round($experience);
+			$attacker->experience_base += (int) round($experience);
 		}
 	}
 
@@ -154,7 +156,7 @@ class RewardService
 					->first();
 
 				$expMultiplier = $this->randomizer->getInt(100, 120) / 100;
-				$addExp = round($enemy->exp * $expMultiplier);
+				$addExp = round($enemy->experience_base * $expMultiplier);
 			} else {
 				$addExp = $this->calculateGroupExperience($battle, $fighter, $user);
 			}
@@ -236,7 +238,7 @@ class RewardService
 	{
 		$baseExp = $battle->members
 			->where('side', '!=', $fighter->side)
-			->avg('exp');
+			->avg('experience_base');
 
 		if ($baseExp === null) {
 			return 0;

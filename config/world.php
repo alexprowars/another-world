@@ -88,6 +88,10 @@ return [
 		],
 		'bank' => [
 			'controller' => Locations\BankController::class,
+			'pages' => [
+				'donations' => 'donations',
+				'exchange' => 'exchangePage',
+			],
 			'actions' => [
 				'donations' => 'donate',
 				'exchange' => 'exchange',
@@ -95,6 +99,11 @@ return [
 		],
 		'market' => [
 			'controller' => Locations\MarketController::class,
+			'pages' => [
+				'buy' => 'buyPage',
+				'sell' => 'sellPage',
+				'my-items' => 'myItems',
+			],
 			'actions' => [
 				'sales' => 'sell',
 				'purchases' => 'buy',
@@ -103,6 +112,10 @@ return [
 		],
 		'pawn-shop' => [
 			'controller' => Locations\PawnShopController::class,
+			'pages' => [
+				'my-items' => 'myItems',
+				'deposit' => 'depositPage',
+			],
 			'actions' => [
 				'deposits' => 'deposit',
 				'withdrawals' => 'withdraw',
@@ -110,6 +123,10 @@ return [
 		],
 		'barn' => [
 			'controller' => Locations\BarnController::class,
+			'pages' => [
+				'resources' => 'resources',
+				'tools' => 'tools',
+			],
 			'actions' => [
 				'sales' => 'sell',
 				'purchases' => 'buy',
@@ -117,6 +134,12 @@ return [
 		],
 		'smithy' => [
 			'controller' => Locations\SmithyController::class,
+			'pages' => [
+				'repair' => 'repairPage',
+				'cut' => 'cutPage',
+				'engraving' => 'engravingPage',
+				'insert' => 'insertPage',
+			],
 			'actions' => [
 				'repairs' => 'repair',
 				'engravings' => 'engrave',
@@ -127,6 +150,12 @@ return [
 		],
 		'administration' => [
 			'controller' => Locations\AdministrationController::class,
+			'pages' => [
+				'rules' => 'registrationRules',
+				'requests' => 'requests',
+				'images' => 'images',
+				'clans' => 'clanArchive',
+			],
 			'actions' => [
 				'requests' => 'submit',
 				'requests/withdraw' => 'withdraw',
@@ -135,6 +164,10 @@ return [
 		],
 		'healer' => [
 			'controller' => Locations\HealerController::class,
+			'pages' => [
+				'services' => 'services',
+				'alchemy' => 'alchemy',
+			],
 			'actions' => [
 				'stats' => 'move_stat',
 				'tribe/leave' => 'leave_tribe',
@@ -144,6 +177,10 @@ return [
 		],
 		'gambling-house' => [
 			'controller' => Locations\GamblingHouseController::class,
+			'pages' => [
+				'dice' => 'dicePage',
+				'lottery' => 'lotteryPage',
+			],
 			'actions' => [
 				'dice' => 'dice',
 				'lottery/tickets' => 'ticket',
@@ -158,6 +195,12 @@ return [
 		],
 		'post-office' => [
 			'controller' => Locations\PostOfficeController::class,
+			'pages' => [
+				'inbox' => 'inbox',
+				'sent' => 'sent',
+				'compose' => 'compose',
+				'transfers' => 'transfers',
+			],
 			'actions' => [
 				'letters' => 'letter',
 				'transfers/items' => 'item',

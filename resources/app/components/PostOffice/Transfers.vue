@@ -60,12 +60,12 @@
 
 				<h3 class="mb-3 font-bold">Передать предмет</h3>
 				<p v-for="(error, field) in itemForm.errors" :key="field" class="mb-2 service-error" role="alert">{{ error }}</p>
-				<div v-if="transfer.items.length" class="shop-items grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-					<SellItem v-for="entry in transfer.items" :key="entry.item.id" :item="entry.item">
+				<div v-if="transfer.items.length" class="storefront-grid">
+					<CatalogItem v-for="entry in transfer.items" :key="entry.item.id" :item="entry.item" :player="user" inventory-item>
 						<template #actions>
 							<button
 								type="button"
-								class="ui-button ui-button--compact mt-2"
+								class="ui-button ui-button--compact"
 								:disabled="busy || !!entry.restriction"
 								@click="transferItem(entry.item)"
 							>
@@ -75,7 +75,7 @@
 						<template #details>
 							<p v-if="entry.restriction" class="service-error">{{ entry.restriction }}</p>
 						</template>
-					</SellItem>
+					</CatalogItem>
 				</div>
 				<p v-else>В рюкзаке нет предметов для передачи.</p>
 			</template>
@@ -89,7 +89,8 @@
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import Name from '~/components/Person/Name.vue';
-	import SellItem from '~/components/City/Shop/SellItem.vue';
+	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
+	import useState from '~/composables/useState.js';
 
 	const location = useLocation();
 
@@ -97,20 +98,20 @@
 		transfer: Object,
 	});
 
+	const state = useState();
+	const user = computed(() => state.user);
+
 	const searchForm = useForm({
-		section: 'transfers',
 		login: props.transfer.login,
 	});
 
 	const goldForm = useForm({
-		action: 'gold',
 		recipient_id: null,
 		amount: '',
 		comment: '',
 	});
 
 	const itemForm = useForm({
-		action: 'item',
 		recipient_id: null,
 		item_id: null,
 	});
@@ -122,7 +123,7 @@
 			return;
 		}
 
-		searchForm.get(location.value.url, {
+		searchForm.get(location.value.url + '/transfers', {
 			preserveState: 'errors',
 			preserveScroll: true,
 		});

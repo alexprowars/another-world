@@ -6,6 +6,7 @@ use App\Http\Middleware\CheckReferral;
 use App\Http\Middleware\EnsureLocation;
 use App\Http\Middleware\RedirectToGame;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 Route::get('/info/{id?}', [Controllers\InfoController::class, 'index'])->whereNumber('id')->name('info');
 Route::get('/battle/log/{id}', [Controllers\BattleLogController::class, 'index'])->whereNumber('id')->name('battle.log');
@@ -63,9 +64,10 @@ Route::middleware(['auth'])->group(function () {
 				}
 
 				foreach ($definition['actions'] as $actionPath => $action) {
-					Route::post($path . '/' . $actionPath, [$definition['controller'], 'store'])
+					$method = Str::camel($action);
+
+					Route::post($path . '/' . $actionPath, [$definition['controller'], $method])
 						->defaults('locationCode', $code)
-						->defaults('locationAction', $action)
 						->whereNumber('vaultRoom')
 						->name('city.' . $code . '.' . $action);
 				}

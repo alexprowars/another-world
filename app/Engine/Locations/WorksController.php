@@ -6,6 +6,7 @@ use App\Exceptions\Exception;
 use App\Models\User;
 use App\Models\Work;
 use App\Models\WorkType;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -45,9 +46,9 @@ class WorksController extends LocationController
 		]);
 	}
 
-	public function store()
+	public function work(Request $request)
 	{
-		$data = request()->validate([
+		$data = $request->validate([
 			'work_id' => ['required', 'integer', 'min:1'],
 		]);
 

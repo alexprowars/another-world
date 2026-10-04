@@ -162,10 +162,7 @@ class UserResource extends JsonResource
 			];
 		}
 
-		$effects = $this->resource->effects()
-			->whereFuture('date')
-			->orderBy('id')
-			->get();
+		$effects = $this->resource->effects;
 
 		foreach ($effects as $effect) {
 			$label = match ($effect->type) {

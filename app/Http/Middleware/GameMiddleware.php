@@ -54,12 +54,12 @@ class GameMiddleware
 		$redirectUrl = null;
 
 		if (!$request->routeIs('world', 'city')) {
-			if ($forcedRoute !== null && !$request->routeIs($forcedRoute, $forcedRoute . '.store')) {
+			if ($forcedRoute && !$request->routeIs($forcedRoute, $forcedRoute . '.store')) {
 				$redirectUrl = route($forcedRoute);
-			} elseif ($forcedLocation !== null) {
+			} elseif ($forcedLocation) {
 				$requestedLocation = $request->route('city') . '.' . $request->route('locationCode');
 
-				if ($request->route('vaultRoom') !== null) {
+				if ($request->route('vaultRoom')) {
 					$requestedLocation .= '.' . $request->route('vaultRoom');
 				}
 

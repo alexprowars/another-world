@@ -57,7 +57,6 @@
 	});
 
 	const exchangeForm = useForm({
-		action: 'exchange',
 		amount: ''
 	});
 

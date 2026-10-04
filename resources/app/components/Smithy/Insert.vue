@@ -82,7 +82,6 @@
 	const targets = reactive({});
 
 	const form = useForm({
-		action: '',
 		id: null,
 		target: null,
 	});
@@ -90,7 +89,6 @@
 	function insert(entry) {
 		confirm(
 			'Вставить камень в выбранный предмет? Камень будет израсходован. Работа займёт ' + props.page.work_seconds / 60 + ' минут.',
-			'insert',
 			entry.item.id,
 			{
 				target: targets[entry.item.id],
@@ -98,7 +96,7 @@
 		);
 	}
 
-	function confirm(message, action, id, data = {}) {
+	function confirm(message, id, data = {}) {
 		openConfirmModal('Подтвердите действие', message, [
 			{ title: 'Нет' },
 			{
@@ -111,9 +109,9 @@
 					form.reset();
 					form.clearErrors();
 
-					Object.assign(form, { action, id }, data);
+					Object.assign(form, { id }, data);
 
-					form.post(location.value.actions.insert + '?section=4', {
+					form.post(location.value.actions.insert, {
 						preserveScroll: true
 					});
 				},

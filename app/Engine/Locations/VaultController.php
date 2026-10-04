@@ -7,6 +7,7 @@ use App\Engine\World\World;
 use App\Exceptions\Exception;
 use App\Models\User;
 use App\Models\Vault as VaultRoom;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -38,6 +39,7 @@ class VaultController extends LocationController
 
 		$room = VaultRoom::query()
 			->findOrFail($user->currentLocation()->roomId);
+
 		$entranceId = World::location($user->currentLocation()->city, 'vault')['entrance_id'];
 
 		$neighbors = VaultRoom::query()
@@ -69,23 +71,62 @@ class VaultController extends LocationController
 		]);
 	}
 
-	public function store()
+	public function heal()
 	{
 		$user = $this->user;
-		$action = request()->route('locationAction');
 
 		try {
-			$message = DB::transaction(function () use ($user, $action) {
+			$message = DB::transaction(function () use ($user) {
 				$this->lockUser($user);
 
-				$room = VaultRoom::query()->findOrFail($user->currentLocation()->roomId);
+				$room = VaultRoom::query()
+					->findOrFail($user->currentLocation()->roomId);
 
-				return match ($action) {
-					'heal' => $this->heal($user, $room),
-					'dig' => $this->dig($user),
-					'unwork' => $this->cancel($user),
-					default => throw new Exception('Неизвестное действие в подземелье.'),
-				};
+				return $this->healFromWell($user, $room);
+			});
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return $this->redirectToLocation();
+	}
+
+	public function dig(Request $request)
+	{
+		$user = $this->user;
+
+		try {
+			$message = DB::transaction(function () use ($request, $user) {
+				$this->lockUser($user);
+
+				VaultRoom::query()
+					->findOrFail($user->currentLocation()->roomId);
+
+				return $this->startDigging($request, $user);
+			});
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return $this->redirectToLocation();
+	}
+
+	public function unwork()
+	{
+		$user = $this->user;
+
+		try {
+			$message = DB::transaction(function () use ($user) {
+				$this->lockUser($user);
+
+				VaultRoom::query()
+					->findOrFail($user->currentLocation()->roomId);
+
+				return $this->cancel($user);
 			});
 
 			flash($message);
@@ -143,7 +184,7 @@ class VaultController extends LocationController
 		}
 	}
 
-	private function heal(User $user, VaultRoom $room): string
+	private function healFromWell(User $user, VaultRoom $room): string
 	{
 		$this->ensureFree($user);
 
@@ -167,12 +208,12 @@ class VaultController extends LocationController
 		return 'Ваш уровень жизни полностью восстановлен!';
 	}
 
-	private function dig(User $user): string
+	private function startDigging(Request $request, User $user): string
 	{
 		$this->ensureFree($user);
 
 		$expected = session()->pull('vault.captcha');
-		$answer = request()->input('captcha');
+		$answer = $request->input('captcha');
 
 		if (!is_string($expected) || !is_string($answer) || !hash_equals($expected, $answer)) {
 			throw new Exception('Неправильный ввод цифр.');

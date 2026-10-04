@@ -34,3 +34,119 @@
 .v-popper--theme-tooltip .v-popper__inner a:hover {
 	color: var(--paper-link-hover);
 }
+
+.v-popper__popper.info-popover-popper .v-popper__inner {
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid var(--paper-border);
+	border-radius: 4px;
+	background: var(--paper-panel);
+	color: var(--paper-text);
+	box-shadow: 0 6px 24px var(--shadow-popover);
+	font-size: 12px;
+}
+
+.v-popper__popper.info-popover-popper .v-popper__arrow-outer {
+	border-color: var(--paper-border);
+}
+
+.v-popper__popper.info-popover-popper .v-popper__arrow-inner {
+	border-color: var(--paper-panel);
+}
+
+.info-popover {
+	width: min(230px, calc(100vw - 24px));
+	color: var(--paper-text);
+	font: 12px/1.4 var(--font-interface);
+	text-align: left;
+}
+
+.info-popover-header {
+	padding: var(--space-8) var(--space-10);
+	background: var(--shell-panel);
+	color: var(--shell-text);
+}
+
+.info-popover-header h3 {
+	margin: 0 0 var(--space-2);
+	color: var(--shell-gold);
+	font: 600 14px/1.3 var(--font-interface);
+	overflow-wrap: anywhere;
+}
+
+.info-popover-header span {
+	color: var(--shell-muted);
+}
+
+.info-popover-body {
+	max-height: min(60vh, 520px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: var(--space-8) var(--space-10);
+	overflow-wrap: anywhere;
+}
+
+.info-popover-footer {
+	color: var(--paper-link);
+	font-size: 11px;
+	padding: var(--space-6) var(--space-10);
+	border-top: 1px solid var(--paper-border);
+}
+
+.info-popover-footer > .ui-button {
+	width: 100%;
+}
+
+.info-popover-section + .info-popover-section,
+.info-popover-stats + .info-popover-section {
+	margin-top: var(--space-8);
+	padding-top: var(--space-6);
+	border-top: 1px solid var(--paper-border);
+}
+
+.info-popover-section h4 {
+	margin: 0 0 var(--space-4);
+	color: var(--paper-heading);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.info-popover-section p {
+	margin: 0;
+}
+
+.info-popover-stats {
+	margin: 0;
+}
+
+.info-popover-stats > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: var(--space-12);
+	padding: var(--space-2) var(--space-4);
+}
+
+.info-popover-stats > div:nth-child(odd) {
+	background: var(--paper-stripe);
+}
+
+.info-popover-stats dt {
+	color: var(--paper-muted);
+}
+
+.info-popover-stats dd {
+	margin: 0;
+	font-weight: 600;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.info-popover-stats .is-unmet,
+.info-popover-stats .is-unmet dt {
+	color: var(--paper-danger);
+}
+
+.info-popover-footer .is-unavailable {
+	color: var(--paper-muted);
+}

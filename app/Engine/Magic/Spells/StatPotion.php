@@ -20,7 +20,7 @@ class StatPotion extends Potion
 
 	protected function applyPotion(User $caster, User $target, UserItem $item): string
 	{
-		if ($target->effects()->where('type', Effect::POTION)->whereFuture('date')->exists()) {
+		if ($target->effects()->where('type', Effect::POTION)->exists()) {
 			throw new Exception('На персонаже может действовать только одно зелье');
 		}
 
@@ -29,6 +29,7 @@ class StatPotion extends Potion
 			'type' => Effect::POTION,
 			'date' => now()->addHours($this->hours),
 		]);
+		$target->unsetRelation('effects');
 
 		return $target->name . ' выпил «' . $item->title . '». Характеристики изменены на ' . $this->hours . ' часа.';
 	}

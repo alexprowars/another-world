@@ -7,38 +7,43 @@ use App\Exceptions\Exception;
 use App\Http\Resources\DonationResource;
 use App\Models\Donation;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BankController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
+		return to_route('city.bank.donations', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		$section = $request->integer('section', 1) === 2 ? 2 : 1;
-
-		$donations = $section === 1
-			? Donation::query()->with('user:id,name')->latest()->orderByDesc('id')->limit(20)->get()
-			: collect();
+	public function donations(): Response
+	{
+		$donations = Donation::query()
+			->with('user:id,name')
+			->latest()
+			->orderByDesc('id')
+			->limit(20)
+			->get();
 
 		return Inertia::render('Map/Bank', [
-			'section' => $section,
-			'exchange_rate' => BankService::exchangeRate(),
+			'tab' => 'donations',
 			'donations' => DonationResource::collection($donations),
 		]);
 	}
 
-	public function store()
+	public function exchangePage(): Response
 	{
-		$request = request();
+		return Inertia::render('Map/Bank', [
+			'tab' => 'exchange',
+			'exchange_rate' => BankService::exchangeRate(),
+		]);
+	}
 
-		$user = $request->user();
-
-		$this->prepareAction($request);
-
+	public function donate(Request $request): RedirectResponse
+	{
 		$data = $request->validate([
-			'action' => ['required', 'in:donate,exchange'],
 			'amount' => ['required', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
 			'comment' => ['nullable', 'string', 'max:100'],
 		], [
@@ -49,22 +54,36 @@ class BankController extends LocationController
 
 		$amount = (float) str_replace(',', '.', $data['amount']);
 
-		$section = $data['action'] === 'exchange' ? 2 : 1;
-
 		try {
-			if ($data['action'] === 'donate') {
-				BankService::donate($user, $amount, $data['comment'] ?? null);
+			BankService::donate($request->user(), $amount, $data['comment'] ?? null);
 
-				flash('Ваше пожертвование: ' . $amount . ' зол. принято!');
-			} else {
-				$gold = BankService::exchange($user, $amount);
-
-				flash('Обмен совершён! Вы получили ' . $gold . ' зол.');
-			}
+			flash('Ваше пожертвование: ' . $amount . ' зол. принято!');
 		} catch (Exception $e) {
 			flash($e->getMessage());
 		}
 
-		return $this->redirectToLocation(['section' => $section]);
+		return to_route('city.bank.donations', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function exchange(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'amount' => ['required', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
+		], [
+			'amount.required' => 'Укажите сумму.',
+			'amount.regex' => 'Укажите сумму с точностью до сотых.',
+		]);
+
+		$amount = (float) str_replace(',', '.', $data['amount']);
+
+		try {
+			$gold = BankService::exchange($request->user(), $amount);
+
+			flash('Обмен совершён! Вы получили ' . $gold . ' зол.');
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.bank.exchangePage', ['city' => $this->user->currentLocation()->city]);
 	}
 }

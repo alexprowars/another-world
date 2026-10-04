@@ -7,20 +7,149 @@ use App\Exceptions\Exception;
 use App\Http\Resources\InventoryItemResource;
 use App\Models\UserItem;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SmithyController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
-		$user = $request->user();
-		$section = $request->integer('section', 1);
+		return to_route('city.smithy.repairPage', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		if (!in_array($section, [1, 2, 3, 4])) {
-			$section = 1;
+	public function repairPage(): Response
+	{
+		return $this->renderSection(1);
+	}
+
+	public function cutPage(): Response
+	{
+		return $this->renderSection(2);
+	}
+
+	public function engravingPage(): Response
+	{
+		return $this->renderSection(3);
+	}
+
+	public function insertPage(): Response
+	{
+		return $this->renderSection(4);
+	}
+
+	public function repair(Request $request)
+	{
+		$user = $request->user();
+
+		SmithyService::finishWork($user);
+
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+			'full' => ['sometimes', 'boolean'],
+		]);
+
+		try {
+			$message = SmithyService::repair($user, (int) $data['id'], $request->boolean('full', true));
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
 		}
+
+		return to_route('city.smithy.repairPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function engrave(Request $request)
+	{
+		$user = $request->user();
+
+		SmithyService::finishWork($user);
+
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+			'text' => ['required', 'string', 'max:25'],
+		]);
+
+		try {
+			$message = SmithyService::engrave($user, (int) $data['id'], $data['text']);
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.smithy.engravingPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function upgrade(Request $request)
+	{
+		$user = $request->user();
+
+		SmithyService::finishWork($user);
+
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			$message = SmithyService::upgrade($user, (int) $data['id']);
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.smithy.engravingPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function cut(Request $request)
+	{
+		$user = $request->user();
+
+		SmithyService::finishWork($user);
+
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			$message = SmithyService::cut($user, (int) $data['id']);
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.smithy.cutPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function insert(Request $request)
+	{
+		$user = $request->user();
+
+		SmithyService::finishWork($user);
+
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+			'target' => ['required', 'integer', 'min:1', 'different:id'],
+		]);
+
+		try {
+			$message = SmithyService::insert($user, (int) $data['id'], (int) $data['target']);
+
+			flash($message);
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.smithy.insertPage', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	/** @param int<1, 4> $section */
+	private function renderSection(int $section): Response
+	{
+		$user = $this->user;
 
 		SmithyService::finishWork($user);
 
@@ -72,45 +201,5 @@ class SmithyController extends LocationController
 			])->values(),
 			'targets' => InventoryItemResource::collection($targets),
 		]);
-	}
-
-	public function store()
-	{
-		$request = request();
-		$user = $request->user();
-		$section = $request->integer('section', 1);
-
-		if (!in_array($section, [1, 2, 3, 4])) {
-			$section = 1;
-		}
-
-		SmithyService::finishWork($user);
-
-		$this->prepareAction($request);
-
-		$data = $request->validate([
-			'action' => ['required', 'in:repair,engrave,upgrade,cut,insert'],
-			'id' => ['required', 'integer', 'min:1'],
-			'full' => ['sometimes', 'boolean'],
-			'text' => ['required_if:action,engrave', 'nullable', 'string', 'max:25'],
-			'target' => ['required_if:action,insert', 'nullable', 'integer', 'min:1', 'different:id'],
-		]);
-
-		try {
-			$message = match ($data['action']) {
-				'repair' => SmithyService::repair($user, (int) $data['id'], $request->boolean('full', true)),
-				'engrave' => SmithyService::engrave($user, (int) $data['id'], $data['text']),
-				'upgrade' => SmithyService::upgrade($user, (int) $data['id']),
-				'cut' => SmithyService::cut($user, (int) $data['id']),
-				'insert' => SmithyService::insert($user, (int) $data['id'], (int) $data['target']),
-				default => throw new Exception('Неизвестная операция кузницы!'),
-			};
-
-			flash($message);
-		} catch (Exception $e) {
-			flash($e->getMessage());
-		}
-
-		return $this->redirectToLocation(['section' => $section]);
 	}
 }

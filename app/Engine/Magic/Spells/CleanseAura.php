@@ -13,11 +13,12 @@ class CleanseAura extends AbstractSpell
 	{
 		$this->requireSelf($caster, $target);
 
-		if (!$target->effects()->where('type', Effect::AURA)->whereFuture('date')->exists()) {
+		if (!$target->effects()->where('type', Effect::AURA)->exists()) {
 			throw new Exception('На персонаже нет действующей ауры');
 		}
 
 		$target->effects()->where('type', Effect::AURA)->delete();
+		$target->unsetRelation('effects');
 
 		return $target->name . ' очистился от действия аур.';
 	}

@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Engine\Battle\Enums\BattleStatus;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BattleLog extends Model
 {
+	use MassPrunable;
+
 	public $timestamps = false;
 	protected $table = 'battles_logs';
 
@@ -33,5 +38,15 @@ class BattleLog extends Model
 	public function enemy(): BelongsTo
 	{
 		return $this->belongsTo(BattleMember::class, 'enemy_id');
+	}
+
+	/**
+	 * @return Builder<static>
+	 */
+	public function prunable(): Builder
+	{
+		return static::query()
+			->where('date', '<', now()->subDays(90))
+			->whereHas('battle', fn (Builder $query) => $query->where('status', BattleStatus::FINISHED));
 	}
 }

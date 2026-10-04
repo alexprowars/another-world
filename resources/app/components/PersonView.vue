@@ -6,7 +6,14 @@
 			<HpLine :current="person.energy_now" :max="person.energy_max" color="b_line" v-tooltip="'Мана'" />
 			<HpLine v-if="person.stamina_max" :current="person.stamina_now" :max="person.stamina_max" color="h_line" v-tooltip="'Запас сил'" />
 		</div>
-		<PersonEquipment :slots="person.slots" :avatar="person.avatar" :name="person.name" :editable-avatar="!readonly" />
+		<PersonEquipment
+			:slots="person.slots"
+			:avatar="person.avatar"
+			:name="person.name"
+			:editable-avatar="!readonly"
+			:can-use="canUse && !readonly"
+			@use="emit('use', $event)"
+		/>
 	</section>
 </template>
 
@@ -23,5 +30,8 @@
 		person: {
 			type: Object,
 		},
+		canUse: { type: Boolean, default: false },
 	});
+
+	const emit = defineEmits(['use']);
 </script>

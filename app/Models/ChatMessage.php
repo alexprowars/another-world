@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ChatMessage extends Model
 {
+	use MassPrunable;
+
 	public const string KIND_PLAYER = 'player';
 	public const string KIND_SYSTEM = 'system';
 	public const string VISIBILITY_PUBLIC = 'public';
@@ -50,5 +53,13 @@ class ChatMessage extends Model
 						});
 				});
 		});
+	}
+
+	/**
+	 * @return Builder<static>
+	 */
+	public function prunable(): Builder
+	{
+		return static::query()->where('created_at', '<', now()->subDays(30));
 	}
 }

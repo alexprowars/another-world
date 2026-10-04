@@ -63,7 +63,7 @@ class RoundResolver
 
 		foreach ($timedOutMembers as $member) {
 			if ($battle->round > 1) {
-				$member->exp /= 2;
+				$member->experience_base /= 2;
 				$member->died_at = $time;
 			}
 

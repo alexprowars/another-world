@@ -43,6 +43,7 @@ class HealInjury extends AbstractSpell
 		$target->injury = null;
 		$target->injury_type = null;
 		$target->effects()->where('type', 3)->delete();
+		$target->unsetRelation('effects');
 
 		return $caster->name . ' использовал «' . $item->title . '» и исцелил персонажа ' . $target->name . ' от травм.';
 	}

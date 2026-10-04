@@ -4,7 +4,7 @@
 			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться на Королевскую улицу">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="sectionUrl" class="ui-icon-button" title="Обновить">
+			<Link :href="tabUrl" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -15,13 +15,19 @@
 		</div>
 
 		<nav class="ui-tabs healer-tabs">
-			<Link v-for="tab in tabs" :key="tab.id" :href="location.url + '?section=' + tab.id" class="ui-tab" :class="{ 'is-active': page.section === tab.id }">
+			<Link
+				v-for="tab in tabs"
+				:key="tab.id"
+				:href="location.url + '/' + tab.id"
+				class="ui-tab"
+				:class="{ 'is-active': page.tab === tab.id }"
+			>
 				<GameIcon :name="tab.icon" />
 				{{ tab.title }}
 			</Link>
 		</nav>
 
-		<div v-if="page.section === 1" class="service-section">
+		<div v-if="page.tab === 'services'" class="service-section">
 			<section class="service-panel healer-panel">
 				<header class="service-panel-heading">
 					<GameIcon name="shuffle" />
@@ -138,22 +144,21 @@
 	const { t } = useI18n();
 	const state = useState();
 	const user = computed(() => state.user);
-	const sectionUrl = computed(() => location.value.url + '?section=' + props.page.section);
+	const tabUrl = computed(() => location.value.url + '/' + props.page.tab);
 	const tabs = [
-		{ id: 1, title: 'Знахарская', icon: 'shuffle' },
-		{ id: 2, title: 'Алхимка', icon: 'book' },
+		{ id: 'services', title: 'Знахарская', icon: 'shuffle' },
+		{ id: 'alchemy', title: 'Алхимка', icon: 'book' },
 	];
-	const form = useForm({ action: null, from: 'strength', to: 'agility', id: null });
+	const form = useForm({ from: 'strength', to: 'agility', id: null });
 	const canMove = computed(() => !form.processing && form.from !== form.to && user.value.base_stats[form.from] > 1 && user.value.gold >= props.page.move_stat_price);
 
-	watch(() => props.page.section, () => form.clearErrors());
+	watch(() => props.page.tab, () => form.clearErrors());
 
 	function submit(action, id = null) {
 		if (form.processing) return;
 
-		form.action = action;
 		form.id = id;
-		form.post(location.value.actions[action] + '?section=' + props.page.section, { preserveScroll: true });
+		form.post(location.value.actions[action], { preserveScroll: true });
 	}
 
 	function confirmAction(action, title, message, id = null) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Engine\Battle\Abilities\Ability;
 use App\Engine\Battle\Abilities\AbilityRegistry;
+use App\Engine\Battle\Enums\BattleStatus;
 use App\Engine\Services\EquipmentSetService;
 use App\Engine\Services\FriendService;
 use App\Engine\Services\InventoryService;
@@ -12,6 +13,7 @@ use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\UserFriendResource;
+use App\Models\BattleMember;
 use App\Models\UserSet;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,13 +21,38 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Kirschbaum\PowerJoins\PowerJoinClause;
 use Throwable;
 
 class PersonController extends Controller
 {
-	public function index()
+	public function index(Request $request): Response
 	{
-		return Inertia::render('Person/Index');
+		$user = $request->user();
+
+		$recentBattles = BattleMember::query()
+			->with('battle')
+			->joinRelationship('battle', fn (PowerJoinClause $join) => $join->as('recent_battle'))
+			->whereBelongsTo($user)
+			->where('recent_battle.status', BattleStatus::FINISHED)
+			->whereNotNull('recent_battle.result')
+			->orderByDesc('recent_battle.started_at')
+			->orderByDesc('recent_battle.id')
+			->limit(5)
+			->get(['battles_members.*'])
+			->map(fn (BattleMember $member) => [
+				'id' => $member->battle_id,
+				'type' => $member->battle->type,
+				'started_at' => $member->battle->started_at?->toAtomString(),
+				'result' => $member->battle->result->forSide($member->side),
+				'damage' => $member->damage,
+				'experience_reward' => $member->experience_reward,
+			]);
+
+		return Inertia::render('Person/Index', [
+			'recent_battles' => $recentBattles,
+			'statistics' => $user->only(['wins', 'losses', 'draws', 'rating']),
+		]);
 	}
 
 	public function inventory(Request $request)

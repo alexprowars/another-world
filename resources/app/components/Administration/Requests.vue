@@ -81,17 +81,15 @@
 
 	const statuses = ['На рассмотрении', 'Принято', 'Отклонено'];
 
-	const requestForm = useForm({
-		action: ''
-	});
+	const requestForm = useForm({});
 
 	function sendRequest() {
 		if (requestForm.processing) {
 			return;
 		}
 
-		requestForm.action = props.hasRequest ? 'withdraw' : 'submit';
-		requestForm.post(location.value.actions[requestForm.action], {
+		const action = props.hasRequest ? 'withdraw' : 'submit';
+		requestForm.post(location.value.actions[action], {
 			preserveScroll: true
 		});
 	}

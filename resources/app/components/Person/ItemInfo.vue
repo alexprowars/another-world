@@ -1,57 +1,55 @@
 <template>
-	<article class="item-info">
-		<header class="item-info-header">
-			<h3>{{ item.title }}</h3>
-			<span>{{ $t('weapon.' + item.type) }}</span>
-		</header>
-		<div class="item-info-body">
-			<dl v-if="item.wearout_max || item.price != null" class="item-info-stats">
-				<div v-if="item.wearout_max">
-					<dt>Износ</dt>
-					<dd :class="{ 'is-unmet': item.wearout >= item.wearout_max }">{{ item.wearout }} / {{ item.wearout_max }}</dd>
-				</div>
-				<div v-if="item.price != null">
-					<dt>Цена</dt>
-					<dd>{{ item.price }} {{ item.price_type === 1 ? 'пл.' : 'зол.' }}</dd>
+	<InfoPopoverContent :title="item.title" :subtitle="$t('weapon.' + item.type)">
+		<dl v-if="item.wearout_max || item.price != null" class="info-popover-stats">
+			<div v-if="item.wearout_max">
+				<dt>Износ</dt>
+				<dd :class="{ 'is-unmet': item.wearout >= item.wearout_max }">{{ item.wearout }} / {{ item.wearout_max }}</dd>
+			</div>
+			<div v-if="item.price != null">
+				<dt>Цена</dt>
+				<dd>{{ item.price }} {{ item.price_type === 1 ? 'пл.' : 'зол.' }}</dd>
+			</div>
+		</dl>
+		<section v-if="requirements.length" class="info-popover-section">
+			<h4>Требования</h4>
+			<dl class="info-popover-stats">
+				<div v-for="row in requirements" :key="row.key" :class="{ 'is-unmet': row.failed }">
+					<dt>{{ row.label }}</dt>
+					<dd>{{ row.value }}</dd>
 				</div>
 			</dl>
-			<section v-if="requirements.length" class="item-info-section">
-				<h4>Требования</h4>
-				<dl class="item-info-stats">
-					<div v-for="row in requirements" :key="row.key" :class="{ 'is-unmet': row.failed }">
-						<dt>{{ row.label }}</dt>
-						<dd>{{ row.value }}</dd>
-					</div>
-				</dl>
-			</section>
-			<section v-if="bonuses.length" class="item-info-section">
-				<h4>Параметры предмета</h4>
-				<dl class="item-info-stats">
-					<div v-for="row in bonuses" :key="row.key">
-						<dt>{{ row.label }}</dt>
-						<dd>{{ row.value }}</dd>
-					</div>
-				</dl>
-			</section>
-			<section v-if="item.magic" class="item-info-section">
-				<h4>Встроенная магия</h4>
-				<div v-html="item.magic"></div>
-			</section>
-			<section v-if="item.engraving" class="item-info-section">
-				<h4>Гравировка</h4>
-				<p>{{ item.engraving }}</p>
-			</section>
-			<section v-if="item.about" class="item-info-section">
-				<h4>Описание</h4>
-				<div v-html="item.about"></div>
-			</section>
-		</div>
-	</article>
+		</section>
+		<section v-if="bonuses.length" class="info-popover-section">
+			<h4>Параметры предмета</h4>
+			<dl class="info-popover-stats">
+				<div v-for="row in bonuses" :key="row.key">
+					<dt>{{ row.label }}</dt>
+					<dd>{{ row.value }}</dd>
+				</div>
+			</dl>
+		</section>
+		<section v-if="item.magic" class="info-popover-section">
+			<h4>Встроенная магия</h4>
+			<div v-html="item.magic"></div>
+		</section>
+		<section v-if="item.engraving" class="info-popover-section">
+			<h4>Гравировка</h4>
+			<p>{{ item.engraving }}</p>
+		</section>
+		<section v-if="item.about" class="info-popover-section">
+			<h4>Описание</h4>
+			<div v-html="item.about"></div>
+		</section>
+		<template v-if="$slots.actions" #footer>
+			<slot name="actions" />
+		</template>
+	</InfoPopoverContent>
 </template>
 
 <script setup>
 	import { computed } from 'vue';
 	import { useI18n } from 'vue-i18n';
+	import InfoPopoverContent from '~/components/InfoPopoverContent.vue';
 
 	const props = defineProps({
 		item: {

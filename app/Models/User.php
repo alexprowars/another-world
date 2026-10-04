@@ -88,7 +88,9 @@ class User extends Authenticatable implements HasMedia
 	/** @return HasMany<Effect, $this> */
 	public function effects(): HasMany
 	{
-		return $this->hasMany(Effect::class, 'user_id');
+		return $this->hasMany(Effect::class, 'user_id')
+			->whereFuture('date')
+			->orderBy('id');
 	}
 
 	/** @return HasMany<UserAbility, $this> */
@@ -157,7 +159,7 @@ class User extends Authenticatable implements HasMedia
 		$time ??= CarbonImmutable::now();
 
 		UserService::calculateWearsStats($this, $time, $persist);
-		UserService::calculateStats($this, $time, $persist);
+		UserService::calculateStats($this, $persist);
 
 		$this->calculated = true;
 	}

@@ -7,7 +7,7 @@
 			<MovementLink v-else :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
+			<Link :href="location.url + '/' + currentSection.path" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -17,7 +17,7 @@
 				class="ui-tab"
 				v-for="section in availableSections"
 				:key="section.id"
-				:href="location.url + '?section=' + section.id"
+				:href="location.url + '/' + section.path"
 				:class="{ 'is-active': page.section === section.id }"
 			>
 				<GameIcon :name="section.icon" />
@@ -40,7 +40,7 @@
 			<GameIcon :name="currentSection.icon" />
 			<h3>Нужна другая профессия</h3>
 			<p>{{ page.notice }}</p>
-			<Link :href="location.url + '?section=1'" class="ui-button">К починке вещей</Link>
+			<Link :href="location.url + '/repair'" class="ui-button">К починке вещей</Link>
 		</div>
 		<component v-else :is="sectionComponents[page.section]" :key="page.section" :page="page" :user="user" />
 
@@ -82,20 +82,23 @@
 	const user = computed(() => state.user);
 
 	const sections = [
-		{ id: 1, title: 'Починка вещей', icon: 'tools' },
+		{ id: 1, path: 'repair', title: 'Починка вещей', icon: 'tools' },
 		{
 			id: 2,
+			path: 'cut',
 			title: 'Огранка камней',
 			icon: 'gem',
 			profession: 3,
 		},
 		{
 			id: 3,
+			path: 'engraving',
 			title: 'Гравировка и модернизация',
 			icon: 'swords',
 		},
 		{
 			id: 4,
+			path: 'insert',
 			title: 'Вставка камней',
 			icon: 'gem',
 			profession: 2,

@@ -6,6 +6,8 @@ use App\Engine\Services\InventoryService;
 use App\Engine\Services\PostOfficeService;
 use App\Engine\Services\TransferService;
 use App\Exceptions\Exception;
+use App\Http\Requests\SendLetterRequest;
+use App\Http\Requests\TransferGoldRequest;
 use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\MailLetterResource;
 use App\Models\MailLetter;
@@ -17,24 +19,32 @@ use Inertia\Response;
 
 class PostOfficeController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
-		$user = $request->user();
+		return to_route('city.post-office.inbox', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		$section = $request->query('section', 'inbox');
+	public function inbox(Request $request): Response
+	{
+		return $this->mailbox($request, 'inbox');
+	}
 
-		if (!in_array($section, ['inbox', 'sent', 'compose', 'transfers'], true)) {
-			$section = 'inbox';
-		}
+	public function sent(Request $request): Response
+	{
+		return $this->mailbox($request, 'sent');
+	}
 
-		$letter = null;
-		$draft = ['recipient' => '', 'subject' => ''];
+	public function compose(Request $request): Response
+	{
+		$draft = [
+			'recipient' => '',
+			'subject' => '',
+		];
 
-		if ($section === 'compose' && $request->integer('reply') > 0) {
+		if ($request->integer('reply') > 0) {
 			$original = MailLetter::query()
 				->with('sender:id,name')
-				->where('recipient_id', $user->id)
+				->where('recipient_id', $this->user->id)
 				->findOrFail($request->integer('reply'));
 
 			$subject = $original->subject;
@@ -47,10 +57,97 @@ class PostOfficeController extends LocationController
 				'recipient' => $original->sender->name,
 				'subject' => mb_substr($subject, 0, 100),
 			];
-		} elseif (in_array($section, ['inbox', 'sent'], true) && $request->integer('letter') > 0) {
+		}
+
+		return $this->renderPage('compose', ['draft' => $draft]);
+	}
+
+	public function transfers(Request $request): Response
+	{
+		return $this->renderPage('transfers', ['transfer' => $this->transferData($request)]);
+	}
+
+	public function letter(SendLetterRequest $request): RedirectResponse
+	{
+		$user = $request->user();
+		$data = $request->validated();
+
+		$letter = PostOfficeService::send($user, $data['recipient'], $data['subject'], $data['body']);
+
+		flash('Письмо успешно отправлено. Списано ' . config('game.postoffice.send_cost') . ' зол.');
+
+		return to_route('city.post-office.sent', [
+			'city' => $this->user->currentLocation()->city,
+			'letter' => $letter->id,
+		]);
+	}
+
+	public function item(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'recipient_id' => ['required', 'integer', 'min:1'],
+			'item_id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			$transfer = TransferService::transferItem(
+				$request->user(),
+				(int) $data['recipient_id'],
+				(int) $data['item_id'],
+				$request->ip(),
+			);
+
+			flash('Предмет «' . e($transfer->item_title) . '» успешно передан.');
+		} catch (Exception $e) {
+			return to_route('city.post-office.transfers', [
+				'city' => $this->user->currentLocation()->city,
+				'login' => $data['recipient_id'],
+			])->withErrors(['transfer' => $e->getMessage()]);
+		}
+
+		return to_route('city.post-office.transfers', [
+			'city' => $this->user->currentLocation()->city,
+			'login' => $data['recipient_id'],
+		]);
+	}
+
+	public function gold(TransferGoldRequest $request): RedirectResponse
+	{
+		$data = $request->validated();
+
+		try {
+			$transfer = TransferService::transferGold(
+				$request->user(),
+				(int) $data['recipient_id'],
+				(float) str_replace(',', '.', $data['amount']),
+				$data['comment'],
+				$request->ip(),
+			);
+
+			flash('Успешно передано ' . $transfer->gold . ' зол.');
+		} catch (Exception $e) {
+			return to_route('city.post-office.transfers', [
+				'city' => $this->user->currentLocation()->city,
+				'login' => $data['recipient_id'],
+			])->withErrors(['transfer' => $e->getMessage()]);
+		}
+
+		return to_route('city.post-office.transfers', [
+			'city' => $this->user->currentLocation()->city,
+			'login' => $data['recipient_id'],
+		]);
+	}
+
+	private function mailbox(Request $request, string $section): Response
+	{
+		$user = $request->user();
+		$letter = null;
+		$userColumn = $section === 'sent' ? 'sender_id' : 'recipient_id';
+
+		if ($request->integer('letter') > 0) {
 			$letter = MailLetter::query()
 				->with(['sender:id,name', 'recipient:id,name'])
-				->where($section === 'sent' ? 'sender_id' : 'recipient_id', $user->id)
+				->where($userColumn, $user->id)
 				->findOrFail($request->integer('letter'));
 
 			if ($section === 'inbox' && !$letter->read_at) {
@@ -58,70 +155,39 @@ class PostOfficeController extends LocationController
 			}
 		}
 
-		$letters = in_array($section, ['inbox', 'sent'], true)
-			? MailLetter::query()
-				->with(['sender:id,name', 'recipient:id,name'])
-				->where($section === 'sent' ? 'sender_id' : 'recipient_id', $user->id)
-				->orderByDesc('id')
-				->paginate(15, ['id', 'sender_id', 'recipient_id', 'subject', 'read_at', 'created_at'])
-				->appends(['section' => $section])
-			: null;
+		$letters = MailLetter::query()
+			->with(['sender:id,name', 'recipient:id,name'])
+			->where($userColumn, $user->id)
+			->orderByDesc('id')
+			->paginate(15, ['id', 'sender_id', 'recipient_id', 'subject', 'read_at', 'created_at']);
 
-		return Inertia::render('Map/PostOffice', [
-			'section' => $section,
-			'send_cost' => config('game.postoffice.send_cost'),
-			'unread_count' => MailLetter::query()
-				->where('recipient_id', $user->id)
-				->whereNull('read_at')
-				->count(),
-			'letters' => $letters ? MailLetterResource::collection($letters->getCollection()) : [],
-			'pagination' => $letters ? [
+		return $this->renderPage($section, [
+			'letters' => MailLetterResource::collection($letters->getCollection()),
+			'pagination' => [
 				'current_page' => $letters->currentPage(),
 				'last_page' => $letters->lastPage(),
 				'previous_url' => $letters->previousPageUrl(),
 				'next_url' => $letters->nextPageUrl(),
 				'total' => $letters->total(),
-			] : null,
+			],
 			'letter' => $letter ? array_merge(
 				MailLetterResource::make($letter)->resolve(),
 				['body' => $letter->body],
 			) : null,
-			'draft' => $draft,
-			'transfer' => $section === 'transfers' ? $this->transferData($request) : null,
 		]);
 	}
 
-	public function store()
+	private function renderPage(string $section, array $data): Response
 	{
-		$request = request();
-		$user = $request->user();
-
-		$this->prepareAction($request);
-
-		$action = $request->validate(['action' => ['required', 'in:letter,item,gold']]);
-
-		if ($action['action'] !== 'letter') {
-			return $this->transfer($request);
-		}
-
-		$data = $request->validate([
-			'recipient' => ['required', 'string', 'max:100'],
-			'subject' => ['required', 'string', 'max:100'],
-			'body' => ['required', 'string', 'max:5000'],
-		], [
-			'recipient.required' => 'Укажите имя получателя.',
-			'recipient.max' => 'Имя получателя должно содержать не более 100 символов.',
-			'subject.required' => 'Введите тему письма.',
-			'subject.max' => 'Тема должна содержать не более 100 символов.',
-			'body.required' => 'Введите текст письма.',
-			'body.max' => 'Текст письма должен содержать не более 5000 символов.',
+		return Inertia::render('Map/PostOffice', [
+			'section' => $section,
+			'send_cost' => config('game.postoffice.send_cost'),
+			'unread_count' => MailLetter::query()
+				->where('recipient_id', $this->user->id)
+				->whereNull('read_at')
+				->count(),
+			...$data,
 		]);
-
-		$letter = PostOfficeService::send($user, $data['recipient'], $data['subject'], $data['body']);
-
-		flash('Письмо успешно отправлено. Списано ' . config('game.postoffice.send_cost') . ' зол.');
-
-		return $this->redirectToLocation(['section' => 'sent', 'letter' => $letter->id]);
 	}
 
 	private function transferData(Request $request): array
@@ -131,6 +197,7 @@ class PostOfficeController extends LocationController
 		$login = $data['login'] ?? '';
 		$recipient = null;
 		$message = null;
+
 		$allowed = TransferService::canTransfer($user);
 
 		if (!$allowed) {
@@ -158,50 +225,5 @@ class PostOfficeController extends LocationController
 				'restriction' => TransferService::itemRestriction($user, $item),
 			])->values(),
 		];
-	}
-
-	private function transfer(Request $request): RedirectResponse
-	{
-		$data = $request->validate([
-			'action' => ['required', 'in:item,gold'],
-			'recipient_id' => ['required', 'integer', 'min:1'],
-			'item_id' => ['exclude_unless:action,item', 'required', 'integer', 'min:1'],
-			'amount' => ['exclude_unless:action,gold', 'required', 'regex:/^\d{1,10}([.,]\d{1,2})?$/'],
-			'comment' => ['exclude_unless:action,gold', 'required', 'string', 'max:255'],
-		], [
-			'amount.required' => 'Укажите сумму.',
-			'amount.regex' => 'Укажите сумму с точностью до сотых.',
-			'comment.required' => 'Укажите причину передачи.',
-			'comment.max' => 'Причина должна содержать не более 255 символов.',
-		]);
-
-		try {
-			if ($data['action'] === 'item') {
-				$transfer = TransferService::transferItem(
-					$request->user(),
-					(int) $data['recipient_id'],
-					(int) $data['item_id'],
-					$request->ip(),
-				);
-
-				flash('Предмет «' . e($transfer->item_title) . '» успешно передан.');
-			} else {
-				$transfer = TransferService::transferGold(
-					$request->user(),
-					(int) $data['recipient_id'],
-					(float) str_replace(',', '.', $data['amount']),
-					$data['comment'],
-					$request->ip(),
-				);
-				flash('Успешно передано ' . $transfer->gold . ' зол.');
-			}
-		} catch (Exception $e) {
-			return $this->redirectToLocation([
-				'section' => 'transfers',
-				'login' => $data['recipient_id'],
-			])->withErrors(['transfer' => $e->getMessage()]);
-		}
-
-		return $this->redirectToLocation(['section' => 'transfers', 'login' => $data['recipient_id']]);
 	}
 }

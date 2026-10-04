@@ -132,8 +132,8 @@
 
 				<template v-else-if="page.section === 'artifacts'">
 					<h3 class="mb-3 font-bold">Артефакты клана</h3>
-					<div v-if="page.items.length" class="shop-items grid grid-cols-1 gap-4 xl:grid-cols-2">
-						<SellItem v-for="entry in page.items" :key="entry.item.id" :item="entry.item">
+					<div v-if="page.items.length" class="storefront-grid">
+						<CatalogItem v-for="entry in page.items" :key="entry.item.id" :item="entry.item" :player="user" inventory-item>
 							<template #actions><span>Клановый артефакт</span></template>
 							<template #details>
 								<div v-if="entry.holder" class="my-2">
@@ -141,7 +141,7 @@
 									<Name :player="entry.holder" />
 								</div>
 							</template>
-						</SellItem>
+						</CatalogItem>
 					</div>
 					<p v-else>У клана нет клановых артефактов.</p>
 				</template>
@@ -205,13 +205,17 @@
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import Name from '~/components/Person/Name.vue';
-	import SellItem from '~/components/City/Shop/SellItem.vue';
+	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
+	import useState from '~/composables/useState.js';
 
 	const location = useLocation();
 
 	const props = defineProps({
 		page: Object
 	});
+
+	const state = useState();
+	const user = computed(() => state.user);
 
 	const moneyForm = useForm({
 		action: 'deposit',

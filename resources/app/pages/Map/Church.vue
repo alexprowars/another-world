@@ -146,13 +146,11 @@
 	});
 
 	const marriageForm = useForm({
-		action: 'marry',
 		husband: '',
 		wife: '',
 	});
 
 	const divorceForm = useForm({
-		action: 'divorce',
 		name: '',
 	});
 

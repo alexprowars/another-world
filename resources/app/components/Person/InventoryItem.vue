@@ -1,6 +1,6 @@
 <template>
 	<article class="inventory-item">
-		<ItemPopover :item="item" :player="player" class="inventory-item-preview">
+		<ItemPopover :item="item" :player="player" can-use class="inventory-item-preview" @use="emit('use', $event)">
 			<button type="button" class="inventory-item-image" :title="'Информация: ' + item.title">
 				<img :src="getItemImagePath(item)" :alt="item.title" />
 			</button>
@@ -30,7 +30,6 @@
 		</div>
 		<div class="inventory-item-actions">
 			<button type="button" class="ui-button ui-button--compact" @click="confirmWear">Надеть</button>
-			<button v-if="item.can_use" type="button" class="ui-button ui-button--compact ui-button--secondary" @click="useItem">Использовать</button>
 			<button v-if="item.can_drop" type="button" class="ui-text-button" :disabled="dropping" @click="confirmDrop">Выбросить</button>
 		</div>
 	</article>
@@ -81,9 +80,5 @@
 				},
 			},
 		]);
-	}
-
-	function useItem() {
-		emit('use', props.item);
 	}
 </script>

@@ -47,18 +47,17 @@
 	});
 
 	const form = useForm({
-		action: '',
 		id: null,
 		full: true,
 	});
 
 	function confirmRepair(entry, full) {
-		confirm('Починить предмет за ' + (full ? entry.repair_price : entry.repair_one_price) + ' зол.?', 'repair', entry.item.id, {
+		confirm('Починить предмет за ' + (full ? entry.repair_price : entry.repair_one_price) + ' зол.?', entry.item.id, {
 			full,
 		});
 	}
 
-	function confirm(message, action, id, data = {}) {
+	function confirm(message, id, data = {}) {
 		openConfirmModal('Подтвердите действие', message, [
 			{ title: 'Нет' },
 			{
@@ -71,9 +70,9 @@
 					form.reset();
 					form.clearErrors();
 
-					Object.assign(form, { action, id }, data);
+					Object.assign(form, { id }, data);
 
-					form.post(location.value.actions.repair + '?section=1', {
+					form.post(location.value.actions.repair, {
 						preserveScroll: true
 					});
 				},

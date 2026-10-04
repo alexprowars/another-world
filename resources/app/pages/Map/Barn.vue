@@ -4,7 +4,7 @@
 			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться на Промышленную улицу">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="sectionUrl" class="ui-icon-button" title="Обновить отдел">
+			<Link :href="tabUrl" class="ui-icon-button" title="Обновить отдел">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -16,11 +16,11 @@
 
 		<div class="storefront-toolbar">
 			<nav class="ui-tabs storefront-modes">
-				<Link :href="location.url + '?section=1'" class="ui-tab" :class="{ 'is-active': selling }">
+				<Link :href="location.url + '/resources'" class="ui-tab" :class="{ 'is-active': selling }">
 					<GameIcon name="gem" />
 					Сдача ресурсов
 				</Link>
-				<Link :href="location.url + '?section=2'" class="ui-tab" :class="{ 'is-active': !selling }">
+				<Link :href="location.url + '/tools'" class="ui-tab" :class="{ 'is-active': !selling }">
 					<GameIcon name="tools" />
 					Инструменты
 				</Link>
@@ -125,17 +125,17 @@
 
 	const state = useState();
 	const user = computed(() => state.user);
-	const selling = computed(() => props.page.section === 1);
-	const sectionUrl = computed(() => location.value.url + '?section=' + props.page.section);
+	const selling = computed(() => props.page.tab === 'resources');
+	const tabUrl = computed(() => location.value.url + '/' + props.page.tab);
 	const search = ref('');
-	const form = useForm({ action: null, id: null });
+	const form = useForm({ id: null });
 	const filteredItems = computed(() => {
 		const query = search.value.trim().toLocaleLowerCase('ru');
 
 		return props.page.items.filter(entry => entry.item.title.toLocaleLowerCase('ru').includes(query));
 	});
 
-	watch(() => props.page.section, () => {
+	watch(() => props.page.tab, () => {
 		search.value = '';
 		form.clearErrors();
 	});
@@ -150,7 +150,7 @@
 		const action = selling.value ? 'Сдать' : 'Купить';
 		const actionId = selling.value ? 'sell' : 'buy';
 		const itemId = selling.value ? entry.item.id : entry.id;
-		const url = location.value.actions[selling.value ? 'sell' : 'buy'] + '?section=' + props.page.section;
+		const url = location.value.actions[actionId];
 		const message = action + ' «' + entry.item.title + '» за ' + entry.price + (platinum(entry) ? ' пл.' : ' зол.') + '?';
 
 		openConfirmModal(action + ' предмет', escape(message), [
@@ -160,7 +160,6 @@
 				handler() {
 					if (form.processing) return;
 
-					form.action = actionId;
 					form.id = itemId;
 					form.post(url, { preserveScroll: true });
 				},

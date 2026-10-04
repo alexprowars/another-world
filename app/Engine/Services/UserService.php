@@ -199,14 +199,12 @@ class UserService
 		return $user->level < 4 ? 180 : 360;
 	}
 
-	public static function calculateStats(User $user, CarbonImmutable $time, bool $persist = true): void
+	public static function calculateStats(User $user, bool $persist = true): void
 	{
 		$combatStats = $user->getCombatStats();
 
 		// Положительные и отрицательные эффекты на персонаже (элики, ауры, проклятья)
-		$effects = $user->effects()
-			->where('date', '>', $time)
-			->get();
+		$effects = $user->effects;
 
 		/** @var Effect $effect */
 		foreach ($effects as $effect) {

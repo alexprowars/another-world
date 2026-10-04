@@ -53,7 +53,6 @@
 	const user = computed(() => state.user);
 
 	const imageForm = useForm({
-		action: 'buy_image',
 		image: null
 	});
 

@@ -95,7 +95,6 @@
 	const texts = reactive({});
 
 	const form = useForm({
-		action: '',
 		id: null,
 		text: null,
 	});
@@ -127,9 +126,9 @@
 					form.reset();
 					form.clearErrors();
 
-					Object.assign(form, { action, id }, data);
+					Object.assign(form, { id }, data);
 
-					form.post(location.value.actions[action] + '?section=3', {
+					form.post(location.value.actions[action], {
 						preserveScroll: true
 					});
 				},

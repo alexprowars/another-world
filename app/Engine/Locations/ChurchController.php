@@ -6,15 +6,16 @@ use App\Engine\Services\ChurchService;
 use App\Exceptions\Exception;
 use App\Models\Marriage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ChurchController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(Request $request): Response|RedirectResponse
 	{
-		$user = request()->user();
+		$user = $request->user();
 
 		$marriage = Marriage::query()
 			->active()
@@ -51,36 +52,47 @@ class ChurchController extends LocationController
 		]);
 	}
 
-	public function store()
+	public function marry(Request $request)
 	{
-		$request = request();
 		$user = $request->user();
-
-		$this->prepareAction($request);
 
 		abort_unless($user->isAdmin(), 403);
 
 		$data = $request->validate([
-			'action' => ['required', 'in:marry,divorce'],
-			'husband' => ['required_if:action,marry', 'nullable', 'string', 'max:100'],
-			'wife' => ['required_if:action,marry', 'nullable', 'string', 'max:100'],
-			'name' => ['required_if:action,divorce', 'nullable', 'string', 'max:100'],
+			'husband' => ['required', 'string', 'max:100'],
+			'wife' => ['required', 'string', 'max:100'],
 		], [
-			'husband.required_if' => 'Укажите имя жениха.',
-			'wife.required_if' => 'Укажите имя невесты.',
-			'name.required_if' => 'Укажите имя заявителя.',
+			'husband.required' => 'Укажите имя жениха.',
+			'wife.required' => 'Укажите имя невесты.',
 		]);
 
 		try {
-			if ($data['action'] === 'marry') {
-				ChurchService::marry($user, $data['husband'], $data['wife']);
+			ChurchService::marry($user, $data['husband'], $data['wife']);
 
-				flash('Брак заключён. Молодожёны получили обручальные кольца!');
-			} else {
-				ChurchService::divorce($user, $data['name']);
+			flash('Брак заключён. Молодожёны получили обручальные кольца!');
+		} catch (Exception $e) {
+			throw ValidationException::withMessages(['action' => $e->getMessage()]);
+		}
 
-				flash('Брак расторгнут. Обручальные кольца изъяты.');
-			}
+		return $this->redirectToLocation();
+	}
+
+	public function divorce(Request $request)
+	{
+		$user = $request->user();
+
+		abort_unless($user->isAdmin(), 403);
+
+		$data = $request->validate([
+			'name' => ['required', 'string', 'max:100'],
+		], [
+			'name.required' => 'Укажите имя заявителя.',
+		]);
+
+		try {
+			ChurchService::divorce($user, $data['name']);
+
+			flash('Брак расторгнут. Обручальные кольца изъяты.');
 		} catch (Exception $e) {
 			throw ValidationException::withMessages(['action' => $e->getMessage()]);
 		}

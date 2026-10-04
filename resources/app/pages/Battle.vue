@@ -2,7 +2,13 @@
 	<div class="battle-page">
 		<div v-if="data" class="battle battle-layout">
 			<div class="battle-layout__fighter battle-layout__fighter--left">
-				<BattleFighter v-if="data?.user" :fighter="data.user" :current="true" />
+				<BattleFighter
+					v-if="data?.user"
+					:fighter="data.user"
+					:current="true"
+					:can-use="data.action === 'impactForm' && !isFinished"
+					@use="useMagic"
+				/>
 			</div>
 
 			<div class="battle-layout__center">
@@ -47,11 +53,6 @@
 									@complete="gofight"
 								/>
 								<BattleAbilities :abilities="data.abilities || null" @use="useAbility" />
-								<div v-if="magicItems.length" class="battle-magic">
-									<button v-for="item in magicItems" :key="item.id" type="button" class="ui-button ui-button--compact" @click="useMagic(item)">
-										{{ item.title }}
-									</button>
-								</div>
 							</template>
 						</div>
 
@@ -164,7 +165,6 @@
 
 	const isFinished = computed(() => data.value?.action === 'finishBattle');
 	const showNoEnemy = computed(() => !isFinished.value);
-	const magicItems = computed(() => Object.values(data.value?.user?.items || {}).filter(item => item.can_use));
 
 	function useMagic(item) {
 		openPopupModal(UseMagic, {

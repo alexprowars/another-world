@@ -8,7 +8,14 @@
 			<HpLine :current="fighter.hp" :max="fighter.hp_max" color="g_line" />
 			<HpLine :current="fighter.energy" :max="fighter.energy_max" color="b_line" />
 		</div>
-		<PersonEquipment :slots="fighter.items" :avatar="fighter.avatar" :name="fighter.name" :show-scrolls="current" />
+		<PersonEquipment
+			:slots="fighter.items"
+			:avatar="fighter.avatar"
+			:name="fighter.name"
+			:show-scrolls="current"
+			:can-use="canUse && current"
+			@use="emit('use', $event)"
+		/>
 	</section>
 </template>
 
@@ -26,5 +33,8 @@
 			type: Boolean,
 			default: false,
 		},
+		canUse: { type: Boolean, default: false },
 	});
+
+	const emit = defineEmits(['use']);
 </script>

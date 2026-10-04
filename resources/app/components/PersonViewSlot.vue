@@ -1,8 +1,10 @@
 <template>
 	<ItemPopover
 		:item="item"
+		:can-use="canUse"
 		class="person-view-slot"
 		:style="{ width: width + 'px', height: height + 'px' }"
+		@use="emit('use', $event)"
 	>
 		<img :src="image" :class="{ 'cursor-pointer': isEdit }" :width="width" :height="height" :alt="title" @click.prevent="unsetItem()" />
 
@@ -28,8 +30,10 @@
 		item: {
 			type: Object,
 		},
+		canUse: { type: Boolean, default: false },
 	});
 
+	const emit = defineEmits(['use']);
 	const page = usePage();
 
 	const isEdit = computed(() => {

@@ -85,7 +85,6 @@
 	});
 
 	const donationForm = useForm({
-		action: 'donate',
 		amount: '',
 		comment: ''
 	});

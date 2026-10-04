@@ -13,7 +13,14 @@
 			</Link>
 			<img v-else class="person-view-avatar" :src="avatar" width="120" height="220" :alt="name" />
 			<div v-if="showScrolls" class="person-view-scrolls">
-				<PersonViewSlot v-for="position in [17, 18]" :key="position" :position="position" :item="slots['slot_' + position] || null" />
+				<PersonViewSlot
+					v-for="position in [17, 18]"
+					:key="position"
+					:position="position"
+					:item="slots['slot_' + position] || null"
+					:can-use="canUse"
+					@use="emit('use', $event)"
+				/>
 			</div>
 		</div>
 		<div class="person-equipment-column person-equipment-column--right">
@@ -36,5 +43,8 @@
 		name: { type: String, required: true },
 		editableAvatar: { type: Boolean, default: false },
 		showScrolls: { type: Boolean, default: true },
+		canUse: { type: Boolean, default: false },
 	});
+
+	const emit = defineEmits(['use']);
 </script>

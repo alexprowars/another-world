@@ -10,79 +10,89 @@ use App\Http\Resources\ItemResource;
 use App\Models\Item;
 use App\Models\UserItem;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BarnController extends LocationController
 {
-	public function index(): Response|RedirectResponse
+	public function index(): RedirectResponse
 	{
-		$request = request();
+		return to_route('city.barn.resources', ['city' => $this->user->currentLocation()->city]);
+	}
 
-		$user = $request->user();
+	public function resources(Request $request): Response
+	{
+		$query = DB::query()->whereIn('type', config('game.barn.resource_types'));
 
-		$section = $request->integer('section', 1) === 2 ? 2 : 1;
-
-		if ($section === 1) {
-			$query = DB::query()->whereIn('type', config('game.barn.resource_types'));
-
-			$items = InventoryService::getInventoryObjects($user, 0, $query)
-				->filter(fn(UserItem $item) => BarnService::canSell($item))
-				->map(fn(UserItem $item) => [
-					'item' => InventoryItemResource::make($item),
-					'price' => BarnService::sellPrice($item),
-				])
-				->values();
-		} else {
-			$items = Item::query()
-				->where('type', config('game.barn.tool_type'))
-				->orderBy('req_level')
-				->orderBy('title')
-				->get()
-				->map(fn(Item $item) => [
-					'id' => $item->id,
-					'item' => ItemResource::make($item),
-					'price' => $item->getPurchasePrice($user),
-				]);
-		}
+		$items = InventoryService::getInventoryObjects($request->user(), 0, $query)
+			->filter(fn (UserItem $item) => BarnService::canSell($item))
+			->map(fn (UserItem $item) => [
+				'item' => InventoryItemResource::make($item),
+				'price' => BarnService::sellPrice($item),
+			])
+			->values();
 
 		return Inertia::render('Map/Barn', [
-			'section' => $section,
+			'tab' => 'resources',
 			'items' => $items,
 		]);
 	}
 
-	public function store()
+	public function tools(Request $request): Response
 	{
-		$request = request();
-
 		$user = $request->user();
 
-		$section = $request->integer('section', 1) === 2 ? 2 : 1;
+		$items = Item::query()
+			->where('type', config('game.barn.tool_type'))
+			->orderBy('req_level')
+			->orderBy('title')
+			->get()
+			->map(fn (Item $item) => [
+				'id' => $item->id,
+				'item' => ItemResource::make($item),
+				'price' => $item->getPurchasePrice($user),
+			]);
 
-		$this->prepareAction($request);
+		return Inertia::render('Map/Barn', [
+			'tab' => 'tools',
+			'items' => $items,
+		]);
+	}
 
+	public function sell(Request $request): RedirectResponse
+	{
 		$data = $request->validate([
-			'action' => ['required', 'in:sell,buy'],
 			'id' => ['required', 'integer', 'min:1'],
 		]);
 
 		try {
-			if ($data['action'] === 'sell') {
-				$item = BarnService::sell($user, (int) $data['id']);
-				$price = BarnService::sellPrice($item);
+			$item = BarnService::sell($request->user(), (int) $data['id']);
+			$price = BarnService::sellPrice($item);
 
-				flash('Вы сдали <u>' . e($item->title) . '</u> за <u>' . $price . '</u> ' . ($item->price_type == 1 ? 'пл.' : 'зол.'));
-			} else {
-				['item' => $item, 'price' => $price] = BarnService::buy($user, (int) $data['id']);
-
-				flash('Вы купили <u>' . e($item->title) . '</u> за <u>' . $price . '</u> ' . ($item->price_type == 1 ? 'пл.' : 'зол.'));
-			}
+			flash('Вы сдали <u>' . e($item->title) . '</u> за <u>' . $price . '</u> ' . ($item->price_type == 1 ? 'пл.' : 'зол.'));
 		} catch (Exception $e) {
 			flash($e->getMessage());
 		}
 
-		return $this->redirectToLocation(['section' => $section]);
+		return to_route('city.barn.resources', ['city' => $this->user->currentLocation()->city]);
+	}
+
+	public function buy(Request $request): RedirectResponse
+	{
+		$data = $request->validate([
+			'id' => ['required', 'integer', 'min:1'],
+		]);
+
+		try {
+			['item' => $item, 'price' => $price] = BarnService::buy($request->user(), (int) $data['id']);
+
+			flash('Вы купили <u>' . e($item->title) . '</u> за <u>' . $price . '</u> ' . ($item->price_type == 1 ? 'пл.' : 'зол.'));
+		} catch (Exception $e) {
+			flash($e->getMessage());
+		}
+
+		return to_route('city.barn.tools', ['city' => $this->user->currentLocation()->city]);
 	}
 }

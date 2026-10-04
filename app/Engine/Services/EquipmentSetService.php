@@ -120,7 +120,7 @@ class EquipmentSetService
 					}
 				}
 
-				UserService::calculateStats($character, $time, false);
+				UserService::calculateStats($character, false);
 
 				foreach ($selected as $slot => $itemId) {
 					if (!InventoryService::isAllowOnset($items->get($itemId), $character)) {

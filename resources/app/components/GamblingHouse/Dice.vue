@@ -103,7 +103,6 @@
 	const state = useState();
 	const user = computed(() => state.user);
 	const form = useForm({
-		action: 'dice',
 		stake: props.result?.stake ?? props.stakes[0],
 	});
 

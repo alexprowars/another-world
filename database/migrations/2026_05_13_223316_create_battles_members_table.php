@@ -15,7 +15,8 @@ return new class extends Migration {
 			$table->timestamp('finished_at')->nullable();
 			$table->timestamp('died_at')->nullable();
 			$table->unsignedInteger('damage')->default(0);
-			$table->unsignedInteger('exp')->default(0);
+			$table->unsignedInteger('experience_base')->default(0);
+			$table->unsignedInteger('experience_reward')->default(0);
 			$table->smallInteger('wait')->default(0);
 			$table->smallInteger('blocks')->default(0);
 			$table->smallInteger('hits')->default(0);

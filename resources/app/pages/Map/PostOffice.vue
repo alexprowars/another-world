@@ -18,20 +18,20 @@
 		</header>
 
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link :href="location.url + '?section=inbox'" class="ui-tab" :class="{ 'is-active': page.section === 'inbox' }">
+			<Link :href="location.url + '/inbox'" class="ui-tab" :class="{ 'is-active': page.section === 'inbox' }">
 				<GameIcon name="mail" />
 				Входящие
 				<span v-if="page.unread_count" class="ui-badge post-office-unread">{{ page.unread_count }}</span>
 			</Link>
-			<Link :href="location.url + '?section=sent'" class="ui-tab" :class="{ 'is-active': page.section === 'sent' }">
+			<Link :href="location.url + '/sent'" class="ui-tab" :class="{ 'is-active': page.section === 'sent' }">
 				<GameIcon name="send" />
 				Исходящие
 			</Link>
-			<Link :href="location.url + '?section=compose'" class="ui-tab" :class="{ 'is-active': page.section === 'compose' }">
+			<Link :href="location.url + '/compose'" class="ui-tab" :class="{ 'is-active': page.section === 'compose' }">
 				<GameIcon name="quill" />
 				Написать письмо
 			</Link>
-			<Link :href="location.url + '?section=transfers'" class="ui-tab" :class="{ 'is-active': page.section === 'transfers' }">
+			<Link :href="location.url + '/transfers'" class="ui-tab" :class="{ 'is-active': page.section === 'transfers' }">
 				<GameIcon name="transfer" />
 				Передача предметов и золота
 			</Link>
@@ -76,6 +76,6 @@
 	const inertiaPage = usePage();
 	const refreshUrl = computed(() => inertiaPage.url);
 	const listUrl = computed(() =>
-		location.value.url + '?section=' + props.page.section + '&page=' + props.page.pagination.current_page
+		location.value.url + '/' + props.page.section + '?page=' + props.page.pagination.current_page
 	);
 </script>

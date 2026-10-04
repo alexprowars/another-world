@@ -4,6 +4,7 @@ namespace App\Engine\Locations;
 
 use App\Exceptions\Exception;
 use App\Models\Academy;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Throwable;
@@ -41,14 +42,14 @@ class AcademyController extends LocationController
 		]);
 	}
 
-	public function store()
+	public function learn(Request $request)
 	{
-		$data = request()->validate([
+		$data = $request->validate([
 			'profession_id' => ['required', 'integer', 'min:1'],
 		]);
 
 		try {
-			$this->learn((int) $data['profession_id']);
+			$this->startLearning((int) $data['profession_id']);
 		} catch (Throwable $e) {
 			flash($e->getMessage());
 		}
@@ -56,7 +57,7 @@ class AcademyController extends LocationController
 		return $this->redirectToLocation();
 	}
 
-	public function learn(int $professionId)
+	private function startLearning(int $professionId)
 	{
 		$item = Academy::query()
 			->findOne($professionId);

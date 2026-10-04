@@ -4,7 +4,7 @@
 			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться в парк">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="location.url + '?game=' + page.game" class="ui-icon-button" title="Обновить">
+			<Link :href="location.url + '/' + page.game" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -18,11 +18,11 @@
 		</header>
 
 		<nav class="ui-tabs ui-tabs--stacked gambling-tabs">
-			<Link :href="location.url + '?game=dice'" class="ui-tab" :class="{ 'is-active': page.game === 'dice' }">
+			<Link :href="location.url + '/dice'" class="ui-tab" :class="{ 'is-active': page.game === 'dice' }">
 				<GameIcon name="dice" />
 				Кости
 			</Link>
-			<Link :href="location.url + '?game=lottery'" class="ui-tab" :class="{ 'is-active': page.game === 'lottery' }">
+			<Link :href="location.url + '/lottery'" class="ui-tab" :class="{ 'is-active': page.game === 'lottery' }">
 				<GameIcon name="ticket" />
 				Лотерея
 			</Link>

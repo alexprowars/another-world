@@ -21,10 +21,6 @@
 	min-width: 0;
 }
 
-.battle-layout__fighter > .battle-fighter {
-	flex: 1;
-}
-
 .battle-layout__center {
 	display: flex;
 	flex: 1 1 auto;
@@ -42,6 +38,10 @@
 	border-radius: 4px;
 	background: var(--paper-panel);
 	box-shadow: 0 2px 5px var(--paper-edge-shade);
+}
+
+.battle-fighter {
+	overflow: hidden;
 }
 
 .battle-fighter__heading,
@@ -344,7 +344,6 @@
 	--point-color: var(--resource-energy);
 }
 
-.battle-magic,
 .battle-actions {
 	display: flex;
 	flex-wrap: wrap;
@@ -388,104 +387,6 @@
 
 .battle-ability-icon.is-unavailable {
 	filter: grayscale(1) brightness(0.6);
-}
-
-.v-popper__popper.battle-ability-popper .v-popper__inner {
-	padding: 0;
-	overflow: hidden;
-	border: 1px solid var(--paper-border);
-	border-radius: 4px;
-	background: var(--paper-panel);
-	color: var(--paper-text);
-	box-shadow: 0 6px 24px var(--shadow-popover);
-	font-size: 12px;
-}
-
-.v-popper__popper.battle-ability-popper .v-popper__arrow-outer {
-	border-color: var(--paper-border);
-}
-
-.v-popper__popper.battle-ability-popper .v-popper__arrow-inner {
-	border-color: var(--paper-panel);
-}
-
-.battle-ability-tooltip {
-	width: min(260px, calc(100vw - 24px));
-	font: 12px/1.5 var(--font-interface);
-	text-align: left;
-	overflow-wrap: anywhere;
-}
-
-.battle-ability-tooltip__heading {
-	padding: var(--space-10) var(--space-12);
-	background: var(--shell-panel);
-	color: var(--shell-muted);
-}
-
-.battle-ability-tooltip__heading h3 {
-	margin: 0 0 var(--space-4);
-	color: var(--shell-gold);
-	font-size: 15px;
-	font-weight: 600;
-	line-height: 1.3;
-}
-
-.battle-ability-tooltip__body {
-	max-height: min(60vh, 420px);
-	overflow-y: auto;
-	overscroll-behavior: contain;
-	padding: var(--space-12);
-}
-
-.battle-ability-tooltip__body section + section {
-	margin-top: var(--space-12);
-	padding-top: var(--space-10);
-	border-top: 1px solid var(--paper-border);
-}
-
-.battle-ability-tooltip__body h4 {
-	margin: 0 0 var(--space-8);
-	color: var(--paper-heading);
-	font-weight: 600;
-}
-
-.battle-ability-tooltip__body p,
-.battle-ability-tooltip__requirements {
-	margin: 0;
-}
-
-.battle-ability-tooltip__requirements > div {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--space-12);
-	padding: var(--space-2) var(--space-6);
-}
-
-.battle-ability-tooltip__requirements > div:nth-child(odd) {
-	background: var(--paper-stripe);
-}
-
-.battle-ability-tooltip__requirements dt {
-	color: var(--paper-muted);
-}
-
-.battle-ability-tooltip__requirements dd {
-	margin: 0;
-	font-weight: 600;
-	font-variant-numeric: tabular-nums;
-	text-align: right;
-}
-
-.battle-ability-tooltip__footer {
-	padding: var(--space-10) var(--space-12);
-	border-top: 1px solid var(--paper-border);
-	color: var(--paper-link);
-	font-size: 11px;
-}
-
-.battle-ability-tooltip__footer.is-unavailable {
-	color: var(--paper-muted);
 }
 
 .battle-timer {

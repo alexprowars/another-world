@@ -17,7 +17,7 @@ class Aura extends AbstractSpell
 
 	public function cast(User $caster, User $target, UserItem $item): string
 	{
-		if ($target->effects()->where('type', Effect::AURA)->whereFuture('date')->exists()) {
+		if ($target->effects()->where('type', Effect::AURA)->exists()) {
 			throw new Exception('На персонаже может действовать только одна аура');
 		}
 
@@ -28,6 +28,7 @@ class Aura extends AbstractSpell
 			'type' => Effect::AURA,
 			'date' => now()->addSeconds($seconds),
 		]);
+		$target->unsetRelation('effects');
 
 		return $caster->name . ' наложил на персонажа ' . $target->name . ' ауру «' . $item->title . '» на ' . ($seconds / 60) . ' мин.';
 	}

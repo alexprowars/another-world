@@ -5,6 +5,7 @@ namespace App\Engine\Locations;
 use App\Engine\Services\BattleService;
 use App\Exceptions\Exception;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,9 +25,9 @@ class TrainingArenaController extends LocationController
 		return Inertia::render('Map/Arena/Training', ['players' => $players]);
 	}
 
-	public function store()
+	public function fight(Request $request)
 	{
-		$data = request()->validate([
+		$data = $request->validate([
 			'enemy_id' => ['required', 'integer', 'min:1'],
 		]);
 

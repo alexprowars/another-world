@@ -5,7 +5,7 @@
 			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
 			</MovementLink>
-			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
+			<Link :href="location.url + '/' + page.tab" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -13,24 +13,24 @@
 		<nav class="ui-tabs ui-tabs--stacked">
 			<Link
 				class="ui-tab"
-				v-for="(title, index) in sections"
-				:key="index"
-				:href="location.url + '?section=' + (index + 1)"
-				:class="{ 'is-active': page.section === index + 1 }"
+				v-for="tab in tabs"
+				:key="tab.id"
+				:href="location.url + '/' + tab.id"
+				:class="{ 'is-active': page.tab === tab.id }"
 			>
-				<GameIcon :name="['clan', 'justice', 'character', 'book'][index]" />
-				{{ title }}
+				<GameIcon :name="tab.icon" />
+				{{ tab.title }}
 			</Link>
 		</nav>
-		<RegistrationRules v-if="page.section === 1" :min-level="page.min_level" />
+		<RegistrationRules v-if="page.tab === 'rules'" :min-level="page.min_level" />
 		<Requests
-			v-else-if="page.section === 2"
+			v-else-if="page.tab === 'requests'"
 			:request-price="page.request_price"
 			:min-level="page.min_level"
 			:has-request="page.has_request"
 			:requests="page.requests"
 		/>
-		<Images v-else-if="page.section === 3" :image-price="page.image_price" :images="page.images" />
+		<Images v-else-if="page.tab === 'images'" :image-price="page.image_price" :images="page.images" />
 		<ClanArchive v-else :tribes="page.tribes" />
 	</ContentBlock>
 </template>
@@ -53,5 +53,10 @@
 		page: Object
 	});
 
-	const sections = ['Правила регистрации', 'Подать заявку на проверку', 'Образ', 'Архив кланов'];
+	const tabs = [
+		{ id: 'rules', title: 'Правила регистрации', icon: 'clan' },
+		{ id: 'requests', title: 'Подать заявку на проверку', icon: 'justice' },
+		{ id: 'images', title: 'Образ', icon: 'character' },
+		{ id: 'clans', title: 'Архив кланов', icon: 'book' },
+	];
 </script>

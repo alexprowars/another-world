@@ -53,6 +53,7 @@ abstract class Potion extends AbstractSpell
 				'date' => now()->addMinutes($minutes),
 				$stat => -$penalty,
 			]);
+			$target->unsetRelation('effects');
 
 			$message = ' Отравление уменьшило показатель «' . $stats[$stat] . '» на ' . $penalty . ' на ' . $minutes . ' мин.';
 		}

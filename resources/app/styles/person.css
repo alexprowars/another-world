@@ -307,8 +307,7 @@
 	overflow-wrap: anywhere;
 }
 
-.person-stat-section h3,
-.item-info-section h4 {
+.person-stat-section h3 {
 	margin: 0 0 var(--space-6);
 	color: var(--paper-heading);
 	font-size: 12px;
@@ -731,6 +730,156 @@
 	}
 }
 
+/* Обзор персонажа */
+.person-overview {
+	font-size: 12px;
+}
+
+.person-overview-section + .person-overview-section {
+	margin-top: var(--space-20);
+	padding-top: var(--space-16);
+	border-top: 1px solid var(--paper-border);
+}
+
+.person-overview .person-section-heading-row {
+	align-items: center;
+	margin-bottom: var(--space-8);
+}
+
+.person-overview .person-section-heading-row .person-section-heading {
+	margin-bottom: 0;
+}
+
+.person-overview .person-section-heading {
+	display: flex;
+	align-items: center;
+	gap: var(--space-6);
+}
+
+.person-overview .person-section-heading .game-icon {
+	width: 16px;
+	height: 16px;
+	color: var(--paper-link);
+}
+
+.person-recent-battles {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.person-recent-battle + .person-recent-battle {
+	border-top: 1px solid var(--paper-border);
+}
+
+.person-recent-battle {
+	padding: var(--space-12) 0;
+}
+
+.person-recent-battle-heading {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-6) var(--space-10);
+}
+
+.person-recent-battle a {
+	color: var(--paper-link);
+}
+
+.person-recent-battle a:hover {
+	color: var(--paper-link-hover);
+}
+
+.person-recent-battle-heading > a {
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.person-battle-result {
+	padding: var(--space-2) var(--space-6);
+	border-radius: 3px;
+	background: var(--paper-highlight);
+	color: var(--paper-muted);
+	white-space: nowrap;
+}
+
+.person-battle-result--win,
+.person-battle-statistic--win dd {
+	color: var(--paper-success);
+}
+
+.person-battle-result--lose,
+.person-battle-statistic--lose dd {
+	color: var(--paper-danger);
+}
+
+.person-recent-battle-details {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--space-6) var(--space-12);
+	margin-top: var(--space-8);
+	color: var(--paper-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.person-recent-battle-details b {
+	color: var(--paper-heading);
+	font-weight: 600;
+}
+
+.person-recent-battle-details > a {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-4);
+	margin-left: auto;
+}
+
+.person-recent-battle-details .game-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.person-battle-statistics {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-8);
+	margin: var(--space-12) 0 0;
+}
+
+.person-battle-statistics > div {
+	min-width: 0;
+	padding: var(--space-10);
+	border: 1px solid var(--paper-border);
+	border-radius: 3px;
+	background: var(--paper-highlight);
+}
+
+.person-battle-statistics dt {
+	color: var(--paper-muted);
+}
+
+.person-battle-statistics dd {
+	margin: var(--space-6) 0 0;
+	font-size: 20px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	overflow-wrap: anywhere;
+}
+
+.person-battle-statistics small {
+	margin-left: var(--space-2);
+	font-size: 12px;
+}
+
+@container (max-width: 420px) {
+	.person-battle-statistics {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 /* Инвентарь и комплекты */
 .person-inventory {
 	font-size: 12px;
@@ -917,101 +1066,6 @@
 	display: flex;
 	align-items: center;
 	gap: var(--space-12);
-}
-
-/* Подсказка переносится в body, поэтому селекторы не зависят от лэйаута. */
-.v-popper__popper.item-info-popper .v-popper__inner {
-	padding: 0;
-	overflow: hidden;
-	border: 1px solid var(--paper-border);
-	border-radius: 4px;
-	background: var(--paper-panel);
-	color: var(--paper-text);
-	box-shadow: 0 6px 24px var(--shadow-popover);
-	font-size: 12px;
-}
-
-.v-popper__popper.item-info-popper .v-popper__arrow-outer {
-	border-color: var(--paper-border);
-}
-
-.v-popper__popper.item-info-popper .v-popper__arrow-inner {
-	border-color: var(--paper-panel);
-}
-
-.item-info {
-	width: min(250px, calc(100vw - 24px));
-	color: var(--paper-text);
-	font: 12px/1.5 var(--font-interface);
-	text-align: left;
-}
-
-.item-info-header {
-	padding: var(--space-10) var(--space-12);
-	background: var(--shell-panel);
-	color: var(--shell-text);
-}
-
-.item-info-header h3 {
-	margin: 0 0 var(--space-4);
-	color: var(--shell-gold);
-	font: 600 15px/1.3 var(--font-interface);
-	overflow-wrap: anywhere;
-}
-
-.item-info-header span {
-	color: var(--shell-muted);
-}
-
-.item-info-body {
-	max-height: min(60vh, 520px);
-	overflow-y: auto;
-	overscroll-behavior: contain;
-	padding: var(--space-10) var(--space-12);
-	overflow-wrap: anywhere;
-}
-
-.item-info-section + .item-info-section,
-.item-info-stats + .item-info-section {
-	margin-top: var(--space-10);
-	padding-top: var(--space-8);
-	border-top: 1px solid var(--paper-border);
-}
-
-.item-info-section p {
-	margin: 0;
-}
-
-.item-info-stats {
-	margin: 0;
-}
-
-.item-info-stats > div {
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	gap: var(--space-12);
-	padding: var(--space-2) var(--space-4);
-}
-
-.item-info-stats > div:nth-child(odd) {
-	background: var(--paper-stripe);
-}
-
-.item-info-stats dt {
-	color: var(--paper-muted);
-}
-
-.item-info-stats dd {
-	margin: 0;
-	font-weight: 600;
-	text-align: right;
-	font-variant-numeric: tabular-nums;
-}
-
-.item-info-stats .is-unmet,
-.item-info-stats .is-unmet dt {
-	color: var(--paper-danger);
 }
 
 .item-slot-empty {

@@ -2,7 +2,7 @@
 	<Head title="Персонаж" />
 	<div class="person-layout">
 		<aside class="person-equipment-panel">
-			<PersonView :person="user" />
+			<PersonView :person="user" can-use @use="useItem" />
 			<Link href="/person/inventory" class="person-equipment-link">Управление экипировкой</Link>
 		</aside>
 		<aside class="person-parameters-panel">
@@ -30,11 +30,13 @@
 </template>
 
 <script setup>
-	import { Head, Link, usePage } from '@inertiajs/vue3';
+	import { Head, Link, router, usePage } from '@inertiajs/vue3';
 	import { computed } from 'vue';
 	import PersonView from '~/components/PersonView.vue';
 	import Parameters from '~/components/Person/Parameters.vue';
 	import useState from '~/composables/useState.js';
+	import { openPopupModal } from '~/composables/useModals.js';
+	import UseMagic from '~/components/Dialogs/UseMagic.vue';
 
 	const page = usePage();
 	const state = useState();
@@ -48,4 +50,13 @@
 		{ href: '/person/friends', label: 'Друзья' },
 		{ href: '/person/settings', label: 'Настройки' },
 	];
+
+	function useItem(item) {
+		openPopupModal(UseMagic, {
+			title: 'Использовать магию',
+			item,
+			selfName: user.value.name,
+			onUsed: () => router.reload(),
+		});
+	}
 </script>
