@@ -181,22 +181,46 @@ class UserService
 
 	public static function getHealthRegenerationTime(User $user): ?int
 	{
-		if ($user->battle_id || $user->hp_max <= 0) {
+		if ($user->battle_id || $user->hp_max <= 0 || $user->online === null) {
 			return null;
 		}
 
 		if ($user->r_type == 2) {
 			return $user->getCombatStats()->vitality > 0 && $user->r_date?->isFuture()
-				? self::getHospitalHealingTime($user)
+				? self::getHospitalHealingTime()
 				: null;
 		}
 
-		return $user->online ? 600 : null;
+		return config('game.regeneration.health_time');
 	}
 
-	public static function getHospitalHealingTime(User $user): int
+	public static function getCuredEnergy(User $user): float
 	{
-		return $user->level < 4 ? 180 : 360;
+		$duration = self::getEnergyRegenerationTime($user);
+
+		if ($duration === null || $user->energy_now >= $user->energy_max) {
+			return 0;
+		}
+
+		$seconds = max(0, (int) $user->online->diffInSeconds());
+
+		$result = round($user->energy_max * ($seconds / $duration), 4);
+
+		return min($user->energy_max - $user->energy_now, $result);
+	}
+
+	public static function getEnergyRegenerationTime(User $user): ?int
+	{
+		if ($user->battle_id || $user->energy_max <= 0 || $user->online === null) {
+			return null;
+		}
+
+		return config('game.regeneration.energy_time');
+	}
+
+	public static function getHospitalHealingTime(): int
+	{
+		return config('game.hospital.health_time');
 	}
 
 	public static function calculateStats(User $user, bool $persist = true): void

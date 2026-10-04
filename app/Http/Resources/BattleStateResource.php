@@ -40,6 +40,7 @@ class BattleStateResource extends JsonResource
 			'timeout_left' => $state->timeoutLeft,
 			'timeout' => $state->battle->timeout,
 			'logs' => BattleLogResource::collection($state->logs)->resolve($request),
+			'last_log_id' => $state->lastLogId,
 		];
 
 		if ($state->message !== null) {

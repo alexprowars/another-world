@@ -34,15 +34,16 @@ class RewardService
 		// Восстанавливаем запас сил
 		$user->stamina_now = min($user->stamina_now + 20, $user->getCombatStats()->vitality * 20);
 
-		if ($result === ParticipantResult::DRAW) {
+		if ($result === ParticipantResult::WIN) {
+			$user->wins += 1;
+		} elseif ($result === ParticipantResult::DRAW) {
 			$user->draws += 1;
 		} elseif ($result === ParticipantResult::LOSS) {
 			$user->losses += 1;
 		}
 
-		// Начисляем опыт за победу
-		if ($result === ParticipantResult::WIN) {
-			$experienceReward = $this->awardExperience($battle, $fighter, $user, $time);
+		if ($result !== ParticipantResult::DRAW) {
+			$experienceReward = $this->awardExperience($battle, $fighter, $user, $result, $time);
 		}
 
 		$fighter->update(['experience_reward' => $experienceReward]);
@@ -94,7 +95,8 @@ class RewardService
 		if ($result === ParticipantResult::DRAW) {
 			$message = 'К сожалению ваш бой закончился ничьёй. Попытайтесь снова. Нанесено урона: ' . $fighter->damage . ' HP.';
 		} elseif ($result === ParticipantResult::LOSS) {
-			$message = 'Ваш бой закончен, Вы проиграли. Нанесено урона: ' . $fighter->damage . ' HP.';
+			$message = 'Ваш бой закончен, Вы проиграли. Нанесено урона: ' . $fighter->damage
+				. ' HP. Получено опыта: ' . $experienceReward . '.';
 		} else {
 			$message = 'Вы одержали победу! Нанесено урона: ' . $fighter->damage . ' HP. Получено опыта: ' . $experienceReward . '.';
 
@@ -138,6 +140,7 @@ class RewardService
 		Battle $battle,
 		BattleMember $fighter,
 		User $user,
+		ParticipantResult $result,
 		CarbonImmutable $time,
 	): int {
 		$addExp = 0;
@@ -149,7 +152,9 @@ class RewardService
 
 		if ($levelUp) {
 			// Рассчитываем опыт за бой
-			if ($battle->type == BattleType::DUEL) {
+			if ($result === ParticipantResult::LOSS) {
+				$addExp = $this->calculateDefeatExperience($battle, $fighter, $user);
+			} elseif ($battle->type == BattleType::DUEL) {
 				/** @var BattleMember $enemy */
 				$enemy = $battle->members
 					->where('user_id', '!=', $user->id)
@@ -178,6 +183,10 @@ class RewardService
 
 			if ($addExp > $maxExp) {
 				$addExp = $maxExp;
+			}
+
+			if ($result === ParticipantResult::LOSS) {
+				$addExp *= config('battle.experience.loss_rate');
 			}
 
 			// Боевая ярость удваивает опыт до окончания срока действия.
@@ -226,11 +235,32 @@ class RewardService
 				}
 			}
 
-			$user->wins += 1;
 			$user->exp = $newExp;
 		}
 
 		return $addExp;
+	}
+
+	private function calculateDefeatExperience(Battle $battle, BattleMember $fighter, User $user): int
+	{
+		if ($fighter->damage <= 0) {
+			return 0;
+		}
+
+		if ($battle->type !== BattleType::DUEL) {
+			return $this->calculateGroupExperience($battle, $fighter, $user);
+		}
+
+		/** @var BattleMember $enemy */
+		$enemy = $battle->members
+			->where('side', '!=', $fighter->side)
+			->first();
+
+		$baseExp = BattleService::getBaseLevelExp($enemy->user->level);
+		$maxHealth = max(1, $enemy->user->hp_max);
+		$damageRatio = min(1, $fighter->damage / $maxHealth);
+
+		return (int) round($baseExp * $damageRatio);
 	}
 
 	private function calculateDuelExperience(BattleMember $enemy, User $user): int

@@ -27,6 +27,7 @@ class BattleLogResource extends JsonResource
 			'enemy' => $log->enemy?->user->name,
 			'enemy_blocks' => $log->enemy_block,
 			'comment' => $log->comment_id,
+			'message' => $log->message,
 			'my' => $viewer !== null && (
 				$viewer->id === $log->member->user_id
 				|| $viewer->id === $log->enemy?->user_id

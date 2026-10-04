@@ -3,6 +3,15 @@
 return [
 	'max_slots' => 22,
 
+	'regeneration' => [
+		'health_time' => 600,
+		'energy_time' => 1200,
+	],
+
+	'hospital' => [
+		'health_time' => 120,
+	],
+
 	'bank' => [
 		'exchange_rate' => 20,
 	],

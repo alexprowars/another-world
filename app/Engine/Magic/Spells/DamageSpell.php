@@ -65,9 +65,11 @@ abstract class DamageSpell extends AbstractSpell
 		$minDamage = (int) round($combatStats->getMinMagicDamage());
 		$maxDamage = (int) round($combatStats->getMaxMagicDamage());
 
-		return $this->damage
+		$damage = $this->damage
 			+ random_int($minDamage, $maxDamage)
 			+ random_int(0, 5);
+
+		return $this->applyResistance($target, $damage);
 	}
 
 	protected function applyResistance(User $target, float $damage): float

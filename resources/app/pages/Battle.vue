@@ -178,17 +178,7 @@
 		});
 	}
 
-	const lastLogId = computed(() => {
-		let last = 0;
-
-		logs.value.forEach(item => {
-			if (item.id > last) {
-				last = item.id;
-			}
-		});
-
-		return last;
-	});
+	const lastLogId = ref(0);
 
 	onMounted(() => {
 		userChannel?.listen('BattleUpdated', onBattleUpdated);
@@ -320,8 +310,14 @@
 		}
 
 		if (res.logs.length) {
-			logs.value = [...logs.value, ...res.logs];
+			const entries = new Map(logs.value.map(item => [item.id, item]));
+
+			res.logs.forEach(item => entries.set(item.id, item));
+
+			logs.value = [...entries.values()].sort((first, second) => second.id - first.id);
 		}
+
+		lastLogId.value = res.last_log_id;
 
 		if (res.action === 'finishBattle') {
 			selectedEnemy.value = 0;

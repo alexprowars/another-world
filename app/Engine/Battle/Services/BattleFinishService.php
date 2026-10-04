@@ -18,7 +18,6 @@ class BattleFinishService
 	{
 	}
 
-	/** Работает с участниками, загруженными и заблокированными BattleEngine. */
 	public function finishIfReady(
 		Battle $battle,
 		BattleMember $fighter,
@@ -26,7 +25,7 @@ class BattleFinishService
 		CarbonImmutable $time,
 	): void {
 		if (DB::transactionLevel() === 0) {
-			throw new LogicException('Завершение боя должно выполняться в транзакции BattleEngine');
+			throw new LogicException('Завершение боя должно выполняться в транзакции с блокировкой боя');
 		}
 
 		if (!in_array($battle->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)) {
@@ -42,10 +41,43 @@ class BattleFinishService
 			$fighter->save();
 		}
 
-		$result = $battle->result ?? $this->determineResult($battle);
+		$result = $this->resolveResult($battle, $time);
 
 		if ($result === null) {
 			return;
+		}
+
+		// После расчёта battle_id сбрасывается, поэтому повторный вызов не выдаёт награду.
+		if ($user->battle_id !== $battle->id || $user->isBot()) {
+			return;
+		}
+
+		$personalResult = $result->forSide($fighter->side);
+
+		$this->rewardService->award($battle, $fighter, $user, $personalResult, $time);
+
+		$user->battle()->associate(null);
+		$user->save();
+	}
+
+	public function resolveResult(Battle $battle, CarbonImmutable $time): ?BattleResult
+	{
+		if (DB::transactionLevel() === 0) {
+			throw new LogicException('Определение результата должно выполняться в транзакции с блокировкой боя');
+		}
+
+		if (!in_array($battle->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)) {
+			return null;
+		}
+
+		if ($battle->result !== null) {
+			return $battle->result;
+		}
+
+		$result = $this->determineResult($battle);
+
+		if ($result === null) {
+			return null;
 		}
 
 		$battle->result = $result;
@@ -60,17 +92,7 @@ class BattleFinishService
 				'battle_id' => null,
 			]);
 
-		// После расчёта battle_id сбрасывается, поэтому повторный вызов не выдаёт награду.
-		if ($user->battle_id !== $battle->id || $user->isBot()) {
-			return;
-		}
-
-		$personalResult = $result->forSide($fighter->side);
-
-		$this->rewardService->award($battle, $fighter, $user, $personalResult, $time);
-
-		$user->battle()->associate(null);
-		$user->save();
+		return $result;
 	}
 
 	private function determineResult(Battle $battle): ?BattleResult

@@ -332,6 +332,7 @@ class BattleService
 		$turns = $battle->logs()
 			->with(['member', 'enemy'])
 			->where('round', $battle->round)
+			->whereNotNull('hit')
 			->whereNotNull('enemy_id')
 			->get();
 

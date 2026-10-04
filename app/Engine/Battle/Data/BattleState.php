@@ -31,6 +31,7 @@ readonly class BattleState
 		public array $userItems,
 		public array $opponentItems,
 		public Collection $logs,
+		public int $lastLogId,
 		public array $limits,
 		public CarbonImmutable $time,
 		public int $timeoutLeft,

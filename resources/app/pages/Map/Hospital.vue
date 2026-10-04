@@ -21,7 +21,7 @@
 						<h2 v-else>{{ user.r_date ? 'Лечение идёт' : page.time > 0 ? 'Восстановление здоровья' : 'Лечение не требуется' }}</h2>
 						<p v-if="!page.can_heal">Для лечения нужны положительные выносливость и максимум здоровья.</p>
 						<p v-else-if="user.r_date">Отдыхайте. Лекари позаботятся о вашем здоровье.</p>
-						<p v-else-if="page.time > 0">Восстановите здоровье перед следующим сражением.</p>
+						<p v-else-if="page.time > 0">Лекари ускорят восстановление здоровья перед следующим сражением.</p>
 						<p v-else>Ваше здоровье полностью восстановлено. Вы готовы к новым сражениям.</p>
 					</div>
 				</header>
@@ -45,10 +45,11 @@
 							<GameIcon name="hourglass" />
 							{{ $formatTime(page.time) }}
 						</strong>
+						<p class="hospital-hint">Без лечения: {{ $formatTime(page.natural_time) }}</p>
 					</div>
 					<button type="button" class="ui-button" :disabled="processing" @click="healAction">
 						<GameIcon name="health" />
-						{{ healForm.processing ? 'Начинаем лечение…' : 'Подлечиться' }}
+						{{ healForm.processing ? 'Начинаем лечение…' : 'Восстановиться' }}
 					</button>
 				</div>
 			</section>

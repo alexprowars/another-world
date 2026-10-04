@@ -22,6 +22,15 @@ class BattleLog extends Model
 		'enemy_block' => 'array',
 	];
 
+	/** @param Builder<static> $query */
+	public function scopeVisible(Builder $query): void
+	{
+		$query->where(function (Builder $query) {
+			$query->where('comment_id', '>', 0)
+				->orWhereNotNull('message');
+		});
+	}
+
 	/** @return BelongsTo<Battle, $this> */
 	public function battle(): BelongsTo
 	{

@@ -46,7 +46,7 @@
 			<div class="ui-emblem"><GameIcon name="health" /></div>
 			<div class="arena-lobby-hospital-copy">
 				<h2>Больница</h2>
-				<p>Восстановите здоровье и вылечите травмы после боя.</p>
+				<p>Ускорьте восстановление здоровья и вылечите травмы после боя.</p>
 			</div>
 			<MovementLink :to="location.city + '.hospital'" class="ui-button ui-button--compact ui-button--secondary">
 				Перейти в больницу

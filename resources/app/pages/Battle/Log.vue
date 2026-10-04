@@ -47,7 +47,6 @@
 		</section>
 
 		<footer class="battle-log-footer">
-			<p v-if="page.battle.status === 'active'">Новые события появляются после завершения раунда.</p>
 			<button type="button" class="ui-button" :disabled="refreshing" @click="refresh">
 				<GameIcon name="refresh" /> {{ refreshing ? 'Обновляем…' : 'Обновить журнал' }}
 			</button>

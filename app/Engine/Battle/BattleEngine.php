@@ -239,17 +239,25 @@ class BattleEngine
 			];
 		}
 
-		// Не выдаём более поздние сообщения: иначе курсор пропустит скрытые ходы.
+		// Курсор не проходит скрытые ходы, даже если события магии уже показаны.
 		$pendingLogId = $this->battle->result !== null ? null : $this->battle->logs()
 			->where('round', '>=', $this->battle->round)
+			->whereNotNull('hit')
+			->whereNull('comment_id')
 			->min('id');
 
 		$logs = $this->battle->logs()
+			->visible()
 			->orderByDesc('round')
 			->orderByDesc('id')
 			->where('id', '>', $lastLogId)
-			->when($pendingLogId !== null, fn($query) => $query->where('id', '<', $pendingLogId))
 			->get();
+
+		$nextLogId = $logs->max('id') ?? $lastLogId;
+
+		if ($pendingLogId !== null) {
+			$nextLogId = min($nextLogId, $pendingLogId - 1);
+		}
 
 		$membersById = $this->battle->members->keyBy('id');
 
@@ -270,6 +278,7 @@ class BattleEngine
 			userItems: $userItems,
 			opponentItems: $opponentItems,
 			logs: $logs,
+			lastLogId: max($lastLogId, $nextLogId),
 			limits: $limits,
 			time: $time,
 			timeoutLeft: $timeout,

@@ -61,6 +61,7 @@ class UserResource extends JsonResource
 			'hp_regeneration' => $this->healthRegeneration(),
 			'energy_now' => (int) floor($user->energy_now ?: 0),
 			'energy_max' => $user->energy_max ?: 0,
+			'energy_regeneration' => $this->energyRegeneration(),
 			'stamina_now' => (int) floor($user->stamina_now ?: 0),
 			'stamina_max' => $user->stamina_max ?: 0,
 			'krit' => $combatStats->krit,
@@ -130,6 +131,26 @@ class UserResource extends JsonResource
 			'duration' => $duration,
 			'remaining' => max(0, $remaining),
 			'hospital' => $hospital,
+		];
+	}
+
+	private function energyRegeneration(): ?array
+	{
+		$user = $this->resource;
+
+		$duration = UserService::getEnergyRegenerationTime($user);
+
+		if ($duration === null || $user->energy_now >= $user->energy_max) {
+			return null;
+		}
+
+		$elapsed = max(0, (int) $user->online->diffInSeconds());
+		$remaining = (1 - $user->energy_now / $user->energy_max) * $duration - $elapsed;
+
+		return [
+			'duration' => $duration,
+			'remaining' => max(0, $remaining),
+			'hospital' => false,
 		];
 	}
 

@@ -3,6 +3,7 @@
 namespace App\Engine\Services;
 
 use App\Engine\Battle\Enums\BattleStatus;
+use App\Engine\Battle\Services\BattleMagicService;
 use App\Engine\Magic\Spell;
 use App\Engine\Magic\SpellRegistry;
 use App\Exceptions\Exception;
@@ -123,7 +124,7 @@ class MagicService
 			}
 
 			if (
-				!$target->is($caster) && !$target->isAdmin()
+				!$target->is($caster) && !$caster->isAdmin()
 				&& !$spell->ignoresMagicProtection()
 				&& $target->magic_protection?->isFuture()
 			) {
@@ -151,6 +152,15 @@ class MagicService
 
 			foreach ($users as $participant) {
 				$participant->fresh()->calculate();
+			}
+
+			if ($caster->battle_id) {
+				app(BattleMagicService::class)->process(
+					$caster->battle,
+					$caster,
+					$target,
+					$battleId ? $message : null,
+				);
 			}
 
 			$redirect = $target->battle_id && $target->battle_id !== $targetBattleId ? route('battle') : null;

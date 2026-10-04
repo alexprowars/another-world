@@ -5,8 +5,10 @@
 				<b v-if="item.my" class="date2">{{ $formatDate(item['date'], 'DD MMM HH:mm:ss') }}</b>
 				<b v-else class="date1">{{ $formatDate(item['date'], 'DD MMM HH:mm:ss') }}</b>
 
-				<span v-if="item.user && item.enemy" class="battle-log-entry__schema inline-flex" v-html="hitSchema(item.side, item.hits, item.enemy_blocks)"></span>
+				<span v-if="item.user && item.enemy && item.hits" class="battle-log-entry__schema inline-flex" v-html="hitSchema(item.side, item.hits, item.enemy_blocks)"></span>
+				<span v-if="item.message">{{ item.message }}</span>
 				<span
+					v-else
 					v-html="renderComment($formatDate(item['date'], 'DD MMM HH:mm:ss'), item.user, item.side, item.hits, item.damage, item.enemy, item.comment)"
 				></span>
 			</div>

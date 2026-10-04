@@ -84,9 +84,11 @@ class GameMiddleware
 
 		if ($user->online === null || $user->online->diffInSeconds() >= 15) {
 			$hp = UserService::getCuredHealth($user);
+			$energy = UserService::getCuredEnergy($user);
 
 			$user->online = now();
 			$user->hp_now += $hp;
+			$user->energy_now += $energy;
 			$user->save();
 		}
 

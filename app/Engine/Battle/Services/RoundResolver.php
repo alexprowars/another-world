@@ -128,6 +128,7 @@ class RoundResolver
 	{
 		$logs = $battle->logs()
 			->where('round', $battle->round)
+			->whereNull('message')
 			->orderBy('id')
 			->get();
 

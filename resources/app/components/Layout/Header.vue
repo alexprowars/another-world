@@ -10,7 +10,7 @@
 				<HpLine :current="user.hp_now" :max="user.hp_max" :regeneration="user.hp_regeneration" color="g_line" title="Здоровье">
 					<template #icon><HealthIcon class="resource-icon" /></template>
 				</HpLine>
-				<HpLine :current="user.energy_now" :max="user.energy_max" color="b_line" title="Мана">
+				<HpLine :current="user.energy_now" :max="user.energy_max" :regeneration="user.energy_regeneration" color="b_line" title="Мана">
 					<template #icon><ManaIcon class="resource-icon" /></template>
 				</HpLine>
 				<HpLine :current="user.stamina_now" :max="user.stamina_max" color="h_line" title="Силы">

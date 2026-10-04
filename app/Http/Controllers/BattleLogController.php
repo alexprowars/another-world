@@ -6,7 +6,6 @@ use App\Http\Controller;
 use App\Http\Resources\BattleLogResource;
 use App\Models\Battle;
 use App\Models\BattleMember;
-use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,8 +19,7 @@ class BattleLogController extends Controller
 
 		$logs = $battle->logs()
 			->with(['member.user', 'enemy.user'])
-			->where('comment_id', '>', 0)
-			->when($battle->result === null, fn(Builder $query) => $query->where('round', '<', $battle->round))
+			->visible()
 			->orderByDesc('round')
 			->orderByDesc('id')
 			->get();
