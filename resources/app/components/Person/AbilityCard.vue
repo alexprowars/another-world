@@ -17,7 +17,7 @@
 			</dl>
 		</div>
 		<span v-if="item.onset" class="person-ability-equipped">Выбран</span>
-		<button v-else type="button" class="ui-button ui-button--compact" :disabled="processing" @click="emit('activate')">Добавить</button>
+		<button v-else type="button" class="ui-button ui-button--compact" :disabled="disabled" @click="emit('activate')">Добавить</button>
 	</article>
 </template>
 
@@ -25,7 +25,7 @@
 	defineProps({
 		item: Object,
 		abilityId: [String, Number],
-		processing: Boolean,
+		disabled: Boolean,
 	});
 
 	const emit = defineEmits(['activate']);

@@ -9,6 +9,7 @@ use App\Http\Resources\ShopItemResource;
 use App\Models\ShopItem;
 use App\Models\UserItem;
 use App\Services\InventoryService;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Kirschbaum\PowerJoins\PowerJoinClause;
 use Throwable;
@@ -91,7 +92,10 @@ class Shop
 
 	protected function buy(int $itemId)
 	{
-		$item = ShopItem::query()->findOne($itemId);
+		$item = ShopItem::query()
+			->where('shop_id', $this->shopId)
+			->whereHas('item', fn(Builder $query) => $query->where('req_level', '<=', auth()->user()->level))
+			->findOne($itemId);
 
 		if (!$item) {
 			throw new Exception('Предмет не найден в магазине');

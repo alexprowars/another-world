@@ -13,6 +13,8 @@ class CombatStats
 	public int $min = 0;
 	public int $max = 0;
 	public int $damageReduction = 0;
+	public bool $forceCrit = false;
+	public bool $forceDodge = false;
 
 	public int $krit = 0;
 	public int $unkrit = 0;

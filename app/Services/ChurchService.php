@@ -146,7 +146,7 @@ class ChurchService
 			return;
 		}
 
-		for ($slot = 1; $slot <= $slots::MAX_SLOTS; $slot++) {
+		for ($slot = 1; $slot <= config('game.max_slots'); $slot++) {
 			if (in_array($slots->{'i' . $slot}, $ringIds, true)) {
 				$slots->{'i' . $slot} = 0;
 			}

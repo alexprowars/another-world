@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\Exception;
 use App\Http\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Throwable;
 
@@ -12,29 +15,42 @@ class AvatarController extends Controller
 {
 	public function index(Request $request)
 	{
-		if ($request->has('image')) {
+		$images = [1, 2, 3, 4, 5];
+
+		if ($request->isMethod('post')) {
+			$data = $request->validate([
+				'image' => ['required', 'integer', Rule::in($images)],
+			], [
+				'image.*' => 'Выберите один из пяти бесплатных образов.',
+			]);
+
 			try {
-				if ($this->user->image) {
-					throw new Exception('Вы не можете установить образ!');
-				}
+				DB::transaction(function () use ($request, $data) {
+					$user = User::query()
+						->lockForUpdate()
+						->findOrFail($request->user()->id);
 
-				$image = $request->integer('image');
+					$imageId = (int) pathinfo($user->image ?? '', PATHINFO_FILENAME);
 
-				if ($image && $image < 6) {
-					$this->user->image = 'images/' . ($this->user->gender == 'F' ? 2 : 1) . '/' . $image . '.jpg';
-					$this->user->update();
+					if ($imageId >= 1 && $imageId <= 49) {
+						throw new Exception('Вы не можете установить образ!');
+					}
 
-					throw new Exception('Образ установлен!');
-				}
+					$path = 'images/' . ($user->gender === 'F' ? 2 : 1) . '/' . $data['image'] . '.jpg';
+
+					$user->update(['image' => $path]);
+				}, 3);
+
+				Inertia::flash(['message' => 'Образ установлен!']);
 			} catch (Throwable $e) {
 				Inertia::flash(['message' => $e->getMessage()]);
-
-				return back();
 			}
+
+			return to_route('person.avatar');
 		}
 
 		return Inertia::render('Person/Avatar', [
-			'images' => [1, 2, 3, 4, 5],
+			'images' => $images,
 		]);
 	}
 }

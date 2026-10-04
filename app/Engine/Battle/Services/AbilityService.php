@@ -115,8 +115,8 @@ class AbilityService
 
 		$stats->min += $effect->damageBonus;
 		$stats->max += $effect->damageBonus;
-		$stats->krit += $effect->critBonus;
-		$stats->uv += $effect->dodgeBonus;
+		$stats->forceCrit = $effect->forceCrit;
+		$stats->forceDodge = $effect->forceDodge;
 		$stats->damageReduction += $effect->damageReduction;
 
 		return $stats;

@@ -27,13 +27,12 @@ class BattleStateResource extends JsonResource
 			'kicks' => $state->limits['hits'],
 			'blocks' => $state->limits['blocks'],
 			'abilities' => $this->abilities(),
-			'user' => $this->participant($state->user, $state->userItems, $state->user->tribe),
+			'user' => $this->participant($state->user, $state->userItems),
 			'teams' => $this->teams(),
 			'opponent_id' => $state->opponent?->id,
 			'opponent' => $state->opponent === null ? null : $this->participant(
 				$state->opponent->user,
 				$state->opponentItems,
-				$state->opponent->user->tribe_id,
 			),
 			'damage' => $state->fighter->damage,
 			'id' => $state->user->battle_id,
@@ -76,7 +75,7 @@ class BattleStateResource extends JsonResource
 		return $state->battle->result?->forSide($state->fighter->side)->value;
 	}
 
-	private function participant(User $user, array $items, mixed $tribe): array
+	private function participant(User $user, array $items): array
 	{
 		return [
 			'id' => $user->id,
@@ -86,7 +85,7 @@ class BattleStateResource extends JsonResource
 			'energy' => (int) floor($user->energy_now),
 			'energy_max' => $user->energy_max,
 			'level' => $user->level,
-			'tribe' => $tribe,
+			'tribe' => $user->tribe?->only(['id', 'name']),
 			'name' => $user->name,
 			'avatar' => $user->getAvatar(),
 			'items' => $items,

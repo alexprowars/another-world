@@ -55,8 +55,8 @@
 								<tr>
 									<th>Уровень</th>
 									<th>Ап</th>
-									<th>Золото</th>
-									<th>Сумма золота</th>
+									<th>Платина</th>
+									<th>Сумма платины</th>
 									<th>Характеристики</th>
 									<th>Сумма характеристик</th>
 									<th>Опыт</th>
@@ -68,8 +68,8 @@
 								<tr v-for="level in page.levels" :key="level.id">
 									<td>{{ level.level }}</td>
 									<td>{{ level.up }}</td>
-									<td>{{ level.gold }}</td>
-									<td>{{ level.totalGold }}</td>
+									<td>{{ level.credits }}</td>
+									<td>{{ level.totalCredits }}</td>
 									<td>{{ level.updates }}</td>
 									<td>{{ level.totalUpdates }}</td>
 									<td>{{ level.exp }}</td>

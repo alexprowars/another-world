@@ -107,21 +107,21 @@ class LibraryController extends Controller
 
 	private function levels(): array
 	{
-		$gold = 0;
+		$credits = 0;
 		$updates = 0;
 		$base = 0;
 		$result = [];
 
 		foreach (Level::query()->orderBy('exp')->orderBy('id')->get() as $level) {
-			$gold += $level->credits;
+			$credits += $level->credits;
 			$updates += $level->updates;
 
 			$result[] = [
 				'id' => $level->id,
 				'level' => $level->level,
 				'up' => $level->up,
-				'gold' => $level->credits,
-				'totalGold' => $gold,
+				'credits' => $level->credits,
+				'totalCredits' => $credits,
 				'updates' => $level->updates,
 				'totalUpdates' => $updates,
 				'exp' => $level->exp,

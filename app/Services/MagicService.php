@@ -40,14 +40,15 @@ class MagicService
 		$targetBattleId = $targetBefore->battle_id;
 
 		return DB::transaction(function () use ($user, $itemId, $targetId, $targetBattleId, $battleId, $round) {
-			// Тот же порядок блокировок, что при обработке ходов: сначала бой, затем игроки.
 			$battles = Battle::query()
 				->whereIn('id', array_filter([$battleId, $targetBattleId]))
 				->orderBy('id')
 				->lockForUpdate()
 				->get()
 				->keyBy('id');
+
 			$battle = $battles->get($battleId);
+
 			$users = User::query()
 				->whereIn('id', [$user->id, $targetId])
 				->orderBy('id')
@@ -148,7 +149,6 @@ class MagicService
 
 			self::consume($caster, $item);
 
-			// После снятия экипировки или исчезновения свитка пересчитываем пределы HP и MP.
 			foreach ($users as $participant) {
 				$participant->fresh()->calculate();
 			}
@@ -215,7 +215,7 @@ class MagicService
 		if ($item->wearout >= $item->wearout_max) {
 			$slots = $caster->getSlot();
 
-			for ($slot = 1; $slot <= $slots::MAX_SLOTS; $slot++) {
+			for ($slot = 1; $slot <= config('game.max_slots'); $slot++) {
 				if ($slots->{'i' . $slot} === $item->id) {
 					$slots->{'i' . $slot} = 0;
 				}

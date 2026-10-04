@@ -176,7 +176,9 @@ class BattleEngine
 
 	private function prepareState(TurnData $turn, int $lastLogId, bool $roundExpired, ?string $message, CarbonImmutable $time): BattleState
 	{
-		$timeout = $this->battle->timeout - $this->battle->round_at->diffInSeconds($time);
+		$timeout = max(0, (int) ceil(
+			$this->battle->timeout - $this->battle->round_at->diffInSeconds($time)
+		));
 
 		$limits = $this->turnService->getLimits($this->user);
 
@@ -203,7 +205,9 @@ class BattleEngine
 			}
 
 			if ($opponent !== null && $timeout) {
+				$opponent->user->loadMissing('tribe');
 				$opponent->user->calculate(time: $time);
+
 				$opponentItems = $opponent->user->getSlotsInfo();
 			} else {
 				$opponent = null;
@@ -268,7 +272,7 @@ class BattleEngine
 			logs: $logs,
 			limits: $limits,
 			time: $time,
-			timeoutLeft: (int) max(0, $timeout),
+			timeoutLeft: $timeout,
 			roundExpired: $roundExpired,
 			message: $message,
 		);

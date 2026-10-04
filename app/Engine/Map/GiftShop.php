@@ -147,11 +147,11 @@ class GiftShop
 				throw new Exception('Этот предмет уже был подарен ранее!');
 			}
 
-			$text = htmlspecialchars(addslashes(request()->post('text', '')));
+			$text = strip_tags(request()->string('text')->toString());
 
 			$gift = $info->gifts()->make([
 				'from' => $from,
-				'text' => $text ?: null,
+				'text' => $text === '' ? null : $text,
 			]);
 
 			$gift->item()->associate($object);
@@ -186,7 +186,9 @@ class GiftShop
 
 	protected function buy(int $itemId)
 	{
-		$item = ShopItem::query()->findOne($itemId);
+		$item = ShopItem::query()
+			->where('shop_id', 4)
+			->findOne($itemId);
 
 		if (!$item) {
 			throw new Exception('Предмет не найден в магазине');

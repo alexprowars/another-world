@@ -23,6 +23,12 @@ class UserService
 {
 	public static function creation(array $data, bool $notify = false): User
 	{
+		$gender = $data['gender'] ?? null;
+
+		if ($gender !== null && !in_array($gender, ['M', 'F'], true)) {
+			throw new Exception('Выберите пол персонажа из списка.');
+		}
+
 		if (empty($data['password'])) {
 			$data['password'] = Str::random(10);
 		}
@@ -31,6 +37,7 @@ class UserService
 			'email' => $data['email'] ?? '',
 			'password' => Hash::make($data['password']),
 			'name' => $data['name'] ?? '',
+			'gender' => $gender,
 			'ip' => Request::ip(),
 			'online' => now(),
 			'locale' => Locale::getPreferredLocale(),
@@ -93,25 +100,34 @@ class UserService
 			throw new Exception('Такого приёма не существует');
 		}
 
-		if ($user->level < $ability->level) {
-			throw new Exception('Уровень слишком мал!');
-		}
+		DB::transaction(function () use ($user, $ability, $abilityId) {
+			$user->refreshForUpdate();
 
-		$active = $user->abilities()
-			->pluck('ability', 'slot');
-
-		$slot = 1;
-
-		for ($i = 1; $i <= 10; $i++) {
-			if (!isset($active[$i])) {
-				$slot = $i;
-				break;
+			if ($user->level < $ability->level) {
+				throw new Exception('Уровень слишком мал!');
 			}
-		}
 
-		$user->abilities()->updateOrCreate(['slot' => $slot], [
-			'ability' => $abilityId,
-		]);
+			$active = $user->abilities()
+				->pluck('ability', 'slot');
+
+			$slot = null;
+
+			for ($i = 1; $i <= 10; $i++) {
+				if (!isset($active[$i])) {
+					$slot = $i;
+					break;
+				}
+			}
+
+			if ($slot === null) {
+				throw new Exception('Все 10 слотов приёмов заняты. Сначала уберите один из выбранных приёмов.');
+			}
+
+			$user->abilities()->create([
+				'slot' => $slot,
+				'ability' => $abilityId,
+			]);
+		}, 3);
 	}
 
 	public static function deactivateAbility(User $user, int $slot): void

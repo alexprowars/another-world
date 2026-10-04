@@ -34,3 +34,4 @@ app/config/*.ini
 .playwright-cli
 *.md
 /tmp
+/storage/assets

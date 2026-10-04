@@ -29,7 +29,7 @@ return new class extends Migration {
 			$table->unsignedTinyInteger('up')->default(0);
 			$table->unsignedTinyInteger('updates')->default(3);
 			$table->decimal('gold', 12, 2)->default(0);
-			$table->float('credits', 2)->default(0);
+			$table->decimal('credits', 12, 2)->default(0);
 			$table->unsignedSmallInteger('wins')->default(0);
 			$table->unsignedSmallInteger('losses')->default(0);
 			$table->unsignedSmallInteger('draws')->default(0);

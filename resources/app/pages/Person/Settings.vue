@@ -38,6 +38,22 @@
 				<div v-if="Object.keys(profileForm.errors).length" class="ui-notice ui-notice--red ui-notice--compact" role="alert">
 					<p v-for="(error, field) in profileForm.errors" :key="field">{{ error }}</p>
 				</div>
+				<div v-if="!page.gender" class="ui-notice ui-notice--compact" role="status">
+					<p>Выберите пол персонажа и сохраните анкету. Это необходимо для заключения брака.</p>
+				</div>
+				<label class="person-form-field">
+					<span>Пол персонажа</span>
+					<select
+						class="ui-input ui-input--compact"
+						v-model="profileForm.gender"
+						required
+						:class="{ 'is-invalid': profileForm.errors.gender }"
+					>
+						<option disabled value="">Выберите пол</option>
+						<option value="M">Мужской</option>
+						<option value="F">Женский</option>
+					</select>
+				</label>
 				<label class="person-form-field">
 					<span>Город</span>
 					<input
@@ -180,6 +196,7 @@
 
 	const profileForm = useForm({
 		action: 'profile',
+		gender: props.page.gender ?? '',
 		city: props.page.city ?? '',
 		about: props.page.about ?? ''
 	});

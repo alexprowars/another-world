@@ -156,6 +156,7 @@
 
 	let refreshTimer;
 	let timeoutTimer;
+	let timeoutDeadline;
 	let refreshPending = false;
 	let unmounted = false;
 
@@ -328,9 +329,7 @@
 			return;
 		}
 
-		if (res.timeout_left) {
-			startTimeout(res.timeout_left);
-		}
+		startTimeout(res.timeout_left);
 
 		if (res.action === 'userDead') {
 			selectedEnemy.value = 0;
@@ -341,22 +340,29 @@
 
 	function startTimeout(leftTime) {
 		clearTimeout(timeoutTimer);
-		tickTimeout(leftTime);
-	}
+		timeoutDeadline = performance.now() + Math.max(0, leftTime) * 1000;
 
-	function tickTimeout(leftTime) {
-		const next = leftTime - 1;
-
-		if (next <= 0) {
+		if (leftTime <= 0) {
 			timeoutText.value = '';
-			refresh();
-			clearTimeout(refreshTimer);
-			refreshTimer = setTimeout(loaderRefresh, 45000);
+			timeoutTimer = setTimeout(tickTimeout, 1000);
 			return;
 		}
 
-		let sec = next % 60;
-		let min = Math.floor(next / 60);
+		tickTimeout();
+	}
+
+	function tickTimeout() {
+		const leftTime = Math.ceil((timeoutDeadline - performance.now()) / 1000);
+
+		if (leftTime <= 0) {
+			timeoutText.value = '';
+			refresh();
+			timeoutTimer = setTimeout(tickTimeout, 1000);
+			return;
+		}
+
+		let sec = leftTime % 60;
+		let min = Math.floor(leftTime / 60);
 
 		if (sec < 10) {
 			sec = `0${sec}`;
@@ -371,7 +377,7 @@
 		}
 
 		timeoutText.value = `${min} мин. ${sec} сек.`;
-		timeoutTimer = setTimeout(() => tickTimeout(next), 1000);
+		timeoutTimer = setTimeout(tickTimeout, 1000);
 	}
 
 	function toggleEnemyList() {

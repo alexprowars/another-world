@@ -58,9 +58,10 @@ class AttackCalculator
 
 		$experienceMultiplier = 1;
 
-		if ($dodgeChance > $dodgeRoll) {
+		// Гарантированный уворот сильнее гарантированного крита, который обходит случайный уворот.
+		if ($defender->forceDodge || (!$attacker->forceCrit && $dodgeChance > $dodgeRoll)) {
 			$actionByHit[1] = 'uvorot';
-		} elseif ($critChance > $critRoll) {
+		} elseif ($attacker->forceCrit || $critChance > $critRoll) {
 			$baseMinDamage = $attacker->getMinDamage($attackMinDamage);
 			$baseMaxDamage = $attacker->getMaxDamage($attackMaxDamage);
 

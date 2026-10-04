@@ -92,6 +92,10 @@ class LoginController extends Controller
 			Auth::login($user, true);
 		}
 
+		if (Auth::user()->gender === null) {
+			return redirect()->route('person.settings');
+		}
+
 		return redirect()->away('/game');
 	}
 }

@@ -1,6 +1,8 @@
 <?php
 
 return [
+	'max_slots' => 22,
+
 	'healer' => [
 		'move_stat_price' => 15,
 		'dispel_price' => 1,

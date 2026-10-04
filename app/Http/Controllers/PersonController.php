@@ -149,9 +149,11 @@ class PersonController extends Controller
 					break;
 				case 'profile':
 					$data = $request->validate([
+						'gender' => ['required', Rule::in(['M', 'F'])],
 						'city' => ['present', 'nullable', 'string', 'max:255'],
 						'about' => ['present', 'nullable', 'string', 'max:10000'],
 					], [
+						'gender.*' => 'Выберите пол персонажа из списка.',
 						'city.*' => 'Город должен быть строкой длиной не более 255 символов.',
 						'about.*' => 'Рассказ о себе должен быть текстом длиной не более 10 000 символов.',
 					]);
@@ -206,6 +208,7 @@ class PersonController extends Controller
 
 		return Inertia::render('Person/Settings', [
 			'options' => ['presence_status' => $user->options['presence_status'] ?? 0],
+			'gender' => $user->gender,
 			'city' => $user->city,
 			'about' => $user->about,
 		]);

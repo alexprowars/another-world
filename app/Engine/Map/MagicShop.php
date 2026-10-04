@@ -51,7 +51,9 @@ class MagicShop
 
 	protected function buy(int $itemId)
 	{
-		$item = ShopItem::query()->findOne($itemId);
+		$item = ShopItem::query()
+			->where('shop_id', 3)
+			->findOne($itemId);
 
 		if (!$item) {
 			throw new Exception('Предмет не найден в магазине');

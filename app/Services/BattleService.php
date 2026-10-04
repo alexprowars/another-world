@@ -51,8 +51,50 @@ class BattleService
 
 	public static function fight(User $user, User $enemy, int $type = 1): void
 	{
+		$enemyId = $enemy->id;
+		$enemyBattleId = $enemy->battle_id;
+
+		DB::transaction(function () use ($user, $enemyId, $enemyBattleId, $type) {
+			$battle = $enemyBattleId
+				? Battle::query()->lockForUpdate()->find($enemyBattleId)
+				: null;
+
+			$participants = User::query()
+				->whereKey([$user->id, $enemyId])
+				->orderBy('id')
+				->lockForUpdate()
+				->get()
+				->keyBy('id');
+
+			$player = $participants->get($user->id);
+			$enemy = $participants->get($enemyId);
+
+			if (!$player || !$enemy) {
+				throw new Exception('Противник не найден');
+			}
+
+			if ($enemy->battle_id !== $enemyBattleId) {
+				throw new Exception('Состояние боя изменилось. Обновите данные');
+			}
+
+			$enemy->setRelation('battle', $battle);
+
+			self::fightLocked($player, $enemy, $type);
+		}, 3);
+	}
+
+	private static function fightLocked(User $user, User $enemy, int $type = 1): void
+	{
 		if ($enemy->is($user)) {
 			throw new Exception('Нападение на самого себя - это уже мазохизм...');
+		}
+
+		if ($user->battle_id) {
+			throw new Exception('Вы уже участвуете в бою');
+		}
+
+		if ($type == 2 && $user->room != 2) {
+			throw new Exception('Начать тренировку можно только в тренировочном зале');
 		}
 
 		if ($type == 2 && $enemy->rank != 60) {
@@ -182,7 +224,6 @@ class BattleService
 		}
 	}
 
-	/** Вызывается MagicService внутри транзакции с блокировками боя и участников. */
 	public static function attackWithMagic(User $user, User $enemy, bool $blood): void
 	{
 		if ($user->is($enemy)) {
@@ -241,7 +282,7 @@ class BattleService
 			}
 		}
 
-		self::fight($user, $enemy);
+		self::fightLocked($user, $enemy);
 
 		$battle = $user->battle;
 
@@ -256,7 +297,6 @@ class BattleService
 		$battle->save();
 	}
 
-	/** Вызывается MagicService внутри транзакции с блокировками боя и участников. */
 	public static function changeSideWithMagic(User $user, User $target): void
 	{
 		if ($user->is($target)) {
@@ -304,7 +344,6 @@ class BattleService
 		}
 	}
 
-	/** Вызывается MagicService внутри транзакции с блокировкой пользователя. */
 	public static function fightMirror(User $user): void
 	{
 		if ($user->battle_id || self::getCurrentUserRequest($user)) {
@@ -349,7 +388,7 @@ class BattleService
 			$copy->user()->associate($clone);
 			$copy->save();
 
-			for ($slot = 1; $slot <= $cloneSlots::MAX_SLOTS; $slot++) {
+			for ($slot = 1; $slot <= config('game.max_slots'); $slot++) {
 				if ($user->getSlot()->{'i' . $slot} === $item->id) {
 					$cloneSlots->{'i' . $slot} = $copy->id;
 				}
@@ -364,7 +403,7 @@ class BattleService
 			$copy->save();
 		}
 
-		self::fight($user, $clone->fresh());
+		self::fightLocked($user, $clone->fresh());
 	}
 
 	public static function getCurrentUserRequest(User $user): ?BattleMember

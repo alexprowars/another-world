@@ -198,6 +198,10 @@ class RoundResolver
 			$defenceLog->block ?? [],
 		);
 
+		// Гарантированные эффекты действуют только на первый соответствующий удар.
+		$attackerStats->forceCrit = false;
+		$defenderStats->forceDodge = false;
+
 		$this->applyAttackResult($attackLog, $defenceLog, $attack, $time);
 	}
 

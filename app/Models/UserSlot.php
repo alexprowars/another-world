@@ -14,8 +14,6 @@ class UserSlot extends Model
 
 	public $timestamps = false;
 
-	public const int MAX_SLOTS = 22;
-
 	protected static function booted(): void
 	{
 		self::saved(function (self $slot) {
@@ -51,7 +49,7 @@ class UserSlot extends Model
 	{
 		$result = [];
 
-		for ($i = 1; $i <= self::MAX_SLOTS; $i++) {
+		for ($i = 1; $i <= config('game.max_slots'); $i++) {
 			if ($this->{'i' . $i} > 0) {
 				$result[] = $this->{'i' . $i};
 			}

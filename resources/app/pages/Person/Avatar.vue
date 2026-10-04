@@ -12,7 +12,9 @@
 
 		<div class="text-center text-sm font-bold mb-4">Внимание! Выбрав образ сейчас, Вы более не сможете его сменить!</div>
 
-		<div v-if="user.image" class="text-center font-bold">У вас уже установлен образ. Сменить его вы сможете только в здании администрации.</div>
+		<div v-if="form.errors.image" class="ui-notice ui-notice--red" role="alert">{{ form.errors.image }}</div>
+
+		<div v-if="imageId >= 1 && imageId <= 49" class="text-center font-bold">У вас уже установлен образ. Сменить его вы сможете только в здании администрации.</div>
 		<div v-else class="flex gap-4 justify-center">
 			<div v-for="i in page.images">
 				<a href="" @click.prevent="changeImage(i)">
@@ -37,6 +39,10 @@
 
 	const state = useState();
 	const user = computed(() => state.user);
+	const imageId = computed(() => Number.parseInt(user.value.image?.split('/').pop() ?? '', 10));
+	const form = useForm({
+		image: null
+	});
 
 	function changeImage(i) {
 		openConfirmModal('Подтвердите действие', 'Применить это образ?', [
@@ -44,9 +50,8 @@
 			{
 				title: 'Да',
 				handler() {
-					useForm({
-						image: i,
-					}).post('/person/avatar');
+					form.image = i;
+					form.post('/person/avatar');
 				},
 			},
 		]);

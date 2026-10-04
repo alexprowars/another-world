@@ -31,13 +31,14 @@
 				<h2 class="person-section-heading">Доступные приёмы</h2>
 				<span class="person-section-count">{{ Object.keys(page.items).length }}</span>
 			</div>
+			<p v-if="activeCount >= 10" class="person-page-hint">Все 10 слотов заняты. Уберите один из выбранных приёмов, чтобы добавить другой.</p>
 			<div class="person-ability-list">
 				<AbilityCard
 					v-for="(item, id) in page.items"
 					:key="id"
 					:item="item"
 					:ability-id="id"
-					:processing="form.processing"
+					:disabled="form.processing || activeCount >= 10"
 					@activate="activateAbility(id)"
 				/>
 			</div>

@@ -112,7 +112,7 @@ class InventoryService
 
 		$items = $slots->getItemsId();
 
-		for ($i = 1; $i <= $slots::MAX_SLOTS; $i++) {
+		for ($i = 1; $i <= config('game.max_slots'); $i++) {
 			$slots->{'i' . $i} = 0;
 		}
 
