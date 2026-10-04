@@ -1,0 +1,8 @@
+.ability-icon {
+	box-sizing: content-box;
+	padding: 2px;
+	border: 1px solid #968366;
+	border-radius: 3px;
+	background: linear-gradient(135deg, #b6a07a, #302b26 45%, #77634a);
+	box-shadow: inset 0 0 0 1px #28241e, 0 1px 2px #00000030;
+}

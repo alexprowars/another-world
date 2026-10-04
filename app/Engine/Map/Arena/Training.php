@@ -5,6 +5,7 @@ namespace App\Engine\Map\Arena;
 use App\Exceptions\Exception;
 use App\Models\User;
 use App\Services\BattleService;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class Training
@@ -17,10 +18,14 @@ class Training
 			$enemy = User::findOne($request->integer('fight'));
 
 			if (!$enemy) {
-				throw new Exception('Противник не найден');
+				throw ValidationException::withMessages(['fight' => 'Противник не найден']);
 			}
 
-			BattleService::fight($request->user(), $enemy, 2);
+			try {
+				BattleService::fight($request->user(), $enemy, 2);
+			} catch (Exception $e) {
+				throw ValidationException::withMessages(['fight' => strip_tags($e->getMessage())]);
+			}
 
 			return to_route('battle');
 		}

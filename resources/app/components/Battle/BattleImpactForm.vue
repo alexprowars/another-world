@@ -22,10 +22,10 @@
 						class="battle-impact-form__area"
 						:class="{ 'is-selected': selectedImpacts[area.key] }"
 						:title="area.title + (selectedImpacts[area.key] ? ' — выбрано' : '')"
-						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
+						:style="{ height: `${area.height}px`, '--area-offset': `-${area.offset}px` }"
 						@click="toggleImpact(area.key)"
 					>
-						<img :src="`/assets/images/battle/impact_action_${selectedImpacts[area.key] ? 'true' : 'false'}.gif`" alt="" />
+						<img class="battle-impact-form__action" src="/assets/images/battle/impact_action.png" width="15" height="14" alt="" />
 					</button>
 				</div>
 			</div>
@@ -38,10 +38,10 @@
 						class="battle-impact-form__area"
 						:class="{ 'is-selected': selectedBlocks[area.key] }"
 						:title="area.title + (selectedBlocks[area.key] ? ' — выбрано' : '')"
-						:style="{ height: `${area.height}px`, backgroundImage: 'url(' + area.background + ')' }"
+						:style="{ height: `${area.height}px`, '--area-offset': `-${area.offset}px` }"
 						@click="toggleBlock(area.key)"
 					>
-						<img :src="`/assets/images/battle/block_action_${selectedBlocks[area.key] ? 'true' : 'false'}.gif`" alt="" />
+						<img class="battle-impact-form__action" src="/assets/images/battle/block_action.png" width="13" height="13" alt="" />
 					</button>
 				</div>
 			</div>
@@ -76,11 +76,11 @@
 	const emit = defineEmits(['update:auto', 'complete']);
 
 	const areas = [
-		{ key: 'head', title: 'Голова', height: 27, background: '/assets/images/battle/f_head.gif' },
-		{ key: 'case', title: 'Грудь', height: 25, background: '/assets/images/battle/f_grud.gif' },
-		{ key: 'stomach', title: 'Живот', height: 24, background: '/assets/images/battle/f_zhiv.gif' },
-		{ key: 'belt', title: 'Пах', height: 27, background: '/assets/images/battle/f_poyas.gif' },
-		{ key: 'legs', title: 'Ноги', height: 27, background: '/assets/images/battle/f_nogi.gif' },
+		{ key: 'head', title: 'Голова', height: 27, offset: 0 },
+		{ key: 'case', title: 'Грудь', height: 24, offset: 27 },
+		{ key: 'stomach', title: 'Живот', height: 23, offset: 51 },
+		{ key: 'belt', title: 'Пах', height: 26, offset: 74 },
+		{ key: 'legs', title: 'Ноги', height: 30, offset: 100 },
 	];
 
 	const selectedImpacts = reactive(emptySelection());

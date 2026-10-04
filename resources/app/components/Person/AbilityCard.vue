@@ -1,6 +1,6 @@
 <template>
 	<article class="person-ability" :class="{ 'is-equipped': item.onset }">
-		<img :src="'/assets/images/battle/abilities/' + abilityId + '.gif'" class="person-ability-icon" alt="" />
+		<img :src="'/assets/images/battle/abilities/' + abilityId + '.png'" class="ability-icon person-ability-icon" :alt="item.name" />
 		<div class="person-ability-description">
 			<div class="person-ability-heading">
 				<h3>{{ item.name }}</h3>

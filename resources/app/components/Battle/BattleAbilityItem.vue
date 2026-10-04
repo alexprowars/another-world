@@ -1,13 +1,12 @@
 <template>
-	<div v-if="!priem || priem.id === 0">
-		<img width="40" height="25" src="/assets/images/battle/abilities/clear.gif" title="Пустой слот приёма" alt="" />
-	</div>
+	<div v-if="!priem || priem.id === 0" class="battle-ability-empty" title="Пустой слот приёма"></div>
 	<Popper v-else placement="top" popper-class="battle-ability-popper">
 		<img
-			:class="{ 'cursor-pointer': priem.w === 0 }"
-			width="40"
-			height="25"
-			:src="`/assets/images/battle/abilities/${priem.id}${priem.w === 1 ? 'n' : ''}.gif`"
+			class="ability-icon battle-ability-icon"
+			:class="{ 'cursor-pointer': priem.w === 0, 'is-unavailable': priem.w !== 0 }"
+			width="32"
+			height="20"
+			:src="`/assets/images/battle/abilities/${priem.id}.png`"
 			:alt="priem.n"
 			@click="use"
 		/>

@@ -106,8 +106,10 @@
 			<div class="battle-layout__fighter battle-layout__fighter--right">
 				<BattleFighter v-if="data?.opponent && !isFinished" :fighter="data.opponent" />
 				<div v-else class="battle-no-enemy">
+					<div class="battle-no-enemy__art">
+						<img class="battle-no-enemy__image" src="/assets/images/battle/no_enemy.jpg" width="840" height="1400" alt="Декоративный меч на поле боя" />
+					</div>
 					<p v-if="showNoEnemy">Нет противника в зоне досягаемости…</p>
-					<img src="/assets/images/battle/1.gif" width="210" :height="showNoEnemy ? 277 : 230" alt="" />
 				</div>
 			</div>
 		</div>

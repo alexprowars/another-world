@@ -3,7 +3,7 @@
 		<h2 class="person-info-panel-heading"><GameIcon name="gem" />Особенности</h2>
 		<ul v-if="hasFeatures" class="person-info-features">
 			<li v-if="person.zodiac" class="person-info-zodiac">
-				<img :src="'/assets/images/zodiac/' + person.zodiac.id + '.gif'" :alt="person.zodiac.name" />
+				<img :src="'/assets/images/zodiac/' + person.zodiac.id + '.png'" :alt="person.zodiac.name" width="30" height="30"/>
 				{{ person.zodiac.name }}
 			</li>
 			<li v-if="person.admin"><span class="ui-badge">Администратор Another World</span></li>

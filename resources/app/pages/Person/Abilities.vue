@@ -14,7 +14,7 @@
 			<div v-if="activeCount" class="person-active-abilities">
 				<div v-for="(id, slot) in page.active" :key="slot" class="person-active-ability">
 					<span class="person-ability-slot">{{ slot }}</span>
-					<img :src="'/assets/images/battle/abilities/' + id + '.gif'" class="person-ability-icon" alt="" />
+					<img :src="'/assets/images/battle/abilities/' + id + '.png'" class="ability-icon person-ability-icon" :alt="page.items[id].name" />
 					<span class="person-active-ability-name">{{ page.items[id].name }}</span>
 					<button type="button" class="ui-button ui-button--compact ui-button--secondary" :disabled="form.processing"
 						@click="deactivateAbility(slot)"
