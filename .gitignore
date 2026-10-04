@@ -32,6 +32,9 @@ app/config/*.ini
 /public/hot
 /output
 .playwright-cli
+/docs
 *.md
 /tmp
 /storage/assets
+/app/Engine/Simulation/ProgressionSimulation.php
+/app/Console/Commands/SimulateProgression.php

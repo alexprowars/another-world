@@ -33,8 +33,9 @@ class BattleEngine
 	public function __construct(
 		protected Battle $battle,
 		protected User $user,
+		?Randomizer $randomizer = null,
 	) {
-		$randomizer = new Randomizer();
+		$randomizer ??= new Randomizer();
 
 		$this->rewardService = new RewardService($randomizer);
 		$this->abilityService = new AbilityService();
