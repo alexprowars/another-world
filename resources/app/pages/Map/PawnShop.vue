@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Ломбард">
 		<template #actions>
-			<Link href="/map/change/28" class="ui-icon-button" title="Назад">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -14,11 +14,11 @@
 			<p v-for="(error, key) in form.errors" :key="key">{{ error }}</p>
 		</div>
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link class="ui-tab" href="/map?section=50" :class="{ 'is-active': page.section === 50 }">
+			<Link class="ui-tab" :href="location.url + '?section=50'" :class="{ 'is-active': page.section === 50 }">
 				<GameIcon name="armor" />
 				Мои вещи в ломбарде
 			</Link>
-			<Link class="ui-tab" href="/map?section=100" :class="{ 'is-active': page.section === 100 }">
+			<Link class="ui-tab" :href="location.url + '?section=100'" :class="{ 'is-active': page.section === 100 }">
 				<GameIcon name="coins" />
 				Заложить предмет
 			</Link>
@@ -86,6 +86,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -93,6 +96,8 @@
 	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: Object
@@ -132,7 +137,7 @@
 					form.action = deposit ? 'deposit' : 'withdraw';
 					form.id = entry.item.id;
 					form.clearErrors();
-					form.post('/map?section=' + props.page.section, { preserveScroll: true });
+					form.post(location.value.actions[form.action] + '?section=' + props.page.section, { preserveScroll: true });
 				},
 			},
 		]);

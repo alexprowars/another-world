@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Тюрьма">
 		<template #actions>
-			<Link v-if="!page.until" href="/map/change/666" class="ui-icon-button" title="Назад">
+			<MovementLink v-if="!page.until" :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -74,10 +74,15 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Link, router } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import Timer from '~/components/Timer.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object,

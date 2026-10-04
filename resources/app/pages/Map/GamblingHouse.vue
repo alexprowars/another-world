@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Игорный дом">
 		<template #actions>
-			<Link href="/map/change/12" class="ui-icon-button" title="Вернуться в парк">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться в парк">
 				<GameIcon name="back" />
-			</Link>
-			<Link :href="'/map?game=' + page.game" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url + '?game=' + page.game" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -18,11 +18,11 @@
 		</header>
 
 		<nav class="ui-tabs ui-tabs--stacked gambling-tabs">
-			<Link href="/map?game=dice" class="ui-tab" :class="{ 'is-active': page.game === 'dice' }">
+			<Link :href="location.url + '?game=dice'" class="ui-tab" :class="{ 'is-active': page.game === 'dice' }">
 				<GameIcon name="dice" />
 				Кости
 			</Link>
-			<Link href="/map?game=lottery" class="ui-tab" :class="{ 'is-active': page.game === 'lottery' }">
+			<Link :href="location.url + '?game=lottery'" class="ui-tab" :class="{ 'is-active': page.game === 'lottery' }">
 				<GameIcon name="ticket" />
 				Лотерея
 			</Link>
@@ -39,11 +39,16 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Link } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import Dice from '~/components/GamblingHouse/Dice.vue';
 	import Lottery from '~/components/GamblingHouse/Lottery.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object,

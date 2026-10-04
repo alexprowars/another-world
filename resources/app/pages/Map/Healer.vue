@@ -1,9 +1,9 @@
 <template>
 	<ContentBlock title="Домик Знахаря">
 		<template #actions>
-			<Link href="/map/change/27" class="ui-icon-button" title="Вернуться на Королевскую улицу">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться на Королевскую улицу">
 				<GameIcon name="back" />
-			</Link>
+			</MovementLink>
 			<Link :href="sectionUrl" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
@@ -15,7 +15,7 @@
 		</div>
 
 		<nav class="ui-tabs healer-tabs">
-			<Link v-for="tab in tabs" :key="tab.id" :href="'/map?section=' + tab.id" class="ui-tab" :class="{ 'is-active': page.section === tab.id }">
+			<Link v-for="tab in tabs" :key="tab.id" :href="location.url + '?section=' + tab.id" class="ui-tab" :class="{ 'is-active': page.section === tab.id }">
 				<GameIcon :name="tab.icon" />
 				{{ tab.title }}
 			</Link>
@@ -111,7 +111,6 @@
 			<div v-else class="ui-empty"><GameIcon name="book" /><h3>Рецептов пока нет</h3><p>Загляните в мастерскую позже.</p></div>
 		</section>
 
-
 		<template #footer>
 			<GameIcon name="book" />
 			<span>Для зелий подходят доступные ингредиенты из рюкзака. Экипированные, подаренные и клановые вещи не расходуются.</span>
@@ -120,6 +119,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed, watch } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import { useI18n } from 'vue-i18n';
@@ -130,11 +132,13 @@
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
+	const location = useLocation();
+
 	const props = defineProps({ page: { type: Object, required: true } });
 	const { t } = useI18n();
 	const state = useState();
 	const user = computed(() => state.user);
-	const sectionUrl = computed(() => '/map?section=' + props.page.section);
+	const sectionUrl = computed(() => location.value.url + '?section=' + props.page.section);
 	const tabs = [
 		{ id: 1, title: 'Знахарская', icon: 'shuffle' },
 		{ id: 2, title: 'Алхимка', icon: 'book' },
@@ -149,7 +153,7 @@
 
 		form.action = action;
 		form.id = id;
-		form.post(sectionUrl.value, { preserveScroll: true });
+		form.post(location.value.actions[action] + '?section=' + props.page.section, { preserveScroll: true });
 	}
 
 	function confirmAction(action, title, message, id = null) {

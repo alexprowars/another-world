@@ -102,7 +102,7 @@ class BotsSeed extends Seeder
 				'online' => now(),
 				'locale' => 'ru',
 				'rank' => 60,
-				'room' => 2,
+				'location' => 'valmir.training-arena',
 				'level' => $player['level'],
 				'strength' => $player['strength'],
 				'dexterity' => $player['dexterity'],

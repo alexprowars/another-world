@@ -64,6 +64,8 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import useState from '~/composables/useState.js';
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
@@ -71,6 +73,8 @@
 	import { required } from '@vuelidate/validators';
 	import { closeModals } from '~/composables/useModals.js';
 	import { getItemImagePath } from '~/utils/itemImage.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		item: Object,
@@ -82,7 +86,7 @@
 	const user = computed(() => state.user);
 
 	const form = useForm({
-		gift: props.item.id,
+		item_id: props.item.id,
 		user: '',
 		from: 1,
 		text: '',
@@ -101,7 +105,7 @@
 			return;
 		}
 
-		form.post('', {
+		form.post(location.value.actions.gift, {
 			onSuccess() {
 				closeModals();
 			},

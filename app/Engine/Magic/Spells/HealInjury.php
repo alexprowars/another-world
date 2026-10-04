@@ -36,7 +36,7 @@ class HealInjury extends AbstractSpell
 			throw new Exception('Этим свитком такую травму не вылечить');
 		}
 
-		if ($caster->room !== $target->room) {
+		if ($caster->location !== $target->location) {
 			throw new Exception('Для лечения нужно находиться в одной комнате с персонажем');
 		}
 

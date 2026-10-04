@@ -46,6 +46,8 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Link, useForm, usePage } from '@inertiajs/vue3';
 	import { computed } from 'vue';
 	import useState from '~/composables/useState.js';
@@ -55,18 +57,19 @@
 	import ManaIcon from '~/icons/resources/mana.svg';
 	import StaminaIcon from '~/icons/resources/stamina.svg';
 
+	const location = useLocation();
+
 	const state = useState();
 	const user = computed(() => state.user);
 	const page = usePage();
 
 	const logoutForm = useForm({});
-	const navigation = [
-		{ href: '/map', label: 'Город', icon: 'city' },
+	const navigation = computed(() => [
+		{ href: location.value.url, label: 'Мир', icon: 'map' },
 		{ href: '/person', label: 'Персонаж', icon: 'character' },
 		{ href: '/arena', label: 'Поединки', icon: 'swords' },
-		{ href: '/person/work', label: 'Заработок', icon: 'coins' },
 		{ href: '/library', label: 'Библиотека', icon: 'book' },
-	];
+	]);
 
 	function logout() {
 		if (logoutForm.processing) {
@@ -78,10 +81,6 @@
 
 	function isActive(href) {
 		const path = page.url.split('?')[0];
-
-		if (href === '/person' && path === '/person/work') {
-			return false;
-		}
 
 		return path === href || path.startsWith(href + '/');
 	}

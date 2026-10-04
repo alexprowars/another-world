@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Тренировочный зал для новичков" class="arena-training">
 		<template #actions>
-			<Link v-if="user.room === 2" href="/map/change/2" class="ui-icon-button" title="Назад">
+			<MovementLink v-if="location.code === 'training-arena'" :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -17,10 +17,10 @@
 			<GameIcon name="shield" />
 			<h3>Вы готовы к новым поединкам</h3>
 			<p>В тренировочном зале больше нет подходящих соперников для вашего уровня.</p>
-			<Link v-if="user.room === 2" href="/map/change/2" class="ui-button training-return">
+			<MovementLink v-if="location.code === 'training-arena'" :to="location.exit" class="ui-button training-return">
 				<GameIcon name="back" />
 				Вернуться в общий зал
-			</Link>
+			</MovementLink>
 		</div>
 		<div v-else class="training-layout">
 			<section class="arena-section training-opponents">
@@ -40,8 +40,8 @@
 							<span class="training-opponent-level">Уровень {{ player.level }}</span>
 						</div>
 						<button type="button" class="ui-button" :disabled="form.processing" @click="fightTo(player.id)">
-							<GameIcon :name="form.processing && form.fight === player.id ? 'hourglass' : 'swords'" />
-							{{ form.processing && form.fight === player.id ? 'Начинаем бой…' : 'Начать бой' }}
+							<GameIcon :name="form.processing && form.enemy_id === player.id ? 'hourglass' : 'swords'" />
+							{{ form.processing && form.enemy_id === player.id ? 'Начинаем бой…' : 'Начать бой' }}
 						</button>
 					</li>
 				</ul>
@@ -81,11 +81,16 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object
@@ -96,7 +101,7 @@
 	const user = computed(() => state.user);
 
 	const form = useForm({
-		fight: null
+		enemy_id: null
 	});
 
 	function fightTo(id) {
@@ -104,8 +109,8 @@
 			return;
 		}
 
-		form.fight = id;
+		form.enemy_id = id;
 		form.clearErrors();
-		form.post('', { preserveScroll: true });
+		form.post(location.value.actions.fight, { preserveScroll: true });
 	}
 </script>

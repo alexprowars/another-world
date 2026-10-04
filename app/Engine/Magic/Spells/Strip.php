@@ -2,9 +2,9 @@
 
 namespace App\Engine\Magic\Spells;
 
+use App\Engine\Services\InventoryService;
 use App\Models\User;
 use App\Models\UserItem;
-use App\Services\InventoryService;
 
 class Strip extends AbstractSpell
 {

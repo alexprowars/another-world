@@ -2,10 +2,10 @@
 	<Head title="Администрация" />
 	<ContentBlock title="Администрация">
 		<template #actions>
-			<Link href="/map/change/14" class="ui-icon-button" title="Назад">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -15,7 +15,7 @@
 				class="ui-tab"
 				v-for="(title, index) in sections"
 				:key="index"
-				:href="'/map?section=' + (index + 1)"
+				:href="location.url + '?section=' + (index + 1)"
 				:class="{ 'is-active': page.section === index + 1 }"
 			>
 				<GameIcon :name="['clan', 'justice', 'character', 'book'][index]" />
@@ -36,6 +36,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Head, Link } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
@@ -43,6 +46,8 @@
 	import Requests from '~/components/Administration/Requests.vue';
 	import Images from '~/components/Administration/Images.vue';
 	import ClanArchive from '~/components/Administration/ClanArchive.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object

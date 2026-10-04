@@ -3,12 +3,11 @@
 namespace App\Http\Middleware;
 
 use App\Engine\Battle\Enums\BattleStatus;
-use App\Http\Controllers\ArenaController;
-use App\Http\Controllers\BattleController;
-use App\Http\Controllers\MapController;
-use App\Services\UserService;
+use App\Engine\Services\MovementService;
+use App\Engine\Services\UserService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class GameMiddleware
@@ -23,50 +22,61 @@ class GameMiddleware
 			$user->save();
 		}
 
-		$dispatch = null;
+		MovementService::finishTravel($user);
 
-		if ($user->battle_id && !str_contains($request->route()->uri(), 'chat/')) {
-			$dispatch = in_array($user->battle?->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)
-				? BattleController::class
-				: ArenaController::class;
+		$forcedRoute = null;
+		$forcedLocation = null;
+
+		if ($user->battle_id) {
+			$forcedRoute = in_array($user->battle?->status, [BattleStatus::ACTIVE, BattleStatus::FINISHED], true)
+				? 'battle'
+				: 'arena';
 		} elseif ($user->r_date) {
-			switch ($user->r_type) {
-				case 1:
-					UserService::checkRoom($user, 666);
-					$dispatch = MapController::class;
-					break;
-				case 2:
-					UserService::checkRoom($user, 8);
-					$dispatch = MapController::class;
-					break;
-				case 3:
-					UserService::checkRoom($user, 9);
-					$dispatch = MapController::class;
-					break;
-				case 4:
-					UserService::checkRoom($user, 16);
-					$dispatch = MapController::class;
-					break;
-				case 7:
-					UserService::checkRoom($user, 11);
-					$dispatch = MapController::class;
-					break;
-				case 8:
-				case 10:
-					$dispatch = MapController::class;
-					break;
+			$code = match ($user->r_type) {
+				1 => 'prison',
+				2 => 'hospital',
+				3 => 'academy',
+				4 => 'works',
+				7 => 'smithy',
+				default => null,
+			};
+
+			if ($code !== null) {
+				UserService::checkLocation($user, $user->currentLocation()->inCity($code)->value());
 			}
+
+			$forcedLocation = $user->currentLocation();
 		} elseif ($user->prison) {
-			UserService::checkRoom($user, 666);
-			$dispatch = MapController::class;
+			UserService::checkLocation($user, $user->currentLocation()->inCity('prison')->value());
+			$forcedLocation = $user->currentLocation();
 		}
 
-		if ($dispatch) {
-			$controller = $request->route()->getController();
+		$redirectUrl = null;
 
-			if ($controller && get_class($controller) !== $dispatch) {
-				return redirect()->action([$dispatch, 'index']);
+		if (!$request->routeIs('world', 'city')) {
+			if ($forcedRoute !== null && !$request->routeIs($forcedRoute, $forcedRoute . '.store')) {
+				$redirectUrl = route($forcedRoute);
+			} elseif ($forcedLocation !== null) {
+				$requestedLocation = $request->route('city') . '.' . $request->route('locationCode');
+
+				if ($request->route('vaultRoom') !== null) {
+					$requestedLocation .= '.' . $request->route('vaultRoom');
+				}
+
+				if ($requestedLocation !== $forcedLocation->value()) {
+					$redirectUrl = $forcedLocation->url();
+				}
 			}
+		}
+
+		if ($redirectUrl !== null) {
+			if (!$request->isMethod('get')) {
+				throw ValidationException::withMessages([
+					'location' => 'Сейчас персонаж занят. Вернитесь к текущему действию.',
+				]);
+			}
+
+			return redirect($redirectUrl);
 		}
 
 		$user->rating = UserService::getUserRaiting($user);

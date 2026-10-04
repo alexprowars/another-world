@@ -1,13 +1,13 @@
 <template>
 	<ContentBlock title="Рынок">
 		<template #actions>
-			<Link href="/map/change/20" class="ui-icon-button" title="Назад">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map?section=100" class="ui-icon-button" title="Продать предметы">
+			</MovementLink>
+			<Link :href="location.url + '?section=100'" class="ui-icon-button" title="Продать предметы">
 				<GameIcon name="coins" />
 			</Link>
-			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -17,22 +17,22 @@
 			<p v-for="(error, key) in form.errors" :key="key">{{ error }}</p>
 		</div>
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link class="ui-tab" href="/map" :class="{ 'is-active': page.section < 100 }">
+			<Link class="ui-tab" :href="location.url" :class="{ 'is-active': page.section < 100 }">
 				<GameIcon name="coins" />
 				Купить
 			</Link>
-			<Link class="ui-tab" href="/map?section=100" :class="{ 'is-active': page.section === 100 }">
+			<Link class="ui-tab" :href="location.url + '?section=100'" :class="{ 'is-active': page.section === 100 }">
 				<GameIcon name="transfer" />
 				Выставить предмет
 			</Link>
-			<Link class="ui-tab" href="/map?section=101" :class="{ 'is-active': page.section === 101 }">
+			<Link class="ui-tab" :href="location.url + '?section=101'" :class="{ 'is-active': page.section === 101 }">
 				<GameIcon name="armor" />
 				Мои товары
 			</Link>
 		</nav>
 		<div class="storefront-layout" :class="{ 'storefront-layout--inventory': page.section >= 100 }">
 			<nav v-if="page.section < 100" class="ui-menu storefront-departments">
-				<Link href="/map" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
+				<Link :href="location.url" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
 					Новые поступления
 					<GameIcon name="forward" />
 				</Link>
@@ -42,7 +42,7 @@
 						<Link
 							v-for="[id, title] in group.sections"
 							:key="id"
-							:href="'/map?section=' + id"
+							:href="location.url + '?section=' + id"
 							class="ui-menu-link"
 							:class="{ 'is-active': page.section === id }"
 						>
@@ -147,6 +147,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed, reactive } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -154,6 +157,8 @@
 	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: Object
@@ -237,7 +242,7 @@
 
 		form.clearErrors();
 
-		form.post('/map?section=' + props.page.section, {
+		form.post(location.value.actions[action] + '?section=' + props.page.section, {
 			preserveScroll: true
 		});
 	}

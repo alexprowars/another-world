@@ -27,7 +27,7 @@
 				<tbody>
 					<tr v-for="entry in page.friends" :key="entry.id">
 						<td class="person-friend-name"><Name :player="entry.user" /></td>
-						<td data-label="Комната">{{ $t('rooms.' + entry.user.room) }}</td>
+						<td data-label="Локация">{{ entry.user.location_name }}</td>
 						<td data-label="Отношение">
 							<span class="person-relation" :class="{ 'is-ignored': entry.is_ignored }">
 								{{ entry.is_ignored ? 'Враг · игнор' : 'Друг' }}

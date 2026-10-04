@@ -29,7 +29,13 @@ class Chains extends AbstractSpell
 
 		$target->prison = now()->addMinutes(15);
 		$target->prison_reason = 'Донос на персонажа';
-		$target->room = 666;
+		$target->location = $target->currentLocation()->inCity('prison')->value();
+
+		if ($target->r_type == 10) {
+			$target->vault_destination_id = null;
+			$target->r_date = null;
+			$target->r_type = null;
+		}
 
 		return 'На персонажа ' . $target->name . ' поступил донос. Он отправлен в тюрьму на 15 минут.';
 	}

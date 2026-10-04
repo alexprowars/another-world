@@ -1,9 +1,9 @@
 <template>
 	<ContentBlock title="Амбар">
 		<template #actions>
-			<Link href="/map/change/19" class="ui-icon-button" title="Вернуться на Промышленную улицу">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться на Промышленную улицу">
 				<GameIcon name="back" />
-			</Link>
+			</MovementLink>
 			<Link :href="sectionUrl" class="ui-icon-button" title="Обновить отдел">
 				<GameIcon name="refresh" />
 			</Link>
@@ -16,11 +16,11 @@
 
 		<div class="storefront-toolbar">
 			<nav class="ui-tabs storefront-modes">
-				<Link href="/map?section=1" class="ui-tab" :class="{ 'is-active': selling }">
+				<Link :href="location.url + '?section=1'" class="ui-tab" :class="{ 'is-active': selling }">
 					<GameIcon name="gem" />
 					Сдача ресурсов
 				</Link>
-				<Link href="/map?section=2" class="ui-tab" :class="{ 'is-active': !selling }">
+				<Link :href="location.url + '?section=2'" class="ui-tab" :class="{ 'is-active': !selling }">
 					<GameIcon name="tools" />
 					Инструменты
 				</Link>
@@ -105,6 +105,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed, ref, watch } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import { escape } from 'lodash-es';
@@ -114,6 +117,8 @@
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
+	const location = useLocation();
+
 	const props = defineProps({
 		page: { type: Object, required: true },
 	});
@@ -121,7 +126,7 @@
 	const state = useState();
 	const user = computed(() => state.user);
 	const selling = computed(() => props.page.section === 1);
-	const sectionUrl = computed(() => '/map?section=' + props.page.section);
+	const sectionUrl = computed(() => location.value.url + '?section=' + props.page.section);
 	const search = ref('');
 	const form = useForm({ action: null, id: null });
 	const filteredItems = computed(() => {
@@ -145,7 +150,7 @@
 		const action = selling.value ? 'Сдать' : 'Купить';
 		const actionId = selling.value ? 'sell' : 'buy';
 		const itemId = selling.value ? entry.item.id : entry.id;
-		const url = sectionUrl.value;
+		const url = location.value.actions[selling.value ? 'sell' : 'buy'] + '?section=' + props.page.section;
 		const message = action + ' «' + entry.item.title + '» за ' + entry.price + (platinum(entry) ? ' пл.' : ' зол.') + '?';
 
 		openConfirmModal(action + ' предмет', escape(message), [

@@ -32,10 +32,14 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import CatalogItem from '~/components/City/Shop/CatalogItem.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import { useForm } from '@inertiajs/vue3';
 	import { openConfirmModal } from '~/composables/useModals.js';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object,
@@ -69,7 +73,7 @@
 
 					Object.assign(form, { action, id }, data);
 
-					form.post('/map?section=1', {
+					form.post(location.value.actions.repair + '?section=1', {
 						preserveScroll: true
 					});
 				},

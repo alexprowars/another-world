@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Engine\Services\MagicService;
 use App\Models\UserItem;
-use App\Services\MagicService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**

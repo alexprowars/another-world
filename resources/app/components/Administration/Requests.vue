@@ -65,8 +65,12 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		requestPrice: Number,
@@ -87,7 +91,7 @@
 		}
 
 		requestForm.action = props.hasRequest ? 'withdraw' : 'submit';
-		requestForm.post('/map?section=2', {
+		requestForm.post(location.value.actions[requestForm.action], {
 			preserveScroll: true
 		});
 	}

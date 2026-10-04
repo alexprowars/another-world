@@ -44,9 +44,13 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		exchangeRate: Number,
@@ -67,7 +71,7 @@
 			return;
 		}
 
-		exchangeForm.post('/map?section=2', {
+		exchangeForm.post(location.value.actions.exchange, {
 			preserveScroll: true
 		});
 	}

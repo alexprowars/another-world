@@ -2,7 +2,7 @@
 	<Head :title="page.tribe ? 'Клан «' + page.tribe.name + '»' : 'Клан'" />
 	<ContentBlock :title="page.tribe ? 'Клан «' + page.tribe.name + '»' : 'Клан'">
 		<template #actions>
-			<Link href="/map" class="ui-icon-button" title="Вернуться в город">
+			<Link :href="location.url" class="ui-icon-button" title="Вернуться в город">
 				<GameIcon name="back" />
 			</Link>
 			<Link :href="'/tribe?section=' + page.section" class="ui-icon-button" title="Обновить">
@@ -198,12 +198,16 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Head, Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import Name from '~/components/Person/Name.vue';
 	import SellItem from '~/components/City/Shop/SellItem.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: Object

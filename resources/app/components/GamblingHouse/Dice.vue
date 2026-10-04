@@ -85,11 +85,15 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import Die from './Die.vue';
 	import useState from '~/composables/useState.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		stakes: Array,
@@ -133,7 +137,7 @@
 			return;
 		}
 
-		form.post('/map?game=dice', {
+		form.post(location.value.actions.dice, {
 			preserveScroll: true,
 		});
 	}

@@ -2,10 +2,10 @@
 	<Head title="Церковь" />
 	<ContentBlock title="Церковь">
 		<template #actions>
-			<Link href="/map/change/22" class="ui-icon-button" title="Вернуться на Королевскую улицу">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться на Королевскую улицу">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -20,7 +20,7 @@
 		</header>
 
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link href="/map" class="ui-tab is-active">
+			<Link :href="location.url" class="ui-tab is-active">
 				<GameIcon name="rings" />
 				Заключение брака и развод
 			</Link>
@@ -131,10 +131,15 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Head, Link, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object,
@@ -158,7 +163,7 @@
 			return;
 		}
 
-		marriageForm.post('/map', {
+		marriageForm.post(location.value.actions.marry, {
 			preserveScroll: true,
 			errorBag: 'marriage',
 		});
@@ -169,7 +174,7 @@
 			return;
 		}
 
-		divorceForm.post('/map', {
+		divorceForm.post(location.value.actions.divorce, {
 			preserveScroll: true,
 			errorBag: 'divorce',
 		});

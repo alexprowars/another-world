@@ -12,7 +12,7 @@
 			<Link
 				v-for="letter in letters"
 				:key="letter.id"
-				:href="'/map?section=' + section + '&letter=' + letter.id + '&page=' + pagination.current_page"
+				:href="location.url + '?section=' + section + '&letter=' + letter.id + '&page=' + pagination.current_page"
 				class="post-office-entry"
 				:class="{ 'is-unread': section === 'inbox' && !letter.read_at }"
 			>
@@ -32,7 +32,7 @@
 			<GameIcon name="mail" />
 			<h3>{{ section === 'sent' ? 'Вы ещё не отправляли писем' : 'Почтовый ящик пуст' }}</h3>
 			<p>{{ section === 'sent' ? 'Напишите другу — почта доставит вашу весточку.' : 'Здесь появятся письма от других персонажей.' }}</p>
-			<Link href="/map?section=compose" class="ui-button">
+			<Link :href="location.url + '?section=compose'" class="ui-button">
 				<GameIcon name="quill" />
 				Написать письмо
 			</Link>
@@ -53,8 +53,12 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Link } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		letters: Array,

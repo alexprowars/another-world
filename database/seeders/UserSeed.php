@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Services\UserService;
-use Illuminate\Database\Seeder;
+use App\Engine\Services\UserService;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class UserSeed extends Seeder
 {

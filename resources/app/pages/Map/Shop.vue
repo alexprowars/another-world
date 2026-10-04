@@ -1,9 +1,13 @@
 <template>
-	<Storefront :page="page" title="Государственный магазин" back-href="/map/change/7" :departments="departments" />
+	<Storefront :page="page" title="Государственный магазин" :back-location="location.exit" :departments="departments" />
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import Storefront from '~/components/City/Shop/Storefront.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: { type: Object, required: true },

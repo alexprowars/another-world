@@ -14,27 +14,27 @@
 			<figure class="city-location-map">
 				<div class="city-location-scene" :style="{ aspectRatio: map.width + ' / ' + map.height }">
 					<img class="city-location-background" :src="imagePath + map.image" :alt="map.alt" :width="map.width" :height="map.height" />
-					<Link
+					<MovementLink
 						v-for="place in mapPlaces"
-						:key="place.room"
-						:href="'?room=' + place.room"
+						:key="place.location"
+						:to="place.location"
 						class="city-location-building"
 						:class="{
-							'is-highlighted': activeRoom === place.room,
+							'is-highlighted': activeLocation === place.location,
 							'city-location-hotspot': !place.image,
 							'city-location-map-exit': place.exit,
 							'city-location-map-exit-right': place.exit && place.direction === 'right',
 						}"
 						:style="mapPosition(place)"
 						:title="place.title"
-						@mouseenter="hoveredRoom = place.room"
-						@mouseleave="hoveredRoom = null"
-						@focus="focusedRoom = place.room"
-						@blur="focusedRoom = null"
+						@mouseenter="hoveredLocation = place.location"
+						@mouseleave="hoveredLocation = null"
+						@focus="focusedLocation = place.location"
+						@blur="focusedLocation = null"
 					>
 						<img v-if="place.image" :src="imagePath + place.image" alt="" :width="place.width" :height="place.height" />
 						<span v-if="place.number" class="city-location-map-number">{{ place.number }}</span>
-					</Link>
+					</MovementLink>
 					<img
 						v-for="decoration in decorations"
 						:key="decoration.image"
@@ -61,42 +61,43 @@
 				<div class="city-location-section-heading">
 					<h2>{{ placesTitle }}</h2>
 				</div>
-				<Link
+				<MovementLink
 					v-for="place in places"
-					:key="place.room"
-					:href="'?room=' + place.room"
+					:key="place.location"
+					:to="place.location"
 					class="city-location-place"
-					:class="{ 'is-highlighted': activeRoom === place.room }"
-					@mouseenter="hoveredRoom = place.room"
-					@mouseleave="hoveredRoom = null"
-					@focus="focusedRoom = place.room"
-					@blur="focusedRoom = null"
+					:class="{ 'is-highlighted': activeLocation === place.location }"
+					@mouseenter="hoveredLocation = place.location"
+					@mouseleave="hoveredLocation = null"
+					@focus="focusedLocation = place.location"
+					@blur="focusedLocation = null"
 				>
 					<span class="city-location-place-copy">
 						<strong>{{ place.title }}</strong>
 						<span v-if="place.description">{{ place.description }}</span>
 					</span>
 					<span v-if="place.number" class="city-location-place-number">{{ place.number }}</span>
-				</Link>
+				</MovementLink>
 			</nav>
 		</div>
 
 		<nav v-if="exits.length" class="city-location-travel">
-			<Link v-for="exit in exits" :key="exit.room" :href="'?room=' + exit.room" class="city-location-route">
+			<MovementLink v-for="exit in exits" :key="exit.location" :to="exit.location" class="city-location-route">
 				<span v-if="exit.direction === 'left'" class="city-location-route-arrow">{{ arrows[exit.direction] }}</span>
 				<span class="city-location-route-copy">
 					<small>{{ exit.subtitle || 'Соседний район' }}</small>
 					<strong>{{ exit.title }}</strong>
 				</span>
 				<span v-if="exit.direction !== 'left'" class="city-location-route-arrow">{{ arrows[exit.direction] }}</span>
-			</Link>
+			</MovementLink>
 		</nav>
 	</section>
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
 	import { computed, ref } from 'vue';
-	import { Link, usePage } from '@inertiajs/vue3';
+	import { usePage } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 
 	const props = defineProps({
@@ -111,11 +112,11 @@
 	});
 
 	const inertiaPage = usePage();
-	const hoveredRoom = ref(null);
-	const focusedRoom = ref(null);
-	const activeRoom = computed(() => hoveredRoom.value ?? focusedRoom.value);
+	const hoveredLocation = ref(null);
+	const focusedLocation = ref(null);
+	const activeLocation = computed(() => hoveredLocation.value ?? focusedLocation.value);
 	const mapPlaces = computed(() => [...props.places, ...props.exits.map(exit => ({ ...exit, exit: true }))]);
-	const activePlace = computed(() => mapPlaces.value.find(place => place.room === activeRoom.value));
+	const activePlace = computed(() => mapPlaces.value.find(place => place.location === activeLocation.value));
 	const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 
 	function mapPosition(place) {

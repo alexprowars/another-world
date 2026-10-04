@@ -4,10 +4,10 @@
 			<button v-if="page.busy" type="button" class="ui-icon-button" disabled title="Возвращение доступно после окончания работы">
 				<GameIcon name="back" />
 			</button>
-			<Link v-else href="/map/change/11" class="ui-icon-button" title="Назад">
+			<MovementLink v-else :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link :href="'/map?section=' + page.section" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url + '?section=' + page.section" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -17,7 +17,7 @@
 				class="ui-tab"
 				v-for="section in availableSections"
 				:key="section.id"
-				:href="'/map?section=' + section.id"
+				:href="location.url + '?section=' + section.id"
 				:class="{ 'is-active': page.section === section.id }"
 			>
 				<GameIcon :name="section.icon" />
@@ -40,7 +40,7 @@
 			<GameIcon :name="currentSection.icon" />
 			<h3>Нужна другая профессия</h3>
 			<p>{{ page.notice }}</p>
-			<Link href="/map?section=1" class="ui-button">К починке вещей</Link>
+			<Link :href="location.url + '?section=1'" class="ui-button">К починке вещей</Link>
 		</div>
 		<component v-else :is="sectionComponents[page.section]" :key="page.section" :page="page" :user="user" />
 
@@ -58,6 +58,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, router } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -68,6 +71,8 @@
 	import Cut from '~/components/Smithy/Cut.vue';
 	import Engraving from '~/components/Smithy/Engraving.vue';
 	import Insert from '~/components/Smithy/Insert.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: Object

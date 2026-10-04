@@ -2,7 +2,7 @@
 	<Storefront
 		:page="page"
 		title="Сувенирная лавка"
-		back-href="/map/change/13"
+		:back-location="location.exit"
 		:departments="departments"
 		:inventory-action="inventoryAction"
 		:show-suitable-filter="false"
@@ -16,8 +16,12 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import Storefront from '~/components/City/Shop/Storefront.vue';
 	import GiftItem from '~/components/City/Shop/GiftItem.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: {

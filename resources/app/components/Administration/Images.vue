@@ -34,11 +34,15 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		imagePrice: Number,
@@ -72,7 +76,7 @@
 					}
 
 					imageForm.image = image;
-					imageForm.post('/map?section=3', {
+					imageForm.post(location.value.actions.buy_image, {
 						preserveScroll: true
 					});
 				},

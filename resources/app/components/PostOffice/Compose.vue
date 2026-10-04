@@ -59,7 +59,7 @@
 						<GameIcon name="send" />
 						{{ form.processing ? 'Отправляем…' : 'Отправить письмо' }}
 					</button>
-					<Link href="/map?section=inbox" class="ui-button ui-button--secondary">К входящим</Link>
+					<Link :href="location.url + '?section=inbox'" class="ui-button ui-button--secondary">К входящим</Link>
 				</div>
 			</form>
 		</div>
@@ -67,10 +67,14 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		draft: Object,
@@ -91,7 +95,7 @@
 			return;
 		}
 
-		form.post('/map?section=compose', {
+		form.post(location.value.actions.letter, {
 			preserveScroll: true,
 		});
 	}

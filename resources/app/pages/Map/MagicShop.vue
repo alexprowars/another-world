@@ -2,7 +2,7 @@
 	<Storefront
 		:page="page"
 		title="Башня Мага"
-		back-href="/map/change/10"
+		:back-location="location.exit"
 		:departments="departments"
 		:inventory-action="null"
 		catalog-icon="energy"
@@ -11,7 +11,11 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import Storefront from '~/components/City/Shop/Storefront.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		page: {

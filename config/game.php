@@ -3,6 +3,10 @@
 return [
 	'max_slots' => 22,
 
+	'bank' => [
+		'exchange_rate' => 20,
+	],
+
 	'healer' => [
 		'move_stat_price' => 15,
 		'dispel_price' => 1,

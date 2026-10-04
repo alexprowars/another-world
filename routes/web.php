@@ -1,7 +1,9 @@
 <?php
 
+use App\Engine\World\World;
 use App\Http\Controllers;
 use App\Http\Middleware\CheckReferral;
+use App\Http\Middleware\EnsureLocation;
 use App\Http\Middleware\RedirectToGame;
 use Illuminate\Support\Facades\Route;
 
@@ -41,8 +43,34 @@ Route::middleware(['auth'])->group(function () {
 		Route::match(['get', 'post'], '/person/inventory/sets', [Controllers\PersonController::class, 'sets'])->name('person.inventory.sets');
 		Route::match(['get', 'post'], '/person/friends', [Controllers\PersonController::class, 'friends'])->name('person.friends');
 		Route::match(['get', 'post'], '/person/settings', [Controllers\PersonController::class, 'settings'])->name('person.settings');
-		Route::match(['get', 'post'], '/map', [Controllers\MapController::class, 'index'])->name('map');
-		Route::get('/map/change/{room}', [Controllers\MapController::class, 'change']);
+		Route::get('/world', [Controllers\WorldController::class, 'index'])->name('world');
+		Route::get('/cities/{city}', [Controllers\CityController::class, 'index'])->name('city');
+		Route::post('/movement', [Controllers\MovementController::class, 'store'])->name('movement');
+
+		Route::prefix('/cities/{city}')->middleware(EnsureLocation::class)->group(function () {
+			foreach (World::handlers() as $code => $definition) {
+				$path = '/' . $code . ($code === 'vault' ? '/{vaultRoom}' : '');
+
+				Route::get($path, [$definition['controller'], 'index'])
+					->defaults('locationCode', $code)
+					->whereNumber('vaultRoom')
+					->name('city.' . $code);
+
+				foreach ($definition['pages'] ?? [] as $pagePath => $method) {
+					Route::get($path . '/' . $pagePath, [$definition['controller'], $method])
+						->defaults('locationCode', $code)
+						->name('city.' . $code . '.' . $method);
+				}
+
+				foreach ($definition['actions'] as $actionPath => $action) {
+					Route::post($path . '/' . $actionPath, [$definition['controller'], 'store'])
+						->defaults('locationCode', $code)
+						->defaults('locationAction', $action)
+						->whereNumber('vaultRoom')
+						->name('city.' . $code . '.' . $action);
+				}
+			}
+		});
 		Route::get('/arena', [Controllers\ArenaController::class, 'index'])->name('arena');
 		Route::post('/arena', [Controllers\ArenaController::class, 'store'])->name('arena.store');
 		Route::get('/battle', [Controllers\BattleController::class, 'index'])->name('battle');

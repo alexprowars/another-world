@@ -25,6 +25,7 @@ class HandleInertiaRequests extends Middleware
 		return [
 			...parent::share($request),
 			'state' => $state,
+			'location' => fn () => $request->user()?->currentLocation()->toArray(),
 		];
 	}
 }

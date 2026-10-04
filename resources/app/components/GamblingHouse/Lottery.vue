@@ -106,10 +106,14 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed, onBeforeUnmount, ref } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import useState from '~/composables/useState.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		lottery: Object,
@@ -135,7 +139,7 @@
 		}
 
 		form.draw_id = props.lottery.id;
-		form.post('/map?game=lottery', {
+		form.post(location.value.actions.ticket, {
 			preserveScroll: true,
 		});
 	}

@@ -2,11 +2,11 @@
 
 namespace App\Engine\Magic\Spells;
 
+use App\Engine\Services\InventoryService;
 use App\Exceptions\Exception;
 use App\Models\Level;
 use App\Models\User;
 use App\Models\UserItem;
-use App\Services\InventoryService;
 
 class Reset extends AbstractSpell
 {

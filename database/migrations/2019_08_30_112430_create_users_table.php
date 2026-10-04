@@ -33,7 +33,7 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('wins')->default(0);
 			$table->unsignedSmallInteger('losses')->default(0);
 			$table->unsignedSmallInteger('draws')->default(0);
-			$table->unsignedSmallInteger('room')->default(0);
+			$table->string('location', 100)->default('valmir.arena')->index();
 			$table->unsignedSmallInteger('rank')->nullable();
 			$table->boolean('is_clone')->default(false);
 			$table->smallInteger('strength')->default(3);

@@ -2,7 +2,7 @@
 	<Head title="Покупка платины" />
 	<ContentBlock title="Покупка платины">
 		<template #actions>
-			<Link href="/map" class="ui-icon-button" title="Вернуться в город">
+			<Link :href="location.url" class="ui-icon-button" title="Вернуться в город">
 				<GameIcon name="back" />
 			</Link>
 			<Link href="/pay" class="ui-icon-button" title="Обновить">
@@ -59,7 +59,11 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Head, Link } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 </script>

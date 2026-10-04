@@ -73,8 +73,12 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { useForm } from '@inertiajs/vue3';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
+
+	const location = useLocation();
 
 	defineProps({
 		donations: Array,
@@ -91,7 +95,7 @@
 			return;
 		}
 
-		donationForm.post('/map?section=1', {
+		donationForm.post(location.value.actions.donate, {
 			preserveScroll: true
 		});
 	}

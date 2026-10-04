@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Services\TribeService;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
 use App\Models\TribeLog;
 use App\Models\User;
 use App\Models\UserItem;
-use App\Services\TribeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

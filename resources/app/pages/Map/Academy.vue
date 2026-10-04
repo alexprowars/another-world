@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Академия">
 		<template #actions>
-			<Link href="/map/change/9" class="ui-icon-button" title="Назад">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -36,7 +36,7 @@
 					:key="item.id"
 					:profession="item"
 					:processing="form.processing"
-					:learning="form.processing && form.learn === item.id"
+					:learning="form.processing && form.profession_id === item.id"
 					@learn="learn(item)"
 				/>
 			</div>
@@ -55,6 +55,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import ProfessionCard from '~/components/Academy/ProfessionCard.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
@@ -64,6 +67,8 @@
 	import { openConfirmModal } from '~/composables/useModals.js';
 	import { Link, router, useForm } from '@inertiajs/vue3';
 
+	const location = useLocation();
+
 	defineProps({
 		page: Object,
 	});
@@ -72,7 +77,7 @@
 
 	const user = computed(() => state.user);
 	const form = useForm({
-		learn: null
+		profession_id: null
 	});
 
 	function learn(item) {
@@ -91,8 +96,8 @@
 						return;
 					}
 
-					form.learn = item.id;
-					form.post('/map', { preserveScroll: true });
+					form.profession_id = item.id;
+					form.post(location.value.actions.learn, { preserveScroll: true });
 				},
 			},
 		]);

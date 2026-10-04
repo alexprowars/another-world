@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\GamblingHouseService;
+use App\Engine\Services\GamblingHouseService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 

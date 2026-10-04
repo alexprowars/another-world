@@ -19,7 +19,8 @@ class UserFriendResource extends JsonResource
 			'id' => $entry->id,
 			'is_ignored' => $entry->is_ignored,
 			'user' => [
-				...$friend->only(['id', 'name', 'level', 'rank', 'room']),
+				...$friend->only(['id', 'name', 'level', 'rank', 'location']),
+				'location_name' => $friend->currentLocation()->name(),
 				'tribe' => $friend->tribe?->only(['id', 'name']),
 				'is_online' => $friend->rank !== 100 && ($friend->isBot() || $friend->online?->greaterThanOrEqualTo(now()->subMinutes(3))),
 			],

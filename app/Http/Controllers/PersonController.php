@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Engine\Battle\Abilities\Ability;
 use App\Engine\Battle\Abilities\AbilityRegistry;
+use App\Engine\Services\EquipmentSetService;
+use App\Engine\Services\FriendService;
+use App\Engine\Services\InventoryService;
+use App\Engine\Services\UserService;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Resources\InventoryItemResource;
 use App\Http\Resources\UserFriendResource;
 use App\Models\UserSet;
-use App\Services\EquipmentSetService;
-use App\Services\FriendService;
-use App\Services\InventoryService;
-use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -315,14 +315,5 @@ class PersonController extends Controller
 			'items' => $items,
 			'active' => $active,
 		]);
-	}
-
-	public function workAction()
-	{
-		$this->view->disableLevel(View::LEVEL_LAYOUT);
-
-		$refers = $this->db->query("SELECT id, username, level, onlinetime FROM game_users WHERE refer = '" . $this->user->id . "'")->fetchAll();
-
-		$this->view->setVar('refers', $refers);
 	}
 }

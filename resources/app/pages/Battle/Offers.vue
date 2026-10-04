@@ -1,7 +1,7 @@
 <template>
 	<ContentBlock title="Поединки на арене" class="arena-offers">
 		<template #actions>
-			<Link href="/map" class="ui-icon-button" title="Назад">
+			<Link :href="location.url" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
 			</Link>
 			<button type="button" :disabled="refreshing || actionForm.processing || offerModalOpen" @click="refresh" class="ui-icon-button" title="Обновить">
@@ -103,6 +103,8 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { onBeforeUnmount, onMounted, ref } from 'vue';
 	import { Link, router, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -110,6 +112,8 @@
 	import OfferCard from '~/components/Battle/OfferCard.vue';
 	import OfferForm from '~/components/Battle/OfferForm.vue';
 	import { openConfirmModal, openPopupModal } from '~/composables/useModals.js';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: Object

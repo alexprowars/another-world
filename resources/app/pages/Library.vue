@@ -2,7 +2,7 @@
 	<Head :title="'Энциклопедия — ' + page.title" />
 	<ContentBlock title="Энциклопедия" class="library">
 		<template #actions>
-			<Link href="/map" class="ui-icon-button" title="Вернуться в город">
+			<Link :href="location.url" class="ui-icon-button" title="Вернуться в город">
 				<GameIcon name="back" />
 			</Link>
 			<Link :href="'/library?section=' + page.section" class="ui-icon-button" title="Обновить">
@@ -158,12 +158,16 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { Head, Link, router } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
 	import GameIcon from '~/components/Layout/GameIcon.vue';
 	import { computed, ref, watch } from 'vue';
 	import ItemCard from '~/components/Library/ItemCard.vue';
 	import Modifiers from '~/components/Library/Modifiers.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		page: {

@@ -5,13 +5,13 @@ namespace App\Engine\Battle\Services;
 use App\Engine\Battle\Data\AttackResult;
 use App\Engine\Battle\Enums\BattleType;
 use App\Engine\Battle\Enums\ParticipantResult;
+use App\Engine\Services\BattleService;
+use App\Engine\Services\ChatService;
 use App\Models\Battle;
 use App\Models\BattleMember;
 use App\Models\Level;
 use App\Models\User;
 use App\Models\UserItem;
-use App\Services\BattleService;
-use App\Services\ChatService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Random\Randomizer;
@@ -61,7 +61,7 @@ class RewardService
 		$goldReward = 0;
 
 		if ($result === ParticipantResult::WIN) {
-			if ($user->room == 1) {
+			if ($user->currentLocation()->is('arena')) {
 				$rewardMultiplier = match ($battle->type) {
 					BattleType::DUEL => 0.25,
 					BattleType::GROUP => 0.3,

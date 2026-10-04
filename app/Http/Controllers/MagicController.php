@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Services\MagicService;
 use App\Exceptions\Exception;
 use App\Http\Controller;
-use App\Services\MagicService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

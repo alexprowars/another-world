@@ -1,9 +1,9 @@
 <template>
 	<ContentBlock :title="title" class="storefront">
 		<template #actions>
-			<Link :href="backHref" class="ui-icon-button" title="Вернуться в город">
+			<MovementLink :to="backLocation" class="ui-icon-button" title="Вернуться в город">
 				<GameIcon name="back" />
-			</Link>
+			</MovementLink>
 			<Link :href="sectionUrl" class="ui-icon-button" title="Обновить отдел">
 				<GameIcon name="refresh" />
 			</Link>
@@ -11,11 +11,11 @@
 
 		<div v-if="inventoryAction" class="storefront-toolbar">
 			<nav class="ui-tabs storefront-modes">
-				<Link class="ui-tab" href="/map" :class="{ 'is-active': !inventoryMode }">
+				<Link class="ui-tab" :href="location.url" :class="{ 'is-active': !inventoryMode }">
 					<GameIcon :name="catalogIcon" />
 					Купить
 				</Link>
-				<Link class="ui-tab" :href="'/map?section=' + inventoryAction.section" :class="{ 'is-active': inventoryMode }">
+				<Link class="ui-tab" :href="inventoryUrl" :class="{ 'is-active': inventoryMode }">
 					<GameIcon :name="inventoryAction.icon" />
 					{{ inventoryAction.label }}
 				</Link>
@@ -26,7 +26,7 @@
 
 		<div class="storefront-layout" :class="{ 'storefront-layout--inventory': inventoryMode }">
 			<nav v-if="!inventoryMode" class="ui-menu storefront-departments">
-				<Link href="/map" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
+				<Link :href="location.url" class="ui-menu-link" :class="{ 'is-active': page.section === 0 }">
 					Все товары
 					<GameIcon name="forward" />
 				</Link>
@@ -39,7 +39,7 @@
 						<Link
 							v-for="department in group.items"
 							:key="department.id"
-							:href="'/map?section=' + department.id"
+							:href="location.url + '?section=' + department.id"
 							class="ui-menu-link"
 							:class="{ 'is-active': page.section === department.id }"
 						>
@@ -92,7 +92,7 @@
 						}}
 					</p>
 					<button v-if="filtering" type="button" class="ui-button" @click="resetFilters">Сбросить фильтры</button>
-					<Link v-else-if="!inventoryMode && page.section !== 0" href="/map" class="ui-button">Все товары</Link>
+					<Link v-else-if="!inventoryMode && page.section !== 0" :href="location.url" class="ui-button">Все товары</Link>
 				</div>
 			</section>
 		</div>
@@ -104,6 +104,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed, ref, watch } from 'vue';
 	import { Link, router } from '@inertiajs/vue3';
 	import { escape } from 'lodash-es';
@@ -115,10 +118,12 @@
 	import useState from '~/composables/useState.js';
 	import { openConfirmModal } from '~/composables/useModals.js';
 
+	const location = useLocation();
+
 	const props = defineProps({
 		page: { type: Object, required: true },
 		title: { type: String, required: true },
-		backHref: { type: String, required: true },
+		backLocation: { type: String, required: true },
 		departments: { type: Array, required: true },
 		description: { type: String, default: 'Оружие, снаряжение и припасы для ваших приключений.' },
 		catalogIcon: { type: String, default: 'swords' },
@@ -126,7 +131,7 @@
 		inventoryAction: {
 			type: Object,
 			default: () => ({
-				section: 100,
+				path: 'sell',
 				label: 'Продать',
 				icon: 'coins',
 				title: 'Продажа предметов',
@@ -142,9 +147,16 @@
 	const search = ref('');
 	const processing = ref(false);
 	const suitableOnly = useLocalStorage('shop.suitableOnly', false, { initOnMounted: true });
-	const inventoryMode = computed(() => !!props.inventoryAction && props.page.section === props.inventoryAction.section);
+	const inventoryMode = computed(() =>
+		!!props.inventoryAction && (props.inventoryAction.path ? props.page.selling : props.page.section === props.inventoryAction.section),
+	);
+	const inventoryUrl = computed(() =>
+		props.inventoryAction?.path
+			? location.value.url + '/' + props.inventoryAction.path
+			: location.value.url + '?section=' + props.inventoryAction?.section,
+	);
 	const filtering = computed(() => !!search.value.trim() || (!inventoryMode.value && props.showSuitableFilter && suitableOnly.value));
-	const sectionUrl = computed(() => '/map?section=' + props.page.section);
+	const sectionUrl = computed(() => inventoryMode.value ? inventoryUrl.value : location.value.url + '?section=' + props.page.section);
 	const sectionTitle = computed(() =>
 		inventoryMode.value
 			? props.inventoryAction.title
@@ -162,7 +174,7 @@
 	});
 
 	watch(
-		() => props.page.section,
+		() => [props.page.section, inventoryMode.value],
 		() => {
 			search.value = '';
 		},
@@ -181,7 +193,8 @@
 		const action = isSale ? 'Продать' : 'Купить';
 		const title = isSale ? item.title : item.item.title;
 		const price = isSale ? ' за ' + item.price_sell + (item.price_type === 1 ? ' пл.' : ' зол.') : '';
-		const url = sectionUrl.value;
+		const actionUrl = location.value.actions[isSale ? 'sell' : 'buy'];
+		const url = isSale ? actionUrl : actionUrl + '?section=' + props.page.section;
 
 		openConfirmModal(action + ' предмет', escape(action + ' «' + title + '»' + price + '?'), [
 			{ title: 'Отмена' },
@@ -192,7 +205,7 @@
 					processing.value = true;
 					router.post(
 						url,
-						{ [isSale ? 'sell' : 'buy']: item.id },
+						{ item_id: item.id },
 						{
 							preserveScroll: true,
 							onFinish: () => {

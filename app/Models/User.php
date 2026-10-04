@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use App\Engine\CombatStats;
+use App\Engine\Services\UserService;
+use App\Engine\World\Location;
 use App\Http\Resources\UserSlotItemResource;
-use App\Services\UserService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -125,6 +126,11 @@ class User extends Authenticatable implements HasMedia
 	public function isAdmin(): bool
 	{
 		return $this->rank === 100;
+	}
+
+	public function currentLocation(): Location
+	{
+		return Location::fromCode($this->location);
 	}
 
 	public function isFree(): bool

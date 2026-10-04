@@ -12,7 +12,7 @@ class CleansePoison extends AbstractSpell
 	{
 		$this->requireOutsideBattle($caster, $target);
 
-		if ($caster->room !== $target->room) {
+		if ($caster->location !== $target->location) {
 			throw new Exception('Для очищения нужно находиться в одной комнате с персонажем');
 		}
 

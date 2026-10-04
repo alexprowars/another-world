@@ -84,10 +84,14 @@
 </template>
 
 <script setup>
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { useForm } from '@inertiajs/vue3';
 	import Name from '~/components/Person/Name.vue';
 	import SellItem from '~/components/City/Shop/SellItem.vue';
+
+	const location = useLocation();
 
 	const props = defineProps({
 		transfer: Object,
@@ -118,7 +122,7 @@
 			return;
 		}
 
-		searchForm.get('/map', {
+		searchForm.get(location.value.url, {
 			preserveState: 'errors',
 			preserveScroll: true,
 		});
@@ -133,7 +137,7 @@
 
 		itemForm.clearErrors();
 
-		goldForm.post('/map?section=transfers', {
+		goldForm.post(location.value.actions.gold, {
 			preserveScroll: true,
 			onSuccess: () => goldForm.reset('amount', 'comment'),
 		});
@@ -149,7 +153,7 @@
 
 		goldForm.clearErrors();
 
-		itemForm.post('/map?section=transfers', {
+		itemForm.post(location.value.actions.item, {
 			preserveScroll: true,
 		});
 	}

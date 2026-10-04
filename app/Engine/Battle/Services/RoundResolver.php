@@ -5,11 +5,11 @@ namespace App\Engine\Battle\Services;
 use App\Engine\Battle\Data\AttackResult;
 use App\Engine\Battle\Enums\BattleStatus;
 use App\Engine\CombatStats;
+use App\Engine\Services\BattleService;
 use App\Models\Battle;
 use App\Models\BattleLog;
 use App\Models\BattleMember;
 use App\Models\User;
-use App\Services\BattleService;
 use Carbon\CarbonImmutable;
 use Random\Randomizer;
 

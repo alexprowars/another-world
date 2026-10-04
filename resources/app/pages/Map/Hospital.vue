@@ -4,10 +4,10 @@
 			<button v-if="user.r_date" type="button" class="ui-icon-button" disabled title="Возвращение доступно после окончания лечения">
 				<GameIcon name="back" />
 			</button>
-			<Link v-else href="/map/change/8" class="ui-icon-button" title="Назад">
+			<MovementLink v-else :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -83,6 +83,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, router, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -90,6 +93,8 @@
 	import HpLine from '~/components/Person/HpLine.vue';
 	import Timer from '~/components/Timer.vue';
 	import useState from '~/composables/useState.js';
+
+	const location = useLocation();
 
 	defineProps({
 		page: Object
@@ -113,7 +118,7 @@
 			return;
 		}
 
-		healForm.post('/map', {
+		healForm.post(location.value.actions.heal, {
 			preserveScroll: true
 		});
 	}
@@ -123,7 +128,7 @@
 			return;
 		}
 
-		injuryForm.post('/map', {
+		injuryForm.post(location.value.actions.injury, {
 			preserveScroll: true
 		});
 	}

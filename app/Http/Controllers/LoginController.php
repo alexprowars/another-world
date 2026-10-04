@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Services\UserService;
 use App\Http\Controller;
 use App\Models\User;
 use App\Models\UserAuthentication;
-use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

@@ -2,11 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Engine\Services\UserService;
 use App\Facades\Vars;
 use App\Models\Effect;
 use App\Models\Level;
 use App\Models\User;
-use App\Services\UserService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +43,7 @@ class UserResource extends JsonResource
 			'avatar' => $user->getAvatar(),
 			'rank' => $user->rank,
 			'vip' => $user->vip?->isFuture() ?? false,
-			'room' => $user->room,
+			'location' => $user->location,
 			'admin' => $user->isAdmin(),
 			'gender' => $user->gender,
 			'level' => $user->level,

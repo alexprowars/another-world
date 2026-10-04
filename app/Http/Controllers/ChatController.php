@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Engine\Services\ChatService;
 use App\Http\Controller;
 use App\Http\Resources\ChatMessageResource;
 use App\Models\ChatMessage;
 use App\Models\User;
-use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

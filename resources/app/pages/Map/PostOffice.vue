@@ -1,9 +1,9 @@
 <template>
 	<ContentBlock title="Почта">
 		<template #actions>
-			<Link href="/map/change/25" class="ui-icon-button" title="Вернуться в парк">
+			<MovementLink :to="location.exit" class="ui-icon-button" title="Вернуться в парк">
 				<GameIcon name="back" />
-			</Link>
+			</MovementLink>
 			<Link :href="refreshUrl" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
@@ -18,20 +18,20 @@
 		</header>
 
 		<nav class="ui-tabs ui-tabs--stacked">
-			<Link href="/map?section=inbox" class="ui-tab" :class="{ 'is-active': page.section === 'inbox' }">
+			<Link :href="location.url + '?section=inbox'" class="ui-tab" :class="{ 'is-active': page.section === 'inbox' }">
 				<GameIcon name="mail" />
 				Входящие
 				<span v-if="page.unread_count" class="ui-badge post-office-unread">{{ page.unread_count }}</span>
 			</Link>
-			<Link href="/map?section=sent" class="ui-tab" :class="{ 'is-active': page.section === 'sent' }">
+			<Link :href="location.url + '?section=sent'" class="ui-tab" :class="{ 'is-active': page.section === 'sent' }">
 				<GameIcon name="send" />
 				Исходящие
 			</Link>
-			<Link href="/map?section=compose" class="ui-tab" :class="{ 'is-active': page.section === 'compose' }">
+			<Link :href="location.url + '?section=compose'" class="ui-tab" :class="{ 'is-active': page.section === 'compose' }">
 				<GameIcon name="quill" />
 				Написать письмо
 			</Link>
-			<Link href="/map?section=transfers" class="ui-tab" :class="{ 'is-active': page.section === 'transfers' }">
+			<Link :href="location.url + '?section=transfers'" class="ui-tab" :class="{ 'is-active': page.section === 'transfers' }">
 				<GameIcon name="transfer" />
 				Передача предметов и золота
 			</Link>
@@ -55,6 +55,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, usePage } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -64,6 +67,8 @@
 	import LetterList from '~/components/PostOffice/LetterList.vue';
 	import Transfers from '~/components/PostOffice/Transfers.vue';
 
+	const location = useLocation();
+
 	const props = defineProps({
 		page: Object,
 	});
@@ -71,6 +76,6 @@
 	const inertiaPage = usePage();
 	const refreshUrl = computed(() => inertiaPage.url);
 	const listUrl = computed(() =>
-		'/map?section=' + props.page.section + '&page=' + props.page.pagination.current_page
+		location.value.url + '?section=' + props.page.section + '&page=' + props.page.pagination.current_page
 	);
 </script>

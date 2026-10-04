@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Engine\Battle\Enums\BattleStatus;
 use App\Engine\Battle\Enums\BattleType;
+use App\Engine\Services\BattleService;
 use App\Exceptions\Exception;
 use App\Http\Controller;
 use App\Http\Requests\ArenaActionRequest;
 use App\Http\Resources\BattleOfferResource;
 use App\Models\Battle;
-use App\Services\BattleService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,8 +26,8 @@ class ArenaController extends Controller
 			return to_route('battle');
 		}
 
-		if ($user->room == 2) {
-			return to_route('map');
+		if ($user->currentLocation()->is('training-arena')) {
+			return redirect($user->currentLocation()->url());
 		}
 
 		$userOffer = BattleService::getCurrentUserRequest($user);
@@ -70,7 +70,7 @@ class ArenaController extends Controller
 			'currentOffer' => $userOffer ? BattleOfferResource::make($userOffer->battle) : null,
 			'currentSide' => $userOffer?->side,
 			'offerError' => $offerError,
-			'canTeleport' => !in_array($user->room, [1, 2, 3, 4], true) && !$user->r_type && !$user->prison?->isFuture(),
+			'canTeleport' => !$user->currentLocation()->is('arena') && !$user->r_type && !$user->prison?->isFuture(),
 		]);
 	}
 
@@ -133,7 +133,7 @@ class ArenaController extends Controller
 						throw new Exception('Сейчас вы не можете переместиться на арену');
 					}
 
-					$user->room = 1;
+					$user->location = $user->currentLocation()->inCity('arena')->value();
 					$user->save();
 
 					break;

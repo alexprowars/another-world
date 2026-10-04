@@ -2,10 +2,10 @@
 
 namespace App\Engine\Magic\Spells;
 
+use App\Engine\Services\BattleService;
 use App\Exceptions\Exception;
 use App\Models\User;
 use App\Models\UserItem;
-use App\Services\BattleService;
 
 class Mirror extends AbstractSpell
 {

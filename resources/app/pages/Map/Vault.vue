@@ -1,10 +1,10 @@
 <template>
 	<ContentBlock title="Территория подземелья">
 		<template #actions>
-			<Link v-if="page.vault.id === 200 && !busy" href="/map/change/200" class="ui-icon-button" title="Назад">
+			<MovementLink v-if="page.is_entrance && !busy" :to="location.exit" class="ui-icon-button" title="Назад">
 				<GameIcon name="back" />
-			</Link>
-			<Link href="/map" class="ui-icon-button" title="Обновить">
+			</MovementLink>
+			<Link :href="location.url" class="ui-icon-button" title="Обновить">
 				<GameIcon name="refresh" />
 			</Link>
 		</template>
@@ -31,9 +31,9 @@
 								type="button"
 								class="vault-direction"
 								:class="direction.position"
-								:disabled="!page.directions[direction.key] || form.processing"
+								:disabled="!page.directions[direction.key] || form.processing || movementForm.processing"
 								:title="page.directions[direction.key] ? 'Перейти в ' + page.directions[direction.key].title : 'Нет прохода'"
-								@click="act({ go: direction.key })"
+								@click="move(direction.key)"
 							>
 								<GameIcon name="forward" />
 								<span>{{ direction.label }}</span>
@@ -59,7 +59,7 @@
 							type="button"
 							class="ui-button ui-button--secondary"
 							:disabled="form.processing"
-							@click="act({ unwork: 'Y' })"
+							@click="act('unwork')"
 						>
 							Отменить добычу
 						</button>
@@ -81,7 +81,7 @@
 					</header>
 					<div class="service-panel-body">
 						<p class="service-hint">{{ page.canHeal ? 'Вода из колодца полностью восстанавливает здоровье.' : 'Сейчас колодец пуст.' }}</p>
-						<button type="button" class="ui-button" :disabled="!page.canHeal || form.processing" @click="act({ heal: 'Y' })">
+						<button type="button" class="ui-button" :disabled="!page.canHeal || form.processing || movementForm.processing" @click="act('heal')">
 							Восстановить здоровье
 						</button>
 					</div>
@@ -123,6 +123,9 @@
 </template>
 
 <script setup>
+	import MovementLink from '~/components/City/MovementLink.vue';
+	import useLocation from '~/composables/useLocation.js';
+
 	import { computed } from 'vue';
 	import { Link, router, useForm } from '@inertiajs/vue3';
 	import ContentBlock from '~/components/ContentBlock.vue';
@@ -130,7 +133,9 @@
 	import Timer from '~/components/Timer.vue';
 	import useState from '~/composables/useState.js';
 
-	defineProps({
+	const location = useLocation();
+
+	const props = defineProps({
 		page: Object
 	});
 
@@ -143,6 +148,8 @@
 		captcha: ''
 	});
 
+	const movementForm = useForm({ location: '' });
+
 	const directions = [
 		{ key: 'top', label: 'Вперёд', position: 'vault-direction--top' },
 		{ key: 'left', label: 'Налево', position: 'vault-direction--left' },
@@ -150,17 +157,28 @@
 		{ key: 'bottom', label: 'Назад', position: 'vault-direction--bottom' },
 	];
 
-	function act(data) {
+	function act(action, data = {}) {
 		if (form.processing) {
 			return;
 		}
 
 		form.clearErrors();
-		form.transform(() => data).post('/map', { onFinish: () => form.reset() });
+		form.transform(() => data).post(location.value.actions[action], { onFinish: () => form.reset() });
 	}
 
 	function dig() {
-		act({ dig: 'Y', captcha: form.captcha });
+		act('dig', { captcha: form.captcha });
+	}
+
+	function move(direction) {
+		const destination = props.page.directions[direction];
+
+		if (!destination || movementForm.processing) {
+			return;
+		}
+
+		movementForm.location = destination.location;
+		movementForm.post('/movement');
 	}
 
 	function onTimeout() {
